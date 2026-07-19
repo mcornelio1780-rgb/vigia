@@ -732,6 +732,9 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
                             : `${stats.total} on the list · ${stats.countries} ${stats.countries === 1 ? "country" : "countries"} · 6 continents`)
                         : (es ? "Súmate a la lista global de campos monitoreados." : "Join the global list of monitored farms.")}
                     </div>
+                    <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 12, letterSpacing: ".02em" }}>
+                      {t("Con datos de la ESA · Sentinel-2, la NASA · FIRMS y Open-Meteo", "Powered by ESA · Sentinel-2, NASA · FIRMS and Open-Meteo", "Com dados da ESA · Sentinel-2, NASA · FIRMS e Open-Meteo")}
+                    </div>
                   </>
                 )}
               </div>
