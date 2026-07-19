@@ -262,6 +262,10 @@ registros requiere ser administrador: `POST /api/auth/login` con la
 `ADMIN_PASSWORD` devuelve un token firmado con HMAC-SHA256 (`AUTH_SECRET`) que
 caduca a las 8 horas — implementación sin dependencias en `backend/src/auth.js`.
 
+En la interfaz, el **panel de administrador** se abre desde el enlace
+"Administrador" del landing e inicia sesión con la `ADMIN_PASSWORD`; desde ahí se
+pueden ver y **exportar en CSV** los leads capturados.
+
 ## Límites de uso (rate limiting)
 
 Los endpoints públicos de escritura tienen un límite por IP con ventana de
