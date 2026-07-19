@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mapFires, distanceKm, firmsUrl, firmsConfigured } from "../src/firms.js";
+import { mapFires, distanceKm, firmsUrl, firmsConfigured, fetchFires } from "../src/firms.js";
 
 // Fixture con el formato CSV real de FIRMS (área/VIIRS).
 const CSV = [
@@ -51,6 +51,29 @@ test("firmsConfigured refleja la presencia de FIRMS_MAP_KEY", () => {
   } finally {
     if (prev === undefined) delete process.env.FIRMS_MAP_KEY;
     else process.env.FIRMS_MAP_KEY = prev;
+  }
+});
+
+test("fetchFires filtra por radio y ordena; lanza si el upstream falla", async () => {
+  // Punto de consulta y un foco casi en el mismo lugar (cercano) + otro lejísimos.
+  const CSV = [
+    "latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,confidence,version,bright_ti5,frp,daynight",
+    "-33.1300,-64.3500,330.1,0.4,0.36,2026-07-19,0412,N,nominal,2.0NRT,295.2,12.4,D", // ~0 km
+    "10.0000,10.0000,310.0,0.5,0.40,2026-07-19,0413,N,low,2.0NRT,290.0,4.1,N",         // a miles de km
+  ].join("\n");
+
+  const realFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => ({ ok: true, text: async () => CSV });
+    const fires = await fetchFires(-33.13, -64.35, { radiusKm: 50 });
+    assert.equal(fires.length, 1); // el lejano se descarta
+    assert.equal(typeof fires[0].distanceKm, "number");
+    assert.ok(fires[0].distanceKm <= 50);
+
+    globalThis.fetch = async () => ({ ok: false, status: 500 });
+    await assert.rejects(() => fetchFires(-33.13, -64.35));
+  } finally {
+    globalThis.fetch = realFetch;
   }
 });
 
