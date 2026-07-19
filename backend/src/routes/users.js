@@ -16,15 +16,15 @@ const FARM_SELECT = `
 `;
 
 // Preferencias del usuario: valores por defecto, rangos y saneo.
-const SETTING_DEFAULTS = {
+export const SETTING_DEFAULTS = {
   thFire: 60, thFlood: 50, thDrought: 40, thWind: 50,
   wa: true, sms: true, mail: true, push: false,
   daily: true, weekly: true, autoPdf: true, insCopy: false,
 };
-const NUM_RANGES = { thFire: [20, 95], thFlood: [10, 200], thDrought: [10, 90], thWind: [20, 120] };
-const BOOL_KEYS = ["wa", "sms", "mail", "push", "daily", "weekly", "autoPdf", "insCopy"];
+export const NUM_RANGES = { thFire: [20, 95], thFlood: [10, 200], thDrought: [10, 90], thWind: [20, 120] };
+export const BOOL_KEYS = ["wa", "sms", "mail", "push", "daily", "weekly", "autoPdf", "insCopy"];
 
-function sanitizeSettings(input) {
+export function sanitizeSettings(input) {
   const out = {};
   if (input && typeof input === "object") {
     for (const [k, [min, max]] of Object.entries(NUM_RANGES)) {
