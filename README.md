@@ -44,10 +44,25 @@ vigia/
 
 ## Puesta en marcha
 
+### Opción A — todo con Docker (recomendado)
+
+Levanta la base, la API y el frontend con un solo comando:
+
+```bash
+docker compose up --build
+```
+
+- Web: <http://localhost:3000> · API: <http://localhost:4000> · PostGIS: `localhost:5432`
+- La API aplica migraciones y la semilla automáticamente al arrancar.
+- Variables opcionales (`ADMIN_PASSWORD`, `AUTH_SECRET`, `FIRMS_MAP_KEY`,
+  `NEXT_PUBLIC_API_URL`) se pueden definir en un archivo `.env` junto al compose.
+
+### Opción B — desarrollo local (solo la base en Docker)
+
 ### 1. Base de datos con PostGIS
 
 ```bash
-docker compose up -d          # levanta PostGIS en localhost:5432
+docker compose up -d db       # levanta solo PostGIS en localhost:5432
 ```
 
 Queda disponible en `postgres://vigia:vigia@localhost:5432/vigia`.
