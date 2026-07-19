@@ -516,7 +516,7 @@ const ParcelScan = ({ farm, es, layer = "ndvi", onZone, selected, compact }) => 
         <span className="mono lbl" style={{ marginRight: "auto", color: C.t3 }}>
           {layer === "ndvi" ? (es ? "seco → sano" : "dry → healthy") : layer === "fire" ? (es ? "bajo → crítico" : "low → critical") : (es ? "seco → húmedo" : "dry → wet")}
         </span>
-        <span className="mono lbl">{farm.ha} ha · 6 {es ? "zonas" : "zones"}</span>
+        <span className="mono lbl">{Number(farm.ha).toLocaleString(es ? "es" : "en")} ha · 6 {es ? "zonas" : "zones"}</span>
       </div>
       {!compact && (
         <div className="readout">
@@ -1265,7 +1265,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           <div className="mono lbl" style={{ padding: "0 10px 8px" }}>{es ? "Plan activo" : "Active plan"}</div>
           <div style={{ padding: "0 10px 12px" }}>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.green }}>${cost}<span style={{ fontSize: 11, color: C.t3, fontWeight: 400 }}>{es ? "/mes" : "/mo"}</span></div>
-            <div className="mono" style={{ fontSize: 10, color: C.t4 }}>{farm.ha} ha · {farm.country}</div>
+            <div className="mono" style={{ fontSize: 10, color: C.t4 }}>{Number(farm.ha).toLocaleString(es ? "es" : "en")} ha · {farm.country}</div>
           </div>
           <button className="navbtn" onClick={onLogout} style={{ color: C.t3 }}><Ic d={ic.out} s={15} c={C.t3} /> {es ? "Cerrar sesión" : "Log out"}</button>
         </div>
@@ -1373,7 +1373,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
                 <Metric icon={ic.fire} c={riskColor(farm.risks.fire)} label={es ? "Riesgo mayor" : "Top risk"} value={worst} unit="%" sub={es ? "incendio · zona F" : "wildfire · zone F"} />
                 <Metric icon={ic.leaf} c={ndviColor(Number(avgNdvi))} label="NDVI" value={avgNdvi} sub={es ? "promedio ponderado" : "weighted average"} />
-                <Metric icon={ic.map} label={es ? "Superficie" : "Area"} value={farm.ha} unit="ha" sub={es ? "6 zonas de manejo" : "6 management zones"} />
+                <Metric icon={ic.map} label={es ? "Superficie" : "Area"} value={Number(farm.ha).toLocaleString(es ? "es" : "en")} unit="ha" sub={es ? "6 zonas de manejo" : "6 management zones"} />
                 <Metric icon={ic.water} c={C.blue} label={es ? "Lluvia 10 d" : "Rain 10 d"} value={weather.reduce((a, d) => a + d.p, 0)} unit="mm" sub={es ? "pronóstico Open-Meteo" : "Open-Meteo forecast"} />
                 <Metric icon={ic.bell} c={C.n2} label={es ? "Alertas 7 d" : "Alerts 7 d"} value="3" sub={es ? "1 urgente · 1 alta" : "1 urgent · 1 high"} />
               </div>
@@ -1722,7 +1722,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                       <div className="mono lbl">{es ? "Campos" : "Fields"}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{stats.hectares}</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{Number(stats.hectares).toLocaleString(es ? "es" : "en")}</div>
                       <div className="mono lbl">{es ? "Hectáreas totales" : "Total hectares"}</div>
                     </div>
                     <div>
@@ -1799,7 +1799,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                   <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Suscripción" : "Subscription"}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                     <span style={{ fontSize: 26, fontWeight: 700, color: C.green }}>${cost}<span style={{ fontSize: 12, color: C.t3, fontWeight: 400 }}>{es ? "/mes" : "/mo"}</span></span>
-                    <span className="mono" style={{ fontSize: 10.5, color: C.t3 }}>$9 + $0.15 × {farm.ha} ha</span>
+                    <span className="mono" style={{ fontSize: 10.5, color: C.t3 }}>$9 + $0.15 × {Number(farm.ha).toLocaleString(es ? "es" : "en")} ha</span>
                   </div>
                   <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 6 }}>{es ? "Próximo cobro: 1 de agosto de 2026" : "Next charge: August 1, 2026"}</div>
                   <button className="btn ghost" style={{ width: "100%", marginTop: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
