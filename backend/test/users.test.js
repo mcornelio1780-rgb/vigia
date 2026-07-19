@@ -160,6 +160,39 @@ test("PUT /api/users/me actualiza el nombre del perfil", async () => {
   assert.equal(me.body.user.name, "Nombre Nuevo");
 });
 
+test("GET /api/users/export devuelve perfil, campos y preferencias", async () => {
+  const s = await signup("exp@field.ar", "clave-larga", "Exportador");
+  const auth = { Authorization: `Bearer ${s.body.token}` };
+
+  // Sin sesión -> 401
+  assert.equal((await api(base, "/api/users/export")).status, 401);
+
+  // Con un campo y una preferencia guardada
+  await api(base, "/api/users/farms", {
+    method: "POST",
+    headers: { ...auth, "Content-Type": "application/json" },
+    body: JSON.stringify({ name: "Lote Export", hectares: 120, lat: -34.6, lng: -58.4 }),
+  });
+  await api(base, "/api/users/settings", {
+    method: "PUT",
+    headers: { ...auth, "Content-Type": "application/json" },
+    body: JSON.stringify({ settings: { thFire: 80 } }),
+  });
+
+  const res = await fetch(`${base}/api/users/export`, { headers: auth });
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("content-disposition") || "", /vigia-datos\.json/);
+  const body = await res.json();
+  assert.equal(body.user.email, "exp@field.ar");
+  assert.equal(body.user.name, "Exportador");
+  assert.ok(!("password_hash" in body.user)); // nunca se exporta el hash
+  assert.equal(body.farms.length, 1);
+  assert.equal(body.farms[0].name, "Lote Export");
+  assert.equal(body.settings.thFire, 80); // preferencia guardada
+  assert.equal(body.settings.thFlood, 50); // fusionada con el default
+  assert.ok(body.exportedAt);
+});
+
 test("PUT /api/users/password cambia la contraseña con la actual correcta", async () => {
   const s = await signup("chg@field.ar", "clave-vieja", "Ana");
   const auth = { Authorization: `Bearer ${s.body.token}`, "Content-Type": "application/json" };

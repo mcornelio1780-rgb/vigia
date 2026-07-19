@@ -167,6 +167,23 @@ async function downloadReport(payload) {
   URL.revokeObjectURL(url);
 }
 
+// Descarga en JSON todos los datos del usuario (perfil + campos + preferencias).
+async function exportData() {
+  const t = getUserToken();
+  if (!t) throw new Error("Inicia sesión para exportar tus datos");
+  const res = await fetch(`${API_URL}/api/users/export`, { headers: { Authorization: `Bearer ${t}` } });
+  if (!res.ok) throw new Error("No se pudo exportar tus datos");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "vigia-datos.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 // Focos de calor reales cercanos (NASA FIRMS) vía backend. Devuelve el
 // objeto { count, fires } o null si no está configurado / sin red.
 async function fetchFires(lat, lng) {
@@ -1098,6 +1115,14 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     finally { setProfBusy(false); }
   };
 
+  /* privacidad y datos: exportación real de la cuenta */
+  const [privMsg, setPrivMsg] = useState("");
+  const doExport = async () => {
+    setPrivMsg("");
+    try { await exportData(); }
+    catch (e) { setPrivMsg(e.message); }
+  };
+
   const zones = farm.zones.map((v, i) => ({
     id: "ABCDEF"[i], ndvi: v, ha: Math.round((farm.ha / 6) * (0.7 + (i % 3) * 0.3)),
     crop: farm.zoneCrop[i], fire: Math.min(97, Math.round(farm.risks.fire * (1.35 - v))), soil: Math.round(v * 100 * 0.55 + 12),
@@ -1658,10 +1683,12 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                   <p style={{ fontSize: 12, color: C.t2, lineHeight: 1.6, margin: "0 0 12px" }}>
                     {es ? "Las coordenadas de tu campo están cifradas con AES-256 y no se comparten con terceros." : "Your field coordinates are AES-256 encrypted and never shared with third parties."}
                   </p>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    <button className="mono chipbtn">{es ? "Exportar mis datos" : "Export my data"}</button>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                    <button className="mono chipbtn" onClick={doExport} disabled={!me}>{es ? "Exportar mis datos" : "Export my data"}</button>
                     <button className="mono chipbtn" style={{ color: C.n1, borderColor: `${C.n1}44` }}>{es ? "Eliminar cuenta" : "Delete account"}</button>
                   </div>
+                  {privMsg && <div className="mono lbl" style={{ marginTop: 10, color: C.n1 }}>{privMsg}</div>}
+                  {!me && <div className="mono lbl" style={{ marginTop: 10, color: C.t4 }}>{es ? "Inicia sesión para exportar tus datos reales." : "Log in to export your real data."}</div>}
                 </div>
                 {me && (
                   <div className="card" style={{ marginTop: 14 }}>

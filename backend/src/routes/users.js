@@ -114,6 +114,26 @@ router.put("/me", requireUser, async (req, res, next) => {
   }
 });
 
+// GET /api/users/export -> descarga JSON con todos los datos del usuario
+// (perfil + campos + preferencias). Portabilidad de datos para el productor.
+router.get("/export", requireUser, async (req, res, next) => {
+  try {
+    const u = await query("SELECT id, email, name, settings, created_at FROM users WHERE id = $1", [req.user.id]);
+    if (!u.rows.length) return res.status(404).json({ error: "usuario no encontrado" });
+    const farms = await query(`${FARM_SELECT} WHERE user_id = $1 ORDER BY created_at`, [req.user.id]);
+    const { settings, ...user } = u.rows[0];
+    res.setHeader("Content-Disposition", 'attachment; filename="vigia-datos.json"');
+    res.json({
+      exportedAt: new Date().toISOString(),
+      user,
+      farms: farms.rows,
+      settings: { ...SETTING_DEFAULTS, ...(settings || {}) },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PUT /api/users/password { current, next } -> cambia la contraseña
 router.put("/password", authLimiter, requireUser, async (req, res, next) => {
   try {
