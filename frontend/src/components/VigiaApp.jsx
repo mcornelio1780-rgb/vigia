@@ -1044,7 +1044,8 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
 };
 
 /* ══════════════════ LOGIN ══════════════════ */
-const Login = ({ es, onDone, onBack }) => {
+const Login = ({ es, lang = es ? "es" : "en", onDone, onBack }) => {
+  const t = (esS, enS, ptS) => pick(lang, esS, enS, ptS);
   const [tab, setTab] = useState("in");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -1071,31 +1072,31 @@ const Login = ({ es, onDone, onBack }) => {
   return (
     <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 22 }}>
       <div style={{ width: "100%", maxWidth: 380 }}>
-        <button className="btn ghost sm" onClick={onBack} style={{ marginBottom: 22 }}>← {es ? "Volver" : "Back"}</button>
+        <button className="btn ghost sm" onClick={onBack} style={{ marginBottom: 22 }}>← {t("Volver", "Back", "Voltar")}</button>
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 22 }}>
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
           <span style={{ fontSize: 19, fontWeight: 700 }}>{BRAND}</span>
         </div>
         <div style={{ display: "flex", gap: 4, marginBottom: 18 }}>
-          {[["in", es ? "Entrar" : "Log in"], ["up", es ? "Crear cuenta" : "Sign up"]].map(([k, l]) => (
+          {[["in", t("Entrar", "Log in", "Entrar")], ["up", t("Crear cuenta", "Sign up", "Criar conta")]].map(([k, l]) => (
             <button key={k} onClick={() => { setTab(k); setErr(""); }} className="mono chipbtn" style={{ borderColor: tab === k ? C.green : C.line, color: tab === k ? C.green : C.t3 }}>{l}</button>
           ))}
         </div>
         <form className="card" style={{ padding: 20 }} onSubmit={submit}>
-          {tab === "up" && <><label className="mono lbl">{es ? "Nombre" : "Name"}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={es ? "María Fernández" : "Jane Doe"} style={{ margin: "7px 0 14px" }} /></>}
-          <label className="mono lbl">{es ? "Correo" : "Email"}</label>
+          {tab === "up" && <><label className="mono lbl">{t("Nombre", "Name", "Nome")}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("María Fernández", "Jane Doe", "Maria Fernanda")} style={{ margin: "7px 0 14px" }} /></>}
+          <label className="mono lbl">{t("Correo", "Email", "E-mail")}</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" style={{ margin: "7px 0 14px" }} />
-          <label className="mono lbl">{es ? "Contraseña" : "Password"}</label>
+          <label className="mono lbl">{t("Contraseña", "Password", "Senha")}</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={{ margin: "7px 0 4px" }} />
-          {tab === "up" && <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 10, lineHeight: 1.6 }}>{es ? "Mínimo 6 caracteres. Al crear la cuenta aceptas el tratamiento cifrado de las coordenadas de tu campo." : "At least 6 characters. By signing up you accept encrypted processing of your field coordinates."}</div>}
+          {tab === "up" && <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 10, lineHeight: 1.6 }}>{t("Mínimo 6 caracteres. Al crear la cuenta aceptas el tratamiento cifrado de las coordenadas de tu campo.", "At least 6 characters. By signing up you accept encrypted processing of your field coordinates.", "Mínimo 6 caracteres. Ao criar a conta você aceita o tratamento criptografado das coordenadas do seu campo.")}</div>}
           {err && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 12 }}>{err}</div>}
-          <button className="btn" type="submit" disabled={busy} style={{ width: "100%", marginTop: 16, opacity: busy ? 0.6 : 1 }}>{busy ? (es ? "Un momento…" : "One moment…") : tab === "in" ? (es ? "Entrar" : "Log in") : (es ? "Crear cuenta" : "Create account")}</button>
+          <button className="btn" type="submit" disabled={busy} style={{ width: "100%", marginTop: 16, opacity: busy ? 0.6 : 1 }}>{busy ? t("Un momento…", "One moment…", "Um momento…") : tab === "in" ? t("Entrar", "Log in", "Entrar") : t("Crear cuenta", "Create account", "Criar conta")}</button>
           <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
-            <div style={{ flex: 1, height: 1, background: C.line }} /><span className="mono" style={{ fontSize: 10, color: C.t4 }}>{es ? "o" : "or"}</span><div style={{ flex: 1, height: 1, background: C.line }} />
+            <div style={{ flex: 1, height: 1, background: C.line }} /><span className="mono" style={{ fontSize: 10, color: C.t4 }}>{t("o", "or", "ou")}</span><div style={{ flex: 1, height: 1, background: C.line }} />
           </div>
-          <button className="btn ghost" type="button" style={{ width: "100%" }} onClick={onDone}>{es ? "Continuar sin cuenta (demo)" : "Continue without account (demo)"}</button>
+          <button className="btn ghost" type="button" style={{ width: "100%" }} onClick={onDone}>{t("Continuar sin cuenta (demo)", "Continue without account (demo)", "Continuar sem conta (demo)")}</button>
         </form>
-        <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 16, textAlign: "center" }}>{es ? "Tu cuenta guarda tus campos de verdad." : "Your account saves your fields for real."}</div>
+        <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 16, textAlign: "center" }}>{t("Tu cuenta guarda tus campos de verdad.", "Your account saves your fields for real.", "Sua conta guarda seus campos de verdade.")}</div>
       </div>
     </div>
   );
@@ -2119,7 +2120,7 @@ export default function VigiaApp() {
       `}</style>
 
       {view === "landing" && <Landing es={es} lang={lang} setLang={setLang} live={live} setLive={setLive} onEnter={() => setView("login")} onAdmin={() => setView("admin")} />}
-      {view === "login" && <Login es={es} onDone={() => setView("app")} onBack={() => setView("landing")} />}
+      {view === "login" && <Login es={es} lang={lang} onDone={() => setView("app")} onBack={() => setView("landing")} />}
       {view === "app" && <Dashboard es={es} lang={lang} setLang={setLang} onLogout={() => setView("landing")} />}
       {view === "admin" && <AdminLeads es={es} onBack={() => setView("landing")} />}
     </div>
