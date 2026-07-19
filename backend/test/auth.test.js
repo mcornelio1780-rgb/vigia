@@ -4,7 +4,21 @@ import crypto from "node:crypto";
 
 // Fija el secreto antes de importar auth.js (lee AUTH_SECRET al cargar).
 process.env.AUTH_SECRET = "test-secret-auth";
-const { issueToken, verifyToken } = await import("../src/auth.js");
+const { issueToken, verifyToken, requireAdmin, requireUser } = await import("../src/auth.js");
+
+// Simula el trío (req, res, next) de Express para probar los middlewares.
+function fakeReqRes(headers = {}) {
+  const res = {
+    statusCode: 200,
+    body: undefined,
+    status(c) { this.statusCode = c; return this; },
+    json(b) { this.body = b; return this; },
+  };
+  const state = { nextCalled: false };
+  const next = () => { state.nextCalled = true; };
+  return { req: { headers }, res, next, state };
+}
+const bearer = (token) => ({ authorization: `Bearer ${token}` });
 
 const nowSec = () => Math.floor(Date.now() / 1000);
 const signBody = (body) =>
@@ -51,4 +65,46 @@ test("verifyToken rechaza un token firmado con otro secreto", () => {
   const body = b64({ role: "admin", exp: nowSec() + 999 });
   const mac = crypto.createHmac("sha256", "otro-secreto").update(body).digest("base64url");
   assert.equal(verifyToken(`${body}.${mac}`), null);
+});
+
+test("requireAdmin exige un token de administrador válido", () => {
+  // Sin cabecera Authorization -> 401.
+  let x = fakeReqRes();
+  requireAdmin(x.req, x.res, x.next);
+  assert.equal(x.res.statusCode, 401);
+  assert.equal(x.state.nextCalled, false);
+
+  // Token de usuario (rol equivocado) -> 401.
+  const userToken = issueToken({ role: "user", sub: "u1" }).token;
+  x = fakeReqRes(bearer(userToken));
+  requireAdmin(x.req, x.res, x.next);
+  assert.equal(x.res.statusCode, 401);
+  assert.equal(x.state.nextCalled, false);
+
+  // Token de administrador válido -> next() y req.user con rol admin.
+  const adminToken = issueToken("admin").token;
+  x = fakeReqRes(bearer(adminToken));
+  requireAdmin(x.req, x.res, x.next);
+  assert.equal(x.state.nextCalled, true);
+  assert.equal(x.req.user.role, "admin");
+});
+
+test("requireUser exige un token de usuario con id", () => {
+  // Sin token -> 401.
+  let x = fakeReqRes();
+  requireUser(x.req, x.res, x.next);
+  assert.equal(x.res.statusCode, 401);
+  assert.equal(x.state.nextCalled, false);
+
+  // Token de administrador (sin rol user/sub) -> 401.
+  x = fakeReqRes(bearer(issueToken("admin").token));
+  requireUser(x.req, x.res, x.next);
+  assert.equal(x.res.statusCode, 401);
+  assert.equal(x.state.nextCalled, false);
+
+  // Token de usuario válido -> next() y req.user = { id: sub }.
+  x = fakeReqRes(bearer(issueToken({ role: "user", sub: "u1" }).token));
+  requireUser(x.req, x.res, x.next);
+  assert.equal(x.state.nextCalled, true);
+  assert.deepEqual(x.req.user, { id: "u1" });
 });
