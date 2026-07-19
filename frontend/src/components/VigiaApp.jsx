@@ -1009,7 +1009,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
           <div style={{ display: "flex", gap: 40, flexWrap: "wrap", justifyContent: "space-between" }}>
             <div style={{ maxWidth: 300 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
                 <span style={{ fontSize: 16, fontWeight: 700 }}>{BRAND}</span>
               </div>
               <p style={{ fontSize: 12.5, color: C.t3, lineHeight: 1.6, margin: "12px 0 0" }}>{t("Inteligencia climática satelital para el campo. Te avisamos antes de que veas el problema, zona por zona, en cualquier país.", "Satellite climate intelligence for farms. We warn you before you see the problem, zone by zone, in any country.", "Inteligência climática por satélite para o campo. Avisamos antes de você ver o problema, zona a zona, em qualquer país.")}</p>
@@ -1076,7 +1076,7 @@ const Login = ({ es, lang = es ? "es" : "en", onDone, onBack }) => {
       <div style={{ width: "100%", maxWidth: 380 }}>
         <button className="btn ghost sm" onClick={onBack} style={{ marginBottom: 22 }}>← {t("Volver", "Back", "Voltar")}</button>
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 22 }}>
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
           <span style={{ fontSize: 19, fontWeight: 700 }}>{BRAND}</span>
         </div>
         <div style={{ display: "flex", gap: 4, marginBottom: 18 }}>
@@ -1352,7 +1352,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
       {/* SIDEBAR */}
       <aside className={"side" + (nav ? " open" : "")}>
         <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "0 4px 20px" }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
           <span style={{ fontSize: 16.5, fontWeight: 700, letterSpacing: "-.02em" }}>{BRAND}</span>
         </div>
         {tabs.map((t) => (
@@ -1989,7 +1989,7 @@ const AdminLeads = ({ es, lang = es ? "es" : "en", onBack }) => {
     <div className="wrap" style={{ paddingTop: 20, paddingBottom: 40 }}>
       <button className="btn ghost sm" onClick={onBack} style={{ marginBottom: 18 }}>← {t("Volver", "Back", "Voltar")}</button>
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 18 }}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
         <span style={{ fontSize: 18, fontWeight: 700 }}>{BRAND}</span>
         <span className="mono pill">{t("Administrador", "Admin", "Administrador")}</span>
       </div>
