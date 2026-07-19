@@ -79,6 +79,21 @@ test("POST /api/leads es idempotente por (email, kind)", async () => {
   assert.equal(body[0].country, "Chile"); // el segundo envío completó el país
 });
 
+test("un segundo POST /api/leads rellena hectares y coordenadas que faltaban", async () => {
+  // Primer envío sin ubicación ni superficie.
+  await api(base, "/api/leads", json("POST", { email: "fill@field.ar", kind: "waitlist" }));
+  // Segundo envío (mismo email+kind) aporta los datos que faltaban.
+  await api(base, "/api/leads", json("POST", { email: "fill@field.ar", kind: "waitlist", country: "Argentina", hectares: 320, lat: -33.13, lng: -64.35 }));
+
+  const token = await adminToken();
+  const { body } = await api(base, "/api/leads", { headers: { Authorization: `Bearer ${token}` } });
+  const mine = body.filter((l) => l.email === "fill@field.ar");
+  assert.equal(mine.length, 1); // no se duplica
+  assert.equal(mine[0].country, "Argentina");
+  assert.equal(mine[0].hectares, 320);
+  assert.ok(Math.abs(mine[0].lat - -33.13) < 1e-6 && Math.abs(mine[0].lng - -64.35) < 1e-6);
+});
+
 test("GET /api/leads/stats devuelve conteos públicos", async () => {
   await api(base, "/api/leads", json("POST", { email: "a@x.com", kind: "waitlist", country: "USA" }));
   await api(base, "/api/leads", json("POST", { email: "b@x.com", kind: "waitlist", country: "Brasil" }));
