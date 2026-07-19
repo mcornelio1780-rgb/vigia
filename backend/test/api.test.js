@@ -39,6 +39,8 @@ test("todas las respuestas incluyen cabeceras de seguridad", async () => {
   assert.equal(res.headers.get("x-frame-options"), "DENY");
   assert.equal(res.headers.get("referrer-policy"), "no-referrer");
   assert.equal(res.headers.get("x-dns-prefetch-control"), "off");
+  assert.equal(res.headers.get("permissions-policy"), "geolocation=(), microphone=(), camera=()");
+  assert.equal(res.headers.get("cross-origin-resource-policy"), "same-site");
 });
 
 test("POST /api/leads crea un lead de lista de espera con ubicación", async () => {
