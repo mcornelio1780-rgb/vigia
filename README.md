@@ -120,8 +120,17 @@ componentes desde los mismos Dockerfiles del desarrollo local:
   se aplican en `preDeployCommand` y `/api/health` es el _health check_.
 - **`vigia-web`** — el frontend Next.js standalone.
 
-En [Render](https://render.com) → **New → Blueprint**, apunta al repositorio y
-define en el panel los valores que **no se versionan**:
+**Pasos en Render:**
+
+1. En [Render](https://render.com): **New → Blueprint**.
+2. Conecta este repositorio.
+3. Render lee `render.yaml` y crea los servicios `vigia-db` (PostGIS),
+   `vigia-api` y `vigia-web`.
+4. Define en el panel los valores que **no se versionan** (tabla siguiente).
+5. El primer despliegue aplica las migraciones (`preDeployCommand` de
+   `vigia-api`) y la app queda en vivo.
+
+Valores a definir en el panel:
 
 | Servicio    | Variable              | Valor                                                            |
 | ----------- | --------------------- | ---------------------------------------------------------------- |
