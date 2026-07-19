@@ -1285,7 +1285,9 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             <select value={farmKey} onChange={(e) => { setFarmKey(e.target.value); setZone(null); setSavedMsg(""); setRenameOpen(false); }} className="mono sel" aria-label={es ? "Campo" : "Farm"}>
               {savedFarms.length > 0 && (
                 <optgroup label={es ? "Mis campos" : "My fields"}>
-                  {savedFarms.map((f) => <option key={f.id} value={`saved:${f.id}`}>{f.name}</option>)}
+                  {[...savedFarms]
+                    .sort((a, b) => a.name.localeCompare(b.name, es ? "es" : "en", { sensitivity: "base" }))
+                    .map((f) => <option key={f.id} value={`saved:${f.id}`}>{f.name}</option>)}
                 </optgroup>
               )}
               <optgroup label={es ? "Campos demo" : "Demo fields"}>
