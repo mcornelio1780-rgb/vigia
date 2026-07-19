@@ -932,6 +932,26 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
         </div>
       </section></div>
 
+      {/* FAQ */}
+      <div className="wrap"><section className="sec">
+        <div className="eyebrow">{t("Preguntas frecuentes", "FAQ", "Perguntas frequentes")}</div>
+        <h2 className="h2" style={{ marginTop: 12 }}>{t("Lo que suelen preguntar", "What people usually ask", "O que costumam perguntar")}</h2>
+        <div style={{ marginTop: 24, maxWidth: 760, display: "flex", flexDirection: "column", gap: 10 }}>
+          {[
+            { q: t("¿Necesito instalar hardware o sensores?", "Do I need to install hardware or sensors?", "Preciso instalar hardware ou sensores?"), a: t("No. Vigia es 100% satelital: con las coordenadas de tu campo basta. Nada que comprar, instalar ni mantener.", "No. Vigia is 100% satellite-based: your field's coordinates are enough. Nothing to buy, install or maintain.", "Não. A Vigia é 100% via satélite: as coordenadas do seu campo bastam. Nada para comprar, instalar ou manter.") },
+            { q: t("¿En qué países funciona?", "Which countries does it work in?", "Em quais países funciona?"), a: t("En cualquiera. El satélite ya cubre el planeta entero: si tu campo tiene coordenadas, lo monitoreamos.", "Anywhere. The satellite already covers the whole planet: if your field has coordinates, we monitor it.", "Em qualquer um. O satélite já cobre o planeta inteiro: se o seu campo tem coordenadas, nós o monitoramos.") },
+            { q: t("¿Qué datos usa Vigia?", "What data does Vigia use?", "Quais dados a Vigia usa?"), a: t("Sentinel-2 para el vigor (NDVI) zona por zona, NASA FIRMS para focos de calor y Open-Meteo para el pronóstico. Estamos integrando más fuentes (ERA5, SoilGrids).", "Sentinel-2 for vigor (NDVI) zone by zone, NASA FIRMS for heat spots and Open-Meteo for forecasts. We're integrating more sources (ERA5, SoilGrids).", "Sentinel-2 para o vigor (NDVI) zona a zona, NASA FIRMS para focos de calor e Open-Meteo para a previsão. Estamos integrando mais fontes (ERA5, SoilGrids).") },
+            { q: t("¿Cuánto cuesta?", "How much does it cost?", "Quanto custa?"), a: t("Según las hectáreas de tu campo: una base mensual más una parte por hectárea. Usa la calculadora de arriba para ver tu precio exacto.", "Based on your field's hectares: a monthly base plus a per-hectare part. Use the calculator above to see your exact price.", "Conforme os hectares do seu campo: uma base mensal mais uma parte por hectare. Use a calculadora acima para ver seu preço exato.") },
+            { q: t("¿Las alertas son en tiempo real?", "Are the alerts real-time?", "Os alertas são em tempo real?"), a: t("Combinamos pasadas satelitales frecuentes con clima diario. Las alertas urgentes (como un foco de incendio cercano) se envían siempre, apenas se detectan.", "We combine frequent satellite passes with daily weather. Urgent alerts (like a nearby wildfire spot) always go out the moment they're detected.", "Combinamos passagens de satélite frequentes com clima diário. Alertas urgentes (como um foco de incêndio próximo) sempre são enviados assim que detectados.") },
+          ].map((f, i) => (
+            <details key={i} className="card" style={{ padding: "14px 16px" }}>
+              <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 600, color: C.t1 }}>{f.q}</summary>
+              <p style={{ fontSize: 13, color: C.t2, lineHeight: 1.6, margin: "10px 0 0" }}>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </section></div>
+
       {/* NEWSLETTER */}
       <div className="wrap"><section className="sec">
         <div className="card" style={{ borderColor: C.line2, background: C.s2, padding: 26 }}>
