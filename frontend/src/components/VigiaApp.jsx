@@ -89,6 +89,27 @@ async function saveFarm(payload) {
   if (!res.ok) throw new Error(b?.error || "No se pudo guardar el campo");
   return b;
 }
+async function fetchSettings() {
+  const t = getUserToken();
+  if (!t) return null;
+  try {
+    const res = await fetch(`${API_URL}/api/users/settings`, { headers: { Authorization: `Bearer ${t}` } });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
+async function putSettings(settings) {
+  const t = getUserToken();
+  if (!t) throw new Error("Inicia sesión para guardar tu configuración");
+  const res = await fetch(`${API_URL}/api/users/settings`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${t}` },
+    body: JSON.stringify({ settings }),
+  });
+  const b = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(b?.error || "No se pudo guardar la configuración");
+  return b;
+}
 
 // Genera el PDF de evidencia en el backend y dispara la descarga.
 async function downloadReport(payload) {
@@ -901,6 +922,24 @@ const Dashboard = ({ es, setLang, onLogout }) => {
   const [daily, setDaily] = useState(true), [weekly, setWeekly] = useState(true), [autoPdf, setAutoPdf] = useState(true), [insCopy, setInsCopy] = useState(false);
   const [thFire, setThFire] = useState(60), [thFlood, setThFlood] = useState(50), [thDrought, setThDrought] = useState(40), [thWind, setThWind] = useState(50);
 
+  // Carga las preferencias guardadas del usuario (si tiene sesión).
+  const [settingsMsg, setSettingsMsg] = useState("");
+  useEffect(() => {
+    fetchSettings().then((s) => {
+      if (!s) return;
+      setWa(s.wa); setSms(s.sms); setMail(s.mail); setPush(s.push);
+      setDaily(s.daily); setWeekly(s.weekly); setAutoPdf(s.autoPdf); setInsCopy(s.insCopy);
+      setThFire(s.thFire); setThFlood(s.thFlood); setThDrought(s.thDrought); setThWind(s.thWind);
+    });
+  }, []);
+  const saveSettings = async () => {
+    setSettingsMsg("");
+    try {
+      await putSettings({ thFire, thFlood, thDrought, thWind, wa, sms, mail, push, daily, weekly, autoPdf, insCopy });
+      setSettingsMsg(es ? "Configuración guardada" : "Settings saved");
+    } catch (e) { setSettingsMsg(e.message); }
+  };
+
   const zones = farm.zones.map((v, i) => ({
     id: "ABCDEF"[i], ndvi: v, ha: Math.round((farm.ha / 6) * (0.7 + (i % 3) * 0.3)),
     crop: farm.zoneCrop[i], fire: Math.min(97, Math.round(farm.risks.fire * (1.35 - v))), soil: Math.round(v * 100 * 0.55 + 12),
@@ -1332,6 +1371,19 @@ const Dashboard = ({ es, setLang, onLogout }) => {
 
           {/* ── CONFIGURACIÓN ── */}
           {tab === "settings" && (
+            <>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
+              <div className="mono lbl">
+                {me ? (es ? "Tus preferencias se guardan en tu cuenta" : "Your preferences are saved to your account")
+                    : (es ? "Inicia sesión para guardar tu configuración" : "Log in to save your settings")}
+              </div>
+              {me && (
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  {settingsMsg && <span className="mono lbl" style={{ color: C.green }}>{settingsMsg}</span>}
+                  <button className="btn sm" onClick={saveSettings}>{es ? "Guardar configuración" : "Save settings"}</button>
+                </div>
+              )}
+            </div>
             <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div className="card">
                 <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Perfil" : "Profile"}</div>
@@ -1398,6 +1450,7 @@ const Dashboard = ({ es, setLang, onLogout }) => {
                 </div>
               </div>
             </div>
+            </>
           )}
         </div>
       </main>

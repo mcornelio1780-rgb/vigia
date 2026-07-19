@@ -88,6 +88,37 @@ test("crear campo sin nombre devuelve 400; sin sesión 401", async () => {
   assert.equal((await api(base, "/api/users/farms", json("POST", { name: "X" }))).status, 401);
 });
 
+test("GET/PUT /api/users/settings guarda y carga preferencias", async () => {
+  const s = await signup();
+  const auth = { Authorization: `Bearer ${s.body.token}`, "Content-Type": "application/json" };
+
+  assert.equal((await api(base, "/api/users/settings")).status, 401);
+
+  // Nuevo usuario -> valores por defecto
+  const def = await api(base, "/api/users/settings", { headers: { Authorization: `Bearer ${s.body.token}` } });
+  assert.equal(def.status, 200);
+  assert.equal(def.body.thFire, 60);
+  assert.equal(def.body.wa, true);
+
+  // Guarda cambios (con saneo: thFire fuera de rango se recorta, clave desconocida se ignora)
+  const put = await api(base, "/api/users/settings", {
+    method: "PUT",
+    headers: auth,
+    body: JSON.stringify({ settings: { thFire: 999, wa: false, daily: false, hacker: "x" } }),
+  });
+  assert.equal(put.status, 200);
+  assert.equal(put.body.thFire, 95); // recortado al máximo
+  assert.equal(put.body.wa, false);
+  assert.equal(put.body.daily, false);
+  assert.ok(!("hacker" in put.body));
+
+  // Persistió y fusiona (thFlood sigue en su default)
+  const after = await api(base, "/api/users/settings", { headers: { Authorization: `Bearer ${s.body.token}` } });
+  assert.equal(after.body.thFire, 95);
+  assert.equal(after.body.wa, false);
+  assert.equal(after.body.thFlood, 50);
+});
+
 test("los campos de un usuario no son visibles para otro", async () => {
   const a = await signup("a@x.com", "clave-larga");
   const b = await signup("b@x.com", "clave-larga");

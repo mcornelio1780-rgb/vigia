@@ -15,6 +15,31 @@ const FARM_SELECT = `
   FROM farms
 `;
 
+// Preferencias del usuario: valores por defecto, rangos y saneo.
+const SETTING_DEFAULTS = {
+  thFire: 60, thFlood: 50, thDrought: 40, thWind: 50,
+  wa: true, sms: true, mail: true, push: false,
+  daily: true, weekly: true, autoPdf: true, insCopy: false,
+};
+const NUM_RANGES = { thFire: [20, 95], thFlood: [10, 200], thDrought: [10, 90], thWind: [20, 120] };
+const BOOL_KEYS = ["wa", "sms", "mail", "push", "daily", "weekly", "autoPdf", "insCopy"];
+
+function sanitizeSettings(input) {
+  const out = {};
+  if (input && typeof input === "object") {
+    for (const [k, [min, max]] of Object.entries(NUM_RANGES)) {
+      if (input[k] != null) {
+        const n = Number(input[k]);
+        if (Number.isFinite(n)) out[k] = Math.min(max, Math.max(min, Math.round(n)));
+      }
+    }
+    for (const k of BOOL_KEYS) {
+      if (typeof input[k] === "boolean") out[k] = input[k];
+    }
+  }
+  return out;
+}
+
 // POST /api/users/signup { email, password, name } -> { user, token }
 router.post("/signup", authLimiter, async (req, res, next) => {
   try {
@@ -110,6 +135,29 @@ router.post("/farms", requireUser, async (req, res, next) => {
     );
     const created = await query(`${FARM_SELECT} WHERE id = $1`, [rows[0].id]);
     res.status(201).json(created.rows[0]);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/users/settings -> preferencias (con valores por defecto)
+router.get("/settings", requireUser, async (req, res, next) => {
+  try {
+    const { rows } = await query("SELECT settings FROM users WHERE id = $1", [req.user.id]);
+    res.json({ ...SETTING_DEFAULTS, ...(rows[0]?.settings || {}) });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /api/users/settings { settings } -> guarda (fusiona) y devuelve el resultado
+router.put("/settings", requireUser, async (req, res, next) => {
+  try {
+    const clean = sanitizeSettings(req.body?.settings ?? req.body);
+    const cur = await query("SELECT settings FROM users WHERE id = $1", [req.user.id]);
+    const merged = { ...(cur.rows[0]?.settings || {}), ...clean };
+    await query("UPDATE users SET settings = $1::jsonb WHERE id = $2", [JSON.stringify(merged), req.user.id]);
+    res.json({ ...SETTING_DEFAULTS, ...merged });
   } catch (err) {
     next(err);
   }
