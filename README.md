@@ -244,6 +244,21 @@ registros requiere ser administrador: `POST /api/auth/login` con la
 `ADMIN_PASSWORD` devuelve un token firmado con HMAC-SHA256 (`AUTH_SECRET`) que
 caduca a las 8 horas — implementación sin dependencias en `backend/src/auth.js`.
 
+## Límites de uso (rate limiting)
+
+Los endpoints públicos de escritura tienen un límite por IP con ventana de
+1 minuto:
+
+| Endpoint(s)                                                        | Límite   |
+| ------------------------------------------------------------------ | -------- |
+| `POST /api/leads`                                                  | ~30/min  |
+| `POST /api/report`                                                 | ~20/min  |
+| `POST /api/auth/login`, `/api/users/signup`, `/api/users/login`, `/api/users/password` | ~15/min  |
+
+Las respuestas incluyen `X-RateLimit-Limit` y `X-RateLimit-Remaining`; al superar
+el cupo devuelven `429` con `Retry-After`. Es en memoria **por proceso**; para
+varias instancias conviene un store compartido (p. ej. Redis).
+
 ## Tests
 
 Suite de la API con el runner nativo de Node (`node --test`): salud, alta y
