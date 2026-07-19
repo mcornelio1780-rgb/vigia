@@ -261,9 +261,15 @@ varias instancias conviene un store compartido (p. ej. Redis).
 
 ## Tests
 
-Suite de la API con el runner nativo de Node (`node --test`): salud, alta y
-validación de leads, idempotencia, estadísticas, listado protegido y
-autenticación. Usa una base **de pruebas** aparte y nunca toca la de desarrollo.
+~75 pruebas con el runner nativo de Node (`node --test`). Cubren, contra
+PostGIS: salud, alta/validación/idempotencia y estadísticas de leads, listado
+protegido y autenticación de administrador; cuentas de productor
+(registro/login/perfil), campos PostGIS (alta, detalle, edición, borrado),
+preferencias, cambio de contraseña, exportación y borrado de cuenta. Y sin base
+de datos: contraseñas (scrypt), tokens y middlewares de autenticación,
+validación de email/nombre, saneo de preferencias, distancias FIRMS, mapeo del
+clima (Open-Meteo) y generación del PDF. Usa una base **de pruebas** aparte y
+nunca toca la de desarrollo.
 
 ```bash
 createdb -h localhost -U vigia vigia_test   # una sola vez
