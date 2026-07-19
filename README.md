@@ -146,7 +146,7 @@ Base: `http://localhost:4000`
 | `POST`   | `/api/report`          | —       | Genera un PDF de evidencia satelital del campo                     |
 | `POST`   | `/api/leads`           | —       | Alta en lista de espera o boletín (idempotente por email+kind)     |
 | `GET`    | `/api/leads/stats`     | —       | Conteos públicos (lista de espera, boletín, países)                |
-| `GET`    | `/api/leads`           | admin   | Listado de registros (filtros opcionales `?kind=` y `?country=`)   |
+| `GET`    | `/api/leads`           | admin   | Listado de registros (filtros `?kind=`, `?country=`; paginación `?limit=&offset=`) |
 | `POST`   | `/api/auth/login`      | —       | `{password}` → `{token}` de administrador                          |
 | `GET`    | `/api/auth/me`         | admin   | Verifica el token de administrador                                 |
 | `POST`   | `/api/users/signup`    | —       | Alta de productor (`{email, password, name}`) → `{user, token}`    |
@@ -185,11 +185,18 @@ curl -X POST localhost:4000/api/leads \
 curl -X POST localhost:4000/api/leads \
   -H 'Content-Type: application/json' -d '{"email":"lector@correo.com","kind":"newsletter"}'
 
-# Listar registros (administrador)
+# Listar registros (administrador), filtrando y paginando
 TOKEN=$(curl -s -X POST localhost:4000/api/auth/login \
   -H 'Content-Type: application/json' -d '{"password":"vigia-admin"}' | jq -r .token)
-curl -H "Authorization: Bearer $TOKEN" "localhost:4000/api/leads?kind=waitlist"
+curl -H "Authorization: Bearer $TOKEN" "localhost:4000/api/leads?kind=waitlist&country=Argentina"
+# Paginación: limit (por defecto 100, máx 500) y offset (por defecto 0)
+curl -H "Authorization: Bearer $TOKEN" "localhost:4000/api/leads?limit=50&offset=100"
 ```
+
+`GET /api/leads` admite los filtros `?kind=` y `?country=` (sin distinguir
+mayúsculas, combinables) y la paginación `?limit=` (por defecto 100, máximo 500)
+y `?offset=` (por defecto 0); los registros se devuelven del más reciente al más
+antiguo.
 
 ## Autenticación
 
