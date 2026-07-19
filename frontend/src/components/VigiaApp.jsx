@@ -448,7 +448,7 @@ const buildWeather = (f) => {
 };
 
 /* ══ Panel de parcela con sub-zonas ══ */
-const ParcelScan = ({ farm, es, layer = "ndvi", onZone, selected, compact }) => {
+const ParcelScan = ({ farm, es, lang = es ? "es" : "en", layer = "ndvi", onZone, selected, compact }) => {
   const [hover, setHover] = useState(null);
   const S = farm.shape;
   const zones = farm.zones.map((v, i) => ({
@@ -467,9 +467,9 @@ const ParcelScan = ({ farm, es, layer = "ndvi", onZone, selected, compact }) => 
     <div className="scanwrap">
       <div className="scanhead">
         <span className="mono lbl"><Ic d={ic.pin} s={11} c={C.t3} /> {farm.coord}</span>
-        <span className="mono lbl"><span className="dot" /> {es ? "Sentinel-2 · pasada 10:42" : "Sentinel-2 · pass 10:42"}</span>
+        <span className="mono lbl"><span className="dot" /> {pick(lang, "Sentinel-2 · pasada 10:42", "Sentinel-2 · pass 10:42", "Sentinel-2 · passagem 10:42")}</span>
       </div>
-      <svg viewBox="0 0 520 360" className="scansvg" role="img" aria-label={es ? "Parcela dividida en zonas" : "Field split into zones"}>
+      <svg viewBox="0 0 520 360" className="scansvg" role="img" aria-label={pick(lang, "Parcela dividida en zonas", "Field split into zones", "Parcela dividida em zonas")}>
         <defs>
           <clipPath id="pc"><polygon points={S.hull} /></clipPath>
           <linearGradient id="sw" x1="0" y1="0" x2="1" y2="0">
@@ -514,20 +514,20 @@ const ParcelScan = ({ farm, es, layer = "ndvi", onZone, selected, compact }) => 
       <div className="scanfoot">
         <div className="ramp" aria-hidden="true">{RAMP.map((c, i) => <span key={i} style={{ background: layer === "fire" ? RAMP[4 - i] : c }} />)}</div>
         <span className="mono lbl" style={{ marginRight: "auto", color: C.t3 }}>
-          {layer === "ndvi" ? (es ? "seco → sano" : "dry → healthy") : layer === "fire" ? (es ? "bajo → crítico" : "low → critical") : (es ? "seco → húmedo" : "dry → wet")}
+          {layer === "ndvi" ? pick(lang, "seco → sano", "dry → healthy", "seco → saudável") : layer === "fire" ? pick(lang, "bajo → crítico", "low → critical", "baixo → crítico") : pick(lang, "seco → húmedo", "dry → wet", "seco → úmido")}
         </span>
-        <span className="mono lbl">{Number(farm.ha).toLocaleString(es ? "es" : "en")} ha · 6 {es ? "zonas" : "zones"}</span>
+        <span className="mono lbl">{Number(farm.ha).toLocaleString(pick(lang, "es", "en", "pt"))} ha · 6 {pick(lang, "zonas", "zones", "zonas")}</span>
       </div>
       {!compact && (
         <div className="readout">
           {act ? (
             <>
-              <div className="ro-t" style={{ color: col(act) }}>{es ? "Zona" : "Zone"} {act.id} · {act.crop[es ? 0 : 1]}</div>
-              <div className="ro-s">{act.ha} ha · NDVI {act.ndvi.toFixed(2)} · {es ? "riesgo incendio" : "fire risk"} {act.fire}% · {es ? "humedad suelo" : "soil moisture"} {act.soil}%</div>
+              <div className="ro-t" style={{ color: col(act) }}>{pick(lang, "Zona", "Zone", "Zona")} {act.id} · {act.crop[lang === "es" ? 0 : 1]}</div>
+              <div className="ro-s">{act.ha} ha · NDVI {act.ndvi.toFixed(2)} · {pick(lang, "riesgo incendio", "fire risk", "risco incêndio")} {act.fire}% · {pick(lang, "humedad suelo", "soil moisture", "umidade do solo")} {act.soil}%</div>
             </>
           ) : (
             <>
-              <div className="ro-t">{es ? "Toca una zona para ver su detalle" : "Tap a zone for detail"}</div>
+              <div className="ro-t">{pick(lang, "Toca una zona para ver su detalle", "Tap a zone for detail", "Toque em uma zona para ver o detalhe")}</div>
               <div className="ro-s">{farm.label} · {farm.country} · {farm.tz}</div>
             </>
           )}
@@ -740,7 +740,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
               </div>
             )}
           </div>
-          <ParcelScan farm={farm} es={es} />
+          <ParcelScan farm={farm} es={es} lang={lang} />
         </div>
 
         {/* Selector de campo demo — cobertura global explícita */}
@@ -1320,22 +1320,22 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
   };
 
   const tabs = [
-    { id: "overview", l: es ? "Vista general" : "Overview", i: ic.grid },
-    { id: "geomap", l: es ? "Geomapa" : "Geomap", i: ic.map },
-    { id: "weather", l: es ? "Clima" : "Weather", i: ic.sun },
-    { id: "drought", l: es ? "Sequías" : "Droughts", i: ic.drought },
-    { id: "crops", l: es ? "Cultivos" : "Crops", i: ic.leaf },
-    { id: "pests", l: es ? "Plagas" : "Pests", i: ic.bug },
-    { id: "alerts", l: es ? "Alertas" : "Alerts", i: ic.bell },
-    { id: "reports", l: es ? "Reportes" : "Reports", i: ic.file },
-    { id: "settings", l: es ? "Configuración" : "Settings", i: ic.gear },
+    { id: "overview", l: pick(lang, "Vista general", "Overview", "Visão geral"), i: ic.grid },
+    { id: "geomap", l: pick(lang, "Geomapa", "Geomap", "Geomapa"), i: ic.map },
+    { id: "weather", l: pick(lang, "Clima", "Weather", "Clima"), i: ic.sun },
+    { id: "drought", l: pick(lang, "Sequías", "Droughts", "Secas"), i: ic.drought },
+    { id: "crops", l: pick(lang, "Cultivos", "Crops", "Culturas"), i: ic.leaf },
+    { id: "pests", l: pick(lang, "Plagas", "Pests", "Pragas"), i: ic.bug },
+    { id: "alerts", l: pick(lang, "Alertas", "Alerts", "Alertas"), i: ic.bell },
+    { id: "reports", l: pick(lang, "Reportes", "Reports", "Relatórios"), i: ic.file },
+    { id: "settings", l: pick(lang, "Configuración", "Settings", "Configurações"), i: ic.gear },
   ];
 
   const alerts = [
-    { type: "fire", level: es ? "urgente" : "urgent", title: es ? "Riesgo de incendio 74% — zona F" : "74% wildfire risk — zone F", desc: es ? "Foco de calor VIIRS a 2,3 km al noreste. Viento 38 km/h en dirección al lote. Barbecho seco, NDVI 0.19." : "VIIRS heat spot 2.3 km northeast. Wind 38 km/h toward the block. Dry fallow, NDVI 0.19.", time: "04:12", ch: es ? "Enviado por WhatsApp · SMS · correo · PDF adjunto" : "Sent via WhatsApp · SMS · email · PDF attached" },
-    { type: "drought", level: es ? "alta" : "high", title: es ? "Déficit hídrico 58% — zonas C y D" : "58% water deficit — zones C and D", desc: es ? "Sin precipitación efectiva hace 24 días. NDVI cayó 0.14 puntos en dos pasadas satelitales." : "No effective rainfall for 24 days. NDVI dropped 0.14 points across two satellite passes.", time: es ? "ayer" : "yesterday", ch: es ? "Enviado por WhatsApp · correo" : "Sent via WhatsApp · email" },
-    { type: "wind", level: es ? "media" : "medium", title: es ? "Ráfagas de 46 km/h previstas" : "46 km/h gusts forecast", desc: es ? "Mañana entre 14:00 y 19:00. Por debajo de tu umbral de 50 km/h, registrado sin notificación push." : "Tomorrow between 14:00 and 19:00. Below your 50 km/h threshold, logged without push.", time: "2 d", ch: es ? "Solo registrado en el panel" : "Logged in dashboard only" },
-    { type: "ok", level: null, title: es ? "Zonas A, B y E dentro de parámetros" : "Zones A, B and E within range", desc: es ? "NDVI estable, humedad de suelo sobre el mínimo, sin focos activos en 40 km." : "Stable NDVI, soil moisture above minimum, no active fire spots within 40 km.", time: "6 h", ch: null },
+    { type: "fire", level: pick(lang, "urgente", "urgent", "urgente"), title: pick(lang, "Riesgo de incendio 74% — zona F", "74% wildfire risk — zone F", "Risco de incêndio 74% — zona F"), desc: pick(lang, "Foco de calor VIIRS a 2,3 km al noreste. Viento 38 km/h en dirección al lote. Barbecho seco, NDVI 0.19.", "VIIRS heat spot 2.3 km northeast. Wind 38 km/h toward the block. Dry fallow, NDVI 0.19.", "Foco de calor VIIRS a 2,3 km a nordeste. Vento 38 km/h em direção ao lote. Pousio seco, NDVI 0.19."), time: "04:12", ch: pick(lang, "Enviado por WhatsApp · SMS · correo · PDF adjunto", "Sent via WhatsApp · SMS · email · PDF attached", "Enviado por WhatsApp · SMS · e-mail · PDF anexo") },
+    { type: "drought", level: pick(lang, "alta", "high", "alta"), title: pick(lang, "Déficit hídrico 58% — zonas C y D", "58% water deficit — zones C and D", "Déficit hídrico 58% — zonas C e D"), desc: pick(lang, "Sin precipitación efectiva hace 24 días. NDVI cayó 0.14 puntos en dos pasadas satelitales.", "No effective rainfall for 24 days. NDVI dropped 0.14 points across two satellite passes.", "Sem precipitação efetiva há 24 dias. NDVI caiu 0,14 pontos em duas passagens de satélite."), time: pick(lang, "ayer", "yesterday", "ontem"), ch: pick(lang, "Enviado por WhatsApp · correo", "Sent via WhatsApp · email", "Enviado por WhatsApp · e-mail") },
+    { type: "wind", level: pick(lang, "media", "medium", "média"), title: pick(lang, "Ráfagas de 46 km/h previstas", "46 km/h gusts forecast", "Rajadas de 46 km/h previstas"), desc: pick(lang, "Mañana entre 14:00 y 19:00. Por debajo de tu umbral de 50 km/h, registrado sin notificación push.", "Tomorrow between 14:00 and 19:00. Below your 50 km/h threshold, logged without push.", "Amanhã entre 14:00 e 19:00. Abaixo do seu limite de 50 km/h, registrado sem notificação push."), time: "2 d", ch: pick(lang, "Solo registrado en el panel", "Logged in dashboard only", "Apenas registrado no painel") },
+    { type: "ok", level: null, title: pick(lang, "Zonas A, B y E dentro de parámetros", "Zones A, B and E within range", "Zonas A, B e E dentro dos parâmetros"), desc: pick(lang, "NDVI estable, humedad de suelo sobre el mínimo, sin focos activos en 40 km.", "Stable NDVI, soil moisture above minimum, no active fire spots within 40 km.", "NDVI estável, umidade do solo acima do mínimo, sem focos ativos em 40 km."), time: "6 h", ch: null },
   ];
 
   const maxT = Math.max(...weather.map((d) => d.tmax));
@@ -1355,12 +1355,12 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           </button>
         ))}
         <div style={{ marginTop: "auto", paddingTop: 18, borderTop: `1px solid ${C.line}` }}>
-          <div className="mono lbl" style={{ padding: "0 10px 8px" }}>{es ? "Plan activo" : "Active plan"}</div>
+          <div className="mono lbl" style={{ padding: "0 10px 8px" }}>{pick(lang, "Plan activo", "Active plan", "Plano ativo")}</div>
           <div style={{ padding: "0 10px 12px" }}>
-            <div style={{ fontSize: 17, fontWeight: 700, color: C.green }}>${cost}<span style={{ fontSize: 11, color: C.t3, fontWeight: 400 }}>{es ? "/mes" : "/mo"}</span></div>
-            <div className="mono" style={{ fontSize: 10, color: C.t4 }}>{Number(farm.ha).toLocaleString(es ? "es" : "en")} ha · {farm.country}</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: C.green }}>${cost}<span style={{ fontSize: 11, color: C.t3, fontWeight: 400 }}>{pick(lang, "/mes", "/mo", "/mês")}</span></div>
+            <div className="mono" style={{ fontSize: 10, color: C.t4 }}>{Number(farm.ha).toLocaleString(pick(lang, "es", "en", "pt"))} ha · {farm.country}</div>
           </div>
-          <button className="navbtn" onClick={onLogout} style={{ color: C.t3 }}><Ic d={ic.out} s={15} c={C.t3} /> {es ? "Cerrar sesión" : "Log out"}</button>
+          <button className="navbtn" onClick={onLogout} style={{ color: C.t3 }}><Ic d={ic.out} s={15} c={C.t3} /> {pick(lang, "Cerrar sesión", "Log out", "Sair")}</button>
         </div>
       </aside>
 
@@ -1491,7 +1491,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
 
               <div className="grid" style={{ gridTemplateColumns: "1.25fr 1fr", marginTop: 14, gap: 14 }}>
                 <div>
-                  <ParcelScan farm={farm} es={es} layer={layer} onZone={setZone} selected={zone} />
+                  <ParcelScan farm={farm} es={es} lang={lang} layer={layer} onZone={setZone} selected={zone} />
                   <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
                     {[["ndvi", pick(lang, "Vigor NDVI", "NDVI vigor", "Vigor NDVI")], ["fire", pick(lang, "Riesgo incendio", "Fire risk", "Risco incêndio")], ["soil", pick(lang, "Humedad suelo", "Soil moisture", "Umidade do solo")]].map(([k, l]) => (
                       <button key={k} onClick={() => setLayer(k)} className="mono chipbtn" style={{ borderColor: layer === k ? C.green : C.line, color: layer === k ? C.green : C.t3 }}>{l}</button>
@@ -1522,7 +1522,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {tab === "geomap" && (
             <div className="grid" style={{ gridTemplateColumns: "1.3fr 1fr", gap: 14 }}>
               <div>
-                <ParcelScan farm={farm} es={es} layer={layer} onZone={setZone} selected={zone} />
+                <ParcelScan farm={farm} es={es} lang={lang} layer={layer} onZone={setZone} selected={zone} />
                 <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
                   {[["ndvi", pick(lang, "Vigor NDVI", "NDVI vigor", "Vigor NDVI")], ["fire", pick(lang, "Riesgo incendio", "Fire risk", "Risco incêndio")], ["soil", pick(lang, "Humedad suelo", "Soil moisture", "Umidade do solo")]].map(([k, l]) => (
                     <button key={k} onClick={() => setLayer(k)} className="mono chipbtn" style={{ borderColor: layer === k ? C.green : C.line, color: layer === k ? C.green : C.t3 }}>{l}</button>
