@@ -155,6 +155,24 @@ configuradas por el blueprint. Cualquier otro proveedor con Docker + Postgres
 sirve igual: construye ambas imágenes, activa `DATABASE_SSL=true` si el Postgres
 exige TLS y fija `NEXT_PUBLIC_API_URL` en el build del frontend.
 
+### Frontend en Vercel (URL en vivo rápida)
+
+El frontend es Next.js, así que **despliega en Vercel sin configuración**. Como
+vive en la subcarpeta `frontend/`, solo hay que decirle a Vercel dónde está:
+
+1. En [Vercel](https://vercel.com): **Add New → Project** e importa este
+   repositorio.
+2. En **Root Directory**, selecciona **`frontend`** (Vercel detecta Next.js solo).
+3. _(Opcional)_ En **Environment Variables**, define `NEXT_PUBLIC_API_URL` con la
+   URL pública de la API (p. ej. la de Render). Sin backend, el landing y el
+   dashboard se ven igual con datos de demostración; con backend, la captura de
+   leads y las cuentas funcionan de verdad.
+4. **Deploy**. Vercel te da una URL en vivo (y un _preview_ por cada push).
+
+> Para el producto completo (captura de leads real): frontend en **Vercel** +
+> backend en **Render** (`render.yaml`), con `NEXT_PUBLIC_API_URL` apuntando a la
+> API de Render.
+
 ## API
 
 Base: `http://localhost:4000`
