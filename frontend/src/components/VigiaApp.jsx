@@ -1294,22 +1294,22 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             </select>
             <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label="Cambiar idioma">{langLabel(lang)}</button>
             {me && !farm.saved && (
-              <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} aria-label={es ? "Guardar campo" : "Save field"} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <Ic d={ic.pin} s={12} /> {savedMsg || (es ? "Guardar campo" : "Save field")}
               </button>
             )}
             {me && farm.saved && (
-              <button className="btn ghost sm" onClick={openRename} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <button className="btn ghost sm" onClick={openRename} aria-label={es ? "Editar campo" : "Edit field"} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <Ic d={ic.gear} s={12} /> {es ? "Editar campo" : "Edit field"}
               </button>
             )}
             {me && farm.saved && (
-              <button className="btn ghost sm" onClick={removeFarm} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: C.n1 }}>
+              <button className="btn ghost sm" onClick={removeFarm} aria-label={es ? "Quitar campo" : "Remove field"} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: C.n1 }}>
                 {savedMsg || (es ? "Quitar campo" : "Remove field")}
               </button>
             )}
             {me && (
-              <button className="btn ghost sm" onClick={() => { setAddOpen((v) => !v); setNfErr(""); }} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <button className="btn ghost sm" onClick={() => { setAddOpen((v) => !v); setNfErr(""); }} aria-label={es ? "Nuevo campo" : "New field"} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                 <Ic d={ic.plus} s={12} /> {es ? "Nuevo campo" : "New field"}
               </button>
             )}
@@ -1668,7 +1668,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                   </div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <button className="btn" onClick={generateReport} disabled={genBusy} style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", opacity: genBusy ? 0.6 : 1 }}><Ic d={ic.file} s={15} c="#04140B" /> {genBusy ? (es ? "Generando…" : "Generating…") : es ? "Generar ahora" : "Generate now"}</button>
+                  <button className="btn" onClick={generateReport} disabled={genBusy} aria-label={es ? "Generar reporte" : "Generate report"} style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", opacity: genBusy ? 0.6 : 1 }}><Ic d={ic.file} s={15} c="#04140B" /> {genBusy ? (es ? "Generando…" : "Generating…") : es ? "Generar ahora" : "Generate now"}</button>
                   {genErr && <div style={{ fontSize: 11, color: C.n1, marginTop: 6 }}>{genErr}</div>}
                 </div>
               </div>
