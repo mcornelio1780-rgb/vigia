@@ -989,6 +989,33 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     } catch (e) { setSavedMsg(e.message); }
   };
 
+  // Alta de un campo nuevo por coordenadas.
+  const [addOpen, setAddOpen] = useState(false);
+  const [nf, setNf] = useState({ name: "", lat: "", lng: "", ha: "" });
+  const [nfErr, setNfErr] = useState("");
+  const [nfBusy, setNfBusy] = useState(false);
+  const createNewFarm = async (e) => {
+    e.preventDefault();
+    if (nfBusy) return;
+    setNfBusy(true);
+    setNfErr("");
+    try {
+      const created = await saveFarm({
+        name: nf.name,
+        lat: nf.lat === "" ? undefined : nf.lat,
+        lng: nf.lng === "" ? undefined : nf.lng,
+        hectares: nf.ha === "" ? undefined : nf.ha,
+      });
+      setMe(await fetchMe());
+      setFarmKey(`saved:${created.id}`);
+      setZone(null);
+      setSavedMsg("");
+      setAddOpen(false);
+      setNf({ name: "", lat: "", lng: "", ha: "" });
+    } catch (e2) { setNfErr(e2.message); }
+    finally { setNfBusy(false); }
+  };
+
   /* settings */
   const [wa, setWa] = useState(true), [sms, setSms] = useState(true), [mail, setMail] = useState(true), [push, setPush] = useState(false);
   const [daily, setDaily] = useState(true), [weekly, setWeekly] = useState(true), [autoPdf, setAutoPdf] = useState(true), [insCopy, setInsCopy] = useState(false);
@@ -1118,11 +1145,42 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 {savedMsg || (es ? "Quitar campo" : "Remove field")}
               </button>
             )}
+            {me && (
+              <button className="btn ghost sm" onClick={() => { setAddOpen((v) => !v); setNfErr(""); }} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <Ic d={ic.plus} s={12} /> {es ? "Nuevo campo" : "New field"}
+              </button>
+            )}
             <span className="mono lbl" style={{ color: C.green }}><span className="dot" /> {es ? "próximo análisis 4h 12m" : "next analysis 4h 12m"}</span>
           </div>
         </header>
 
         <div style={{ padding: 24, maxWidth: 1180 }}>
+          {addOpen && me && (
+            <form className="card" onSubmit={createNewFarm} style={{ marginBottom: 14 }}>
+              <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Nuevo campo" : "New field"}</div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+                <label style={{ flex: "2 1 200px" }}>
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>{es ? "Nombre" : "Name"}</div>
+                  <input value={nf.name} onChange={(e) => setNf({ ...nf, name: e.target.value })} placeholder={es ? "Lote Norte" : "North field"} required />
+                </label>
+                <label style={{ flex: "1 1 110px" }}>
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>{es ? "Latitud" : "Latitude"}</div>
+                  <input value={nf.lat} onChange={(e) => setNf({ ...nf, lat: e.target.value })} placeholder="-33.13" inputMode="decimal" />
+                </label>
+                <label style={{ flex: "1 1 110px" }}>
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>{es ? "Longitud" : "Longitude"}</div>
+                  <input value={nf.lng} onChange={(e) => setNf({ ...nf, lng: e.target.value })} placeholder="-64.35" inputMode="decimal" />
+                </label>
+                <label style={{ flex: "1 1 90px" }}>
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>ha</div>
+                  <input value={nf.ha} onChange={(e) => setNf({ ...nf, ha: e.target.value })} placeholder="480" inputMode="numeric" />
+                </label>
+                <button className="btn sm" type="submit" disabled={nfBusy} style={{ opacity: nfBusy ? 0.6 : 1 }}>{nfBusy ? (es ? "Creando…" : "Creating…") : es ? "Crear" : "Create"}</button>
+                <button className="btn ghost sm" type="button" onClick={() => setAddOpen(false)}>{es ? "Cancelar" : "Cancel"}</button>
+              </div>
+              {nfErr && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 10 }}>{nfErr}</div>}
+            </form>
+          )}
           {/* ── VISTA GENERAL ── */}
           {tab === "overview" && (
             <>
