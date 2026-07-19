@@ -1,28 +1,37 @@
 # Vigia
 
-Plataforma de **reportes ciudadanos georreferenciados**. Los vecinos marcan en un
-mapa incidencias de su colonia (baches, alumbrado, fugas, basura, seguridad…) y
-pueden seguir su estado hasta que se resuelven.
+**Inteligencia climática satelital para el campo.** Vigia vigila una parcela
+desde el satélite y avisa por WhatsApp/SMS/correo cuando el riesgo de **incendio,
+sequía, inundación, plaga, helada o viento** cruza el umbral que define el
+productor — zona por zona, en cualquier país.
 
-- **Backend** — API REST en Node/Express sobre **PostgreSQL + PostGIS** para
-  consultas geoespaciales (cercanía, bounding box, GeoJSON), con **fotos** en los
-  reportes y **autenticación de administrador** para gestionar su estado.
-- **Frontend** — **Next.js 16** (App Router) + React 19 + Tailwind, con un mapa
-  interactivo de Leaflet.
+- **Frontend** — **Next.js 16** (App Router) + React 19: **Landing → Login →
+  Dashboard**, con la identidad visual de Vigia (tema oscuro, mapa de parcela por
+  zonas NDVI, riesgos, clima, cultivos, plagas, alertas y configuración).
+- **Backend** — API REST en Node/Express sobre **PostgreSQL + PostGIS**: captura
+  de interés (**lista de espera** y **boletín**) con la ubicación del campo como
+  geografía, más autenticación de administrador para consultar los registros.
 
 ```
 vigia/
 ├── docker-compose.yml     # PostGIS en localhost:5432
-├── .github/workflows/     # CI (tests del backend + build del frontend)
+├── .github/workflows/     # CI (tests del backend + lint/build del frontend)
 ├── backend/               # API Express (puerto 4000)
-│   ├── migrations/        # esquema SQL (PostGIS, tablas, índices GIST)
-│   ├── seeds/             # datos de ejemplo (CDMX)
+│   ├── migrations/        # esquema SQL (PostGIS, tabla leads, índices GIST)
+│   ├── seeds/             # interés de ejemplo repartido por países
 │   ├── scripts/           # migrate.js / seed.js
 │   ├── test/              # tests de la API (node --test)
-│   ├── uploads/           # imágenes subidas (servidas en /uploads)
-│   └── src/               # app.js, index.js, db.js, auth.js, uploads.js, routes/
+│   └── src/               # app.js, index.js, db.js, auth.js, routes/
 └── frontend/              # Next.js (puerto 3000)
+    └── src/components/VigiaApp.jsx   # Landing + Login + Dashboard
 ```
+
+> **Qué es real y qué es demo.** El **landing** captura leads de verdad contra la
+> API (lista de espera, boletín y el contador de campos inscritos vienen de la
+> base). El **dashboard** usa datos satelitales/agronómicos **deterministas de
+> demostración** (parcelas, NDVI, clima, precios). Conectar las fuentes en vivo
+> (NASA FIRMS, Sentinel-2, ERA5, SoilGrids, Open-Meteo) es el siguiente paso y no
+> forma parte de este repositorio todavía.
 
 ## Requisitos
 
@@ -34,16 +43,11 @@ vigia/
 
 ### 1. Base de datos con PostGIS
 
-Con Docker (recomendado):
-
 ```bash
 docker compose up -d          # levanta PostGIS en localhost:5432
 ```
 
-La base queda disponible en `postgres://vigia:vigia@localhost:5432/vigia`.
-
-> Sin Docker, crea el rol/base equivalentes en tu PostgreSQL local y asegúrate de
-> tener instalada la extensión PostGIS; el resto de los pasos es idéntico.
+Queda disponible en `postgres://vigia:vigia@localhost:5432/vigia`.
 
 ### 2. Backend
 
@@ -51,27 +55,26 @@ La base queda disponible en `postgres://vigia:vigia@localhost:5432/vigia`.
 cd backend
 cp .env.example .env          # DATABASE_URL, PORT, ADMIN_PASSWORD, AUTH_SECRET
 npm install
-npm run migrate               # crea la extensión PostGIS, tablas e índices
-npm run seed                  # carga categorías + reportes de ejemplo
+npm run migrate               # crea PostGIS, la tabla leads y sus índices
+npm run seed                  # interés de ejemplo (opcional)
 npm run dev                   # API en http://localhost:4000  (o: npm start)
 ```
-
-Variables de entorno relevantes (`.env`):
-
-| Variable         | Por defecto                        | Descripción                                  |
-| ---------------- | ---------------------------------- | -------------------------------------------- |
-| `DATABASE_URL`   | `postgres://vigia:vigia@localhost:5432/vigia` | Conexión a PostGIS                |
-| `PORT`           | `4000`                             | Puerto de la API                             |
-| `ADMIN_PASSWORD` | `vigia-admin`                      | Contraseña de administrador (**cámbiala**)   |
-| `AUTH_SECRET`    | `dev-secret-change-me`             | Secreto para firmar el token (**cámbialo**)  |
-| `UPLOADS_DIR`    | `backend/uploads`                  | Carpeta donde se guardan las imágenes        |
 
 Comprobación rápida:
 
 ```bash
-curl localhost:4000/api/health
-# {"status":"ok","postgis":"3.4.2"}
+curl localhost:4000/api/health          # {"status":"ok","postgis":"3.4.2"}
+curl localhost:4000/api/leads/stats     # {"waitlist":6,"newsletter":2,...}
 ```
+
+Variables de entorno (`.env`):
+
+| Variable         | Por defecto                                   | Descripción                                 |
+| ---------------- | --------------------------------------------- | ------------------------------------------- |
+| `DATABASE_URL`   | `postgres://vigia:vigia@localhost:5432/vigia` | Conexión a PostGIS                          |
+| `PORT`           | `4000`                                        | Puerto de la API                            |
+| `ADMIN_PASSWORD` | `vigia-admin`                                 | Contraseña de administrador (**cámbiala**)  |
+| `AUTH_SECRET`    | `dev-secret-change-me`                        | Secreto para firmar el token (**cámbialo**) |
 
 ### 3. Frontend
 
@@ -82,107 +85,73 @@ npm install
 npm run dev                   # http://localhost:3000
 ```
 
-Abre <http://localhost:3000>: verás el mapa con los reportes, filtros por
-categoría/estado, la lista lateral y el formulario para crear nuevos reportes
-(clic en el mapa para fijar la ubicación, con foto opcional). Para cambiar el
-estado de un reporte, inicia sesión con **"Entrar como admin"** (contraseña
-`ADMIN_PASSWORD`).
+Abre <http://localhost:3000>: verás el landing de Vigia. Al enviar tu correo en
+**"Pedir acceso"** o en el boletín, el registro se guarda de verdad en PostGIS
+(pruébalo con `GET /api/leads`). Desde **"Ver demo"** entras al dashboard.
 
 ## API
 
 Base: `http://localhost:4000`
 
-| Método  | Ruta                        | Auth  | Descripción                                            |
-| ------- | --------------------------- | ----- | ------------------------------------------------------ |
-| `GET`   | `/api/health`               | —     | Estado de la API y versión de PostGIS                  |
-| `GET`   | `/api/categories`           | —     | Catálogo de categorías                                 |
-| `GET`   | `/api/stats`                | —     | Totales por estado y por categoría                     |
-| `GET`   | `/api/reports`              | —     | Lista de reportes (con filtros)                        |
-| `GET`   | `/api/reports/geojson`      | —     | Mismos reportes como `FeatureCollection` GeoJSON       |
-| `GET`   | `/api/reports/:id`          | —     | Detalle de un reporte                                  |
-| `POST`  | `/api/reports`              | —     | Crea un reporte (acepta `photo_url` de `/api/uploads`) |
-| `POST`  | `/api/uploads`              | —     | Sube una imagen (`multipart`, campo `image`) → `{url}` |
-| `POST`  | `/api/auth/login`           | —     | `{password}` → `{token}` de administrador              |
-| `GET`   | `/api/auth/me`              | admin | Verifica el token de administrador                     |
-| `PATCH` | `/api/reports/:id/status`   | admin | Cambia el estado (`abierto`/`en_proceso`/`resuelto`)   |
+| Método | Ruta                | Auth  | Descripción                                                    |
+| ------ | ------------------- | ----- | -------------------------------------------------------------- |
+| `GET`  | `/api/health`       | —     | Estado de la API y versión de PostGIS                          |
+| `GET`  | `/api/leads/stats`  | —     | Conteos públicos (lista de espera, boletín, países)            |
+| `POST` | `/api/leads`        | —     | Alta en lista de espera o boletín (idempotente por email+kind) |
+| `GET`  | `/api/leads`        | admin | Listado de registros (filtro opcional `?kind=`)                |
+| `POST` | `/api/auth/login`   | —     | `{password}` → `{token}` de administrador                      |
+| `GET`  | `/api/auth/me`      | admin | Verifica el token de administrador                             |
 
-Las rutas marcadas **admin** requieren el header `Authorization: Bearer <token>`
-obtenido en `/api/auth/login`.
+Las rutas **admin** requieren `Authorization: Bearer <token>` de `/api/auth/login`.
 
-### Filtros de `/api/reports` y `/api/reports/geojson`
-
-| Parámetro  | Ejemplo                              | Efecto                                                     |
-| ---------- | ------------------------------------ | --------------------------------------------------------- |
-| `category` | `?category=baches`                   | Filtra por slug de categoría                              |
-| `status`   | `?status=abierto`                    | Filtra por estado                                         |
-| `bbox`     | `?bbox=minLng,minLat,maxLng,maxLat`  | Solo reportes dentro del rectángulo                      |
-| `near`     | `?near=-99.1332,19.4326`             | Reportes cercanos a un punto (`lng,lat`)                  |
-| `radius`   | `?near=…&radius=500`                 | Radio en metros para `near` (por defecto 1000)           |
-| `limit` / `offset` | `?limit=50&offset=0`         | Paginación (`limit` máx. 500)                            |
+`POST /api/leads` acepta: `email` (obligatorio), `kind` (`waitlist` | `newsletter`,
+por defecto `waitlist`), y opcionalmente `name`, `country`, `hectares`, `lat`, `lng`
+(ubicación del campo, guardada como `geography(Point,4326)`).
 
 Ejemplos:
 
 ```bash
-# Reportes abiertos de la categoría "baches"
-curl "localhost:4000/api/reports?category=baches&status=abierto"
-
-# Reportes a menos de 500 m del Zócalo, como GeoJSON
-curl "localhost:4000/api/reports/geojson?near=-99.1332,19.4326&radius=500"
-
-# Crear un reporte
-curl -X POST localhost:4000/api/reports \
+# Alta en la lista de espera con la ubicación del campo
+curl -X POST localhost:4000/api/leads \
   -H 'Content-Type: application/json' \
-  -d '{"title":"Fuga de agua","category":"agua","lat":19.44,"lng":-99.14}'
+  -d '{"email":"maria@campo.ar","kind":"waitlist","country":"Argentina","hectares":480,"lat":-33.13,"lng":-64.35}'
 
-# Subir una foto y crear un reporte con ella
-URL=$(curl -s -X POST localhost:4000/api/uploads -F image=@foto.jpg | jq -r .url)
-curl -X POST localhost:4000/api/reports \
-  -H 'Content-Type: application/json' \
-  -d "{\"title\":\"Bache\",\"category\":\"baches\",\"lat\":19.44,\"lng\":-99.14,\"photo_url\":\"$URL\"}"
+# Suscripción al boletín
+curl -X POST localhost:4000/api/leads \
+  -H 'Content-Type: application/json' -d '{"email":"lector@correo.com","kind":"newsletter"}'
 
-# Cambiar el estado (requiere administrador)
+# Listar registros (administrador)
 TOKEN=$(curl -s -X POST localhost:4000/api/auth/login \
   -H 'Content-Type: application/json' -d '{"password":"vigia-admin"}' | jq -r .token)
-curl -X PATCH localhost:4000/api/reports/<id>/status \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"status":"resuelto"}'
+curl -H "Authorization: Bearer $TOKEN" "localhost:4000/api/leads?kind=waitlist"
 ```
 
 ## Autenticación
 
-Un ciudadano puede consultar y crear reportes sin autenticarse. Cambiar el
-estado de un reporte requiere ser administrador:
-
-1. `POST /api/auth/login` con `{ "password": ADMIN_PASSWORD }` devuelve un token.
-2. Envía ese token en `Authorization: Bearer <token>` en las rutas **admin**.
-
-El token se firma con HMAC-SHA256 usando `AUTH_SECRET` y caduca a las 8 horas
-(implementación en `backend/src/auth.js`, sin dependencias externas).
+Cualquiera puede darse de alta (lista de espera / boletín). Consultar los
+registros requiere ser administrador: `POST /api/auth/login` con la
+`ADMIN_PASSWORD` devuelve un token firmado con HMAC-SHA256 (`AUTH_SECRET`) que
+caduca a las 8 horas — implementación sin dependencias en `backend/src/auth.js`.
 
 ## Tests
 
-El backend tiene una suite de tests de la API con el runner nativo de Node
-(`node --test`), que ejercita los endpoints, los filtros geoespaciales, la
-autenticación y la subida de imágenes. Necesita una base **de pruebas** aparte:
+Suite de la API con el runner nativo de Node (`node --test`): salud, alta y
+validación de leads, idempotencia, estadísticas, listado protegido y
+autenticación. Usa una base **de pruebas** aparte y nunca toca la de desarrollo.
 
 ```bash
-# Crea la base de pruebas una vez (PostGIS ya disponible en el servidor)
-createdb -h localhost -U vigia vigia_test
-
-cd backend
-npm test        # usa vigia_test (o TEST_DATABASE_URL si la defines)
+createdb -h localhost -U vigia vigia_test   # una sola vez
+cd backend && npm test
 ```
 
-Los tests recrean el esquema y sus propios datos en cada corrida; nunca tocan
-la base de desarrollo. En **CI** (`.github/workflows/ci.yml`) se ejecutan contra
-un servicio `postgis/postgis:16-3.4`, junto con el lint y el build del frontend.
+En **CI** (`.github/workflows/ci.yml`) corren contra un servicio
+`postgis/postgis:16-3.4`, junto con el lint y el build del frontend.
 
 ## Modelo de datos
 
-- **`categories`** — catálogo (`slug`, `name`, `color`).
-- **`reports`** — `id` (uuid), `title`, `description`, `category_id`, `status`,
-  `reporter_name`, `photo_url`, `location` (`geography(Point,4326)`), timestamps.
-  La columna `location` tiene un índice **GIST** para consultas espaciales
-  eficientes (`ST_DWithin`, `&&`).
+- **`leads`** — `id` (uuid), `email`, `kind` (`waitlist` | `newsletter`), `name`,
+  `country`, `hectares`, `location` (`geography(Point,4326)`), `created_at`.
+  Restricción `UNIQUE(email, kind)` (altas idempotentes) e índice **GIST** sobre
+  `location` para consultas geoespaciales de cobertura.
 
-El esquema está en `backend/migrations/` (`001_init.sql` y `002_reports_photo.sql`).
+El esquema está en `backend/migrations/001_init.sql`.
