@@ -1,5 +1,7 @@
 # Vigia
 
+[![CI](https://github.com/mcornelio1780-rgb/vigia/actions/workflows/ci.yml/badge.svg)](https://github.com/mcornelio1780-rgb/vigia/actions/workflows/ci.yml)
+
 **Inteligencia climática satelital para el campo.** Vigia vigila una parcela
 desde el satélite y avisa por WhatsApp/SMS/correo cuando el riesgo de **incendio,
 sequía, inundación, plaga, helada o viento** cruza el umbral que define el
