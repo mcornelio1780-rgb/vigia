@@ -75,9 +75,13 @@ cd backend
 cp .env.example .env          # DATABASE_URL, PORT, ADMIN_PASSWORD, AUTH_SECRET
 npm install
 npm run migrate               # crea PostGIS, la tabla leads y sus índices
-npm run seed                  # interés de ejemplo (opcional)
+npm run seed                  # interés de ejemplo (opcional, idempotente)
 npm run dev                   # API en http://localhost:4000  (o: npm start)
 ```
+
+`npm run migrate` y `npm run seed` son **idempotentes**: las migraciones usan
+`IF NOT EXISTS` y el seed solo carga los datos de ejemplo si la tabla `leads`
+está vacía, así que puedes ejecutarlos varias veces sin duplicar nada.
 
 Comprobación rápida:
 
