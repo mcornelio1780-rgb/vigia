@@ -938,7 +938,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
         <footer style={{ borderTop: `1px solid ${C.line}`, padding: "22px 0 34px", display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <span className="mono" style={{ fontSize: 10.5, color: C.t4 }}>{BRAND} © 2026 · {DOMAIN}</span>
           <span style={{ display: "flex", gap: 14 }}>
-            <button onClick={onAdmin} className="mono" style={{ fontSize: 10.5, color: C.t4, background: "none", border: "none", cursor: "pointer", padding: 0 }}>{es ? "Administrador" : "Admin"}</button>
+            <button onClick={onAdmin} aria-label={es ? "Panel de administrador" : "Admin panel"} className="mono" style={{ fontSize: 10.5, color: C.t4, background: "none", border: "none", cursor: "pointer", padding: 0 }}>{es ? "Administrador" : "Admin"}</button>
             <span className="mono" style={{ fontSize: 10.5, color: C.t4 }}>{es ? "Datos: NASA · ESA · NOAA · ISRIC" : "Data: NASA · ESA · NOAA · ISRIC"}</span>
           </span>
         </footer>
