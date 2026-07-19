@@ -146,7 +146,7 @@ Base: `http://localhost:4000`
 | `POST`   | `/api/report`          | —       | Genera un PDF de evidencia satelital del campo                     |
 | `POST`   | `/api/leads`           | —       | Alta en lista de espera o boletín (idempotente por email+kind)     |
 | `GET`    | `/api/leads/stats`     | —       | Conteos públicos (lista de espera, boletín, países)                |
-| `GET`    | `/api/leads`           | admin   | Listado de registros (filtro opcional `?kind=`)                    |
+| `GET`    | `/api/leads`           | admin   | Listado de registros (filtros opcionales `?kind=` y `?country=`)   |
 | `POST`   | `/api/auth/login`      | —       | `{password}` → `{token}` de administrador                          |
 | `GET`    | `/api/auth/me`         | admin   | Verifica el token de administrador                                 |
 | `POST`   | `/api/users/signup`    | —       | Alta de productor (`{email, password, name}`) → `{user, token}`    |
@@ -154,6 +154,7 @@ Base: `http://localhost:4000`
 | `GET`    | `/api/users/me`        | usuario | Perfil del productor y sus campos                                  |
 | `PUT`    | `/api/users/me`        | usuario | Actualiza el nombre del perfil                                     |
 | `DELETE` | `/api/users/me`        | usuario | Elimina la cuenta y sus campos (en cascada)                        |
+| `GET`    | `/api/users/stats`     | usuario | Resumen del productor (nº de campos, hectáreas, ubicaciones, alta) |
 | `GET`    | `/api/users/export`    | usuario | Descarga en JSON el perfil, los campos y las preferencias          |
 | `PUT`    | `/api/users/password`  | usuario | Cambia la contraseña (verifica la actual)                          |
 | `GET`    | `/api/users/farms`     | usuario | Lista los campos del productor                                     |
