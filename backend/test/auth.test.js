@@ -40,6 +40,13 @@ test("issueToken acepta un rol como string", () => {
   assert.equal(verifyToken(token).role, "admin");
 });
 
+test("issueToken devuelve expires_at coherente (~8h) con el exp del token", () => {
+  const { token, expires_at } = issueToken("admin");
+  assert.equal(verifyToken(token).exp, expires_at); // coinciden
+  assert.ok(expires_at > nowSec() + 7 * 3600); // caduca a las ~8h
+  assert.ok(expires_at <= nowSec() + 8 * 3600 + 5); // no más de 8h (con holgura)
+});
+
 test("verifyToken rechaza firmas alteradas y tokens mal formados", () => {
   const { token } = issueToken({ role: "admin" });
   const [body, mac] = token.split(".");
