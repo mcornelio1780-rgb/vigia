@@ -22,11 +22,18 @@ const langLabel = (lang) => nextLang(lang).toUpperCase();
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 async function postLead(payload) {
-  const res = await fetch(`${API_URL}/api/leads`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  let res;
+  try {
+    res = await fetch(`${API_URL}/api/leads`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    const e = new Error("network");
+    e.network = true;
+    throw e;
+  }
   if (!res.ok) {
     const b = await res.json().catch(() => null);
     throw new Error(b?.error || "No se pudo enviar. Intenta de nuevo.");
@@ -623,14 +630,14 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
     if (!wl.includes("@") || wlBusy) return;
     setWlErr(""); setWlBusy(true);
     try { await postLead({ email: wl, kind: "waitlist", hectares: ha }); setWlSent(true); }
-    catch (e) { setWlErr(e.message); }
+    catch (e) { setWlErr(e.network ? t("No pudimos conectar con el servidor. Reintenta en un momento.", "Couldn't reach the server. Please try again in a moment.", "Não foi possível conectar ao servidor. Tente novamente em instantes.") : e.message); }
     finally { setWlBusy(false); }
   };
   const submitNewsletter = async () => {
     if (!nl.includes("@")) return;
     setNlErr("");
     try { await postLead({ email: nl, kind: "newsletter" }); setNlSent(true); }
-    catch (e) { setNlErr(e.message); }
+    catch (e) { setNlErr(e.network ? t("No pudimos conectar con el servidor. Reintenta en un momento.", "Couldn't reach the server. Please try again in a moment.", "Não foi possível conectar ao servidor. Tente novamente em instantes.") : e.message); }
   };
 
   const risks = [
