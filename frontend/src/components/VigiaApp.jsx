@@ -1691,7 +1691,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
               <div className="card" style={{ marginTop: 14 }}>
                 <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Ventana de siembra sugerida", "Suggested planting window", "Janela de plantio sugerida")}</div>
                 <div style={{ display: "flex", gap: 3 }}>
-                  {["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map((m, i) => {
+                  {(lang === "es" ? ["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"] : ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"]).map((m, i) => {
                     const ok = i >= 8 || i <= 1;
                     return (
                       <div key={i} style={{ flex: 1, textAlign: "center" }}>
