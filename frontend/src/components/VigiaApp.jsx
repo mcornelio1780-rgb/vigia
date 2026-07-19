@@ -791,6 +791,25 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
         </div>
       </section></div>
 
+      {/* PARA QUIÉN ES */}
+      <div className="wrap"><section className="sec">
+        <div className="eyebrow">{t("Para quién es", "Who it's for", "Para quem é")}</div>
+        <h2 className="h2" style={{ marginTop: 12, maxWidth: 640 }}>{t("Del productor individual a la cartera de miles de hectáreas", "From the individual grower to a portfolio of thousands of hectares", "Do produtor individual à carteira de milhares de hectares")}</h2>
+        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", marginTop: 26, gap: 18 }}>
+          {[
+            { i: ic.leaf, ti: t("Productores", "Growers", "Produtores"), d: t("Protege tu cosecha zona por zona: sabes qué lote está en riesgo antes de que se vea a simple vista, y recibes el aviso donde ya miras — WhatsApp.", "Protect your harvest zone by zone: know which block is at risk before it's visible, and get the alert where you already look — WhatsApp.", "Proteja sua colheita zona a zona: saiba qual lote está em risco antes de ser visível e receba o aviso onde você já olha — WhatsApp.") },
+            { i: ic.grid, ti: t("Cooperativas y asociaciones", "Co-ops and associations", "Cooperativas e associações"), d: t("Monitorea muchos campos desde un solo panel y prioriza dónde actuar primero cuando el clima aprieta a toda la región.", "Monitor many fields from a single dashboard and prioritize where to act first when the weather hits the whole region.", "Monitore muitos campos em um único painel e priorize onde agir primeiro quando o clima aperta a região toda.") },
+            { i: ic.file, ti: t("Aseguradoras y bancos agrícolas", "Insurers and ag lenders", "Seguradoras e bancos agrícolas"), d: t("Evidencia satelital con PDF, coordenadas y hora de pasada para peritaje de siniestros y decisiones de crédito, sin visitas a campo.", "Satellite evidence with PDF, coordinates and pass time for claims assessment and credit decisions — without field visits.", "Evidência de satélite com PDF, coordenadas e hora da passagem para perícia de sinistros e decisões de crédito, sem visitas a campo.") },
+          ].map((s, i) => (
+            <div key={i} className="card">
+              <span style={{ width: 34, height: 34, borderRadius: 9, background: `${C.green}1a`, display: "grid", placeItems: "center" }}><Ic d={s.i} s={17} c={C.green} /></span>
+              <h3 style={{ fontSize: 15.5, fontWeight: 650, margin: "14px 0 8px", letterSpacing: "-.015em" }}>{s.ti}</h3>
+              <p style={{ fontSize: 12.8, color: C.t2, lineHeight: 1.6, margin: 0 }}>{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </section></div>
+
       {/* CICLO */}
       <div className="wrap"><section className="sec">
         <div className="eyebrow">{es ? "El ciclo, cada 6 horas" : "The cycle, every 6 hours"}</div>
