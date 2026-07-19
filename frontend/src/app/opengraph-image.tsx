@@ -29,8 +29,8 @@ export default function OpengraphImage() {
         <div style={{ display: "flex", fontSize: "68px", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-2px", maxWidth: "900px" }}>
           El incendio empieza seis horas antes de que lo veas.
         </div>
-        <div style={{ display: "flex", marginTop: "32px", fontSize: "28px", color: "#93AC9C", maxWidth: "820px" }}>
-          Inteligencia climática satelital · incendio, sequía, inundación, plaga y helada · zona por zona
+        <div style={{ display: "flex", marginTop: "32px", fontSize: "28px", color: "#93AC9C", maxWidth: "860px" }}>
+          Inteligencia climática satelital · incendio, sequía, inundación, plaga, helada y viento · alertas por WhatsApp, zona por zona
         </div>
         <div style={{ display: "flex", marginTop: "40px", fontSize: "24px", color: "#3DDC84" }}>vigia.ag</div>
       </div>

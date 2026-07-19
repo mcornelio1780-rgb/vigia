@@ -3,7 +3,7 @@ import "./globals.css";
 
 const title = "Vigia — Inteligencia climática satelital para tu campo";
 const description =
-  "Vigia vigila tu campo desde el satélite y te avisa por WhatsApp cuando el riesgo de incendio, sequía, inundación, plaga o helada cruza tu umbral. Zona por zona, en cualquier país.";
+  "Vigia vigila tu campo desde el satélite y te avisa por WhatsApp cuando el riesgo de incendio, sequía, inundación, plaga, helada o viento cruza tu umbral. Zona por zona, en cualquier país. 100% satelital, sin hardware.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://vigia.ag"),
@@ -22,7 +22,12 @@ export const metadata: Metadata = {
     "NDVI",
     "NASA FIRMS",
     "Sentinel-2",
+    "Open-Meteo",
     "alertas de campo",
+    "alertas por WhatsApp",
+    "teledetección",
+    "cooperativas agrícolas",
+    "aseguradoras agrícolas",
     "agtech",
   ],
   authors: [{ name: "Vigia" }],
@@ -33,6 +38,7 @@ export const metadata: Metadata = {
     description,
     url: "https://vigia.ag",
     locale: "es_ES",
+    alternateLocale: ["en_US", "pt_BR"],
   },
   twitter: {
     card: "summary_large_image",
