@@ -751,6 +751,29 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
         </div>
       </div>
 
+      {/* CÓMO FUNCIONA */}
+      <div className="wrap"><section className="sec">
+        <div className="eyebrow">{t("Cómo funciona", "How it works", "Como funciona")}</div>
+        <h2 className="h2" style={{ marginTop: 12, maxWidth: 640 }}>{t("De un punto en el mapa a una alerta que salva tu cosecha", "From a point on the map to an alert that saves your harvest", "De um ponto no mapa a um alerta que salva sua colheita")}</h2>
+        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", marginTop: 26, gap: 18 }}>
+          {[
+            { n: "01", i: ic.pin, ti: t("Marca tu campo", "Mark your field", "Marque seu campo"), d: t("Ingresa las coordenadas de tu parcela — una o varias. Sin hardware ni sensores: basta un punto en el mapa.", "Enter your field's coordinates — one or many. No hardware or sensors: a point on the map is enough.", "Insira as coordenadas do seu campo — um ou vários. Sem hardware nem sensores: basta um ponto no mapa.") },
+            { n: "02", i: ic.map, ti: t("El satélite lo analiza", "The satellite analyzes it", "O satélite o analisa"), d: t("Cada pasada de Sentinel-2 mide el vigor (NDVI), la humedad y el estrés de tu campo, zona por zona.", "Each Sentinel-2 pass measures vigor (NDVI), moisture and stress across your field, zone by zone.", "Cada passagem do Sentinel-2 mede o vigor (NDVI), a umidade e o estresse do seu campo, zona por zona.") },
+            { n: "03", i: ic.gear, ti: t("Defines tus umbrales", "Set your thresholds", "Defina seus limites"), d: t("Eliges cuándo quieres que te avise: incendio, sequía, inundación, plaga, helada o viento — a tu medida.", "Choose when to be alerted: wildfire, drought, flood, pest, frost or wind — on your terms.", "Escolha quando quer ser avisado: incêndio, seca, enchente, praga, geada ou vento — do seu jeito.") },
+            { n: "04", i: ic.bell, ti: t("Recibes la alerta y actúas", "Get the alert and act", "Receba o alerta e aja"), d: t("Cuando un riesgo cruza tu umbral, te llega por WhatsApp, SMS o correo con el PDF de evidencia y las coordenadas.", "When a risk crosses your threshold, it reaches you by WhatsApp, SMS or email with the evidence PDF and coordinates.", "Quando um risco cruza seu limite, chega por WhatsApp, SMS ou e-mail com o PDF de evidência e as coordenadas.") },
+          ].map((s) => (
+            <div key={s.n} className="card">
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ width: 32, height: 32, borderRadius: 9, background: `${C.green}1a`, display: "grid", placeItems: "center" }}><Ic d={s.i} s={16} c={C.green} /></span>
+                <span className="mono" style={{ fontSize: 11, color: C.green, letterSpacing: ".14em" }}>{s.n}</span>
+              </div>
+              <h3 style={{ fontSize: 15.5, fontWeight: 650, margin: "13px 0 7px", letterSpacing: "-.015em" }}>{s.ti}</h3>
+              <p style={{ fontSize: 12.8, color: C.t2, lineHeight: 1.6, margin: 0 }}>{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </section></div>
+
       {/* RIESGOS */}
       <div className="wrap"><section className="sec">
         <div className="eyebrow">{t("Qué vigila", "What it watches", "O que vigia")}</div>
