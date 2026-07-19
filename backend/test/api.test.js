@@ -106,6 +106,18 @@ test("GET /api/leads/stats devuelve conteos públicos", async () => {
   assert.equal(body.countries, 2);
 });
 
+test("GET /api/leads/stats cuenta países distintos, no registros", async () => {
+  await api(base, "/api/leads", json("POST", { email: "ar1@x.com", kind: "waitlist", country: "Argentina" }));
+  await api(base, "/api/leads", json("POST", { email: "ar2@x.com", kind: "waitlist", country: "Argentina" })); // mismo país
+  await api(base, "/api/leads", json("POST", { email: "cl1@x.com", kind: "waitlist", country: "Chile" }));
+  await api(base, "/api/leads", json("POST", { email: "news@x.com", kind: "newsletter" })); // sin país
+  const { body } = await api(base, "/api/leads/stats");
+  assert.equal(body.waitlist, 3);
+  assert.equal(body.newsletter, 1);
+  assert.equal(body.total, 4);
+  assert.equal(body.countries, 2); // Argentina y Chile (distintos), el boletín sin país no cuenta
+});
+
 test("GET /api/leads requiere administrador", async () => {
   const sinToken = await api(base, "/api/leads");
   assert.equal(sinToken.status, 401);
