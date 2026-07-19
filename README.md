@@ -210,6 +210,12 @@ mayúsculas, combinables) y la paginación `?limit=` (por defecto 100, máximo 5
 y `?offset=` (por defecto 0); los registros se devuelven del más reciente al más
 antiguo.
 
+**Formato de errores.** Toda respuesta de error devuelve JSON con la forma
+`{ "error": "mensaje" }` y el código HTTP correspondiente: `400` (validación),
+`401` (autenticación), `404` (no encontrado), `409` (conflicto), `413` (cuerpo
+demasiado grande), `429` (demasiadas solicitudes) y `500`/`502`/`503`
+(error del servidor o de una fuente externa).
+
 ## Autenticación
 
 Cualquiera puede darse de alta (lista de espera / boletín). Consultar los
