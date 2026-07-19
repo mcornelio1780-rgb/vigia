@@ -68,6 +68,18 @@ async function downloadReport(payload) {
   URL.revokeObjectURL(url);
 }
 
+// Focos de calor reales cercanos (NASA FIRMS) vía backend. Devuelve el
+// objeto { count, fires } o null si no está configurado / sin red.
+async function fetchFires(lat, lng) {
+  try {
+    const res = await fetch(`${API_URL}/api/fires?lat=${lat}&lng=${lng}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 // Pronóstico real vía backend (Open-Meteo). Devuelve la serie de días o
 // null si no hay red disponible, para que el dashboard use su demo.
 async function fetchWeather(lat, lng) {
@@ -799,6 +811,14 @@ const Dashboard = ({ es, setLang, onLogout }) => {
   const weather = liveWeather ?? weatherDemo;
   const weatherLive = !!liveWeather;
 
+  const [fires, setFires] = useState(null);
+  useEffect(() => {
+    let active = true;
+    setFires(null);
+    fetchFires(farm.lat, farm.lng).then((d) => { if (active) setFires(d); });
+    return () => { active = false; };
+  }, [farmKey]);
+
   /* settings */
   const [wa, setWa] = useState(true), [sms, setSms] = useState(true), [mail, setMail] = useState(true), [push, setPush] = useState(false);
   const [daily, setDaily] = useState(true), [weekly, setWeekly] = useState(true), [autoPdf, setAutoPdf] = useState(true), [insCopy, setInsCopy] = useState(false);
@@ -908,6 +928,19 @@ const Dashboard = ({ es, setLang, onLogout }) => {
                 <Metric icon={ic.water} c={C.blue} label={es ? "Lluvia 10 d" : "Rain 10 d"} value={weather.reduce((a, d) => a + d.p, 0)} unit="mm" sub={es ? "pronóstico Open-Meteo" : "Open-Meteo forecast"} />
                 <Metric icon={ic.bell} c={C.n2} label={es ? "Alertas 7 d" : "Alerts 7 d"} value="3" sub={es ? "1 urgente · 1 alta" : "1 urgent · 1 high"} />
               </div>
+
+              {fires && (fires.count > 0 ? (
+                <div style={{ marginTop: 14 }}>
+                  <AlertRow type="fire" level={es ? "en vivo" : "live"}
+                    title={es ? `${fires.count} foco(s) de calor a menos de 50 km` : `${fires.count} heat spot(s) within 50 km`}
+                    desc={es ? `Datos NASA FIRMS (VIIRS). El más cercano a ${fires.fires?.[0]?.distanceKm ?? "—"} km del campo.` : `NASA FIRMS data (VIIRS). Nearest ${fires.fires?.[0]?.distanceKm ?? "—"} km from the field.`}
+                    time="FIRMS" channels={null} />
+                </div>
+              ) : (
+                <div className="mono lbl" style={{ marginTop: 14, color: C.green }}>
+                  <span className="dot" /> {es ? "Sin focos activos cerca · NASA FIRMS en vivo" : "No active fire spots nearby · NASA FIRMS live"}
+                </div>
+              ))}
 
               <div className="grid" style={{ gridTemplateColumns: "1.25fr 1fr", marginTop: 14, gap: 14 }}>
                 <div>

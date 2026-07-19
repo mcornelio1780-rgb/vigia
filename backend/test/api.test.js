@@ -128,3 +128,11 @@ test("POST /api/report sin farm devuelve 400", async () => {
   const { status } = await api(base, "/api/report", json("POST", {}));
   assert.equal(status, 400);
 });
+
+test("GET /api/fires valida coordenadas y avisa si FIRMS no está configurado", async () => {
+  assert.equal((await api(base, "/api/fires?lat=999&lng=0")).status, 400);
+  // El entorno de test no define FIRMS_MAP_KEY → 503 con mensaje claro.
+  const r = await api(base, "/api/fires?lat=-33&lng=-64");
+  assert.equal(r.status, 503);
+  assert.match(r.body.error, /FIRMS/);
+});

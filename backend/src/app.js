@@ -4,6 +4,7 @@ import { query } from "./db.js";
 import authRouter from "./routes/auth.js";
 import leadsRouter from "./routes/leads.js";
 import { fetchForecast } from "./weather.js";
+import { fetchFires, firmsConfigured } from "./firms.js";
 import PDFDocument from "pdfkit";
 import { buildReportPdf } from "./report.js";
 
@@ -54,6 +55,25 @@ export function createApp() {
       doc.end();
     } catch (err) {
       if (!res.headersSent) res.status(500).json({ error: "No se pudo generar el PDF" });
+    }
+  });
+
+  // Focos de calor cercanos al campo (NASA FIRMS). Requiere FIRMS_MAP_KEY;
+  // si no está configurada o no hay red, el frontend recurre al demo.
+  app.get("/api/fires", async (req, res) => {
+    const lat = Number(req.query.lat);
+    const lng = Number(req.query.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return res.status(400).json({ error: "lat y lng deben ser coordenadas válidas" });
+    }
+    if (!firmsConfigured()) {
+      return res.status(503).json({ error: "FIRMS no configurado (falta FIRMS_MAP_KEY)" });
+    }
+    try {
+      const fires = await fetchFires(lat, lng);
+      res.json({ source: "firms", count: fires.length, fires });
+    } catch {
+      res.status(502).json({ error: "FIRMS no disponible" });
     }
   });
 
