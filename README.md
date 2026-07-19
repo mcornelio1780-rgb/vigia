@@ -8,7 +8,8 @@ productor — zona por zona, en cualquier país.
 - **Frontend** — **Next.js 16** (App Router) + React 19: **Landing → Login →
   Dashboard**, con la identidad visual de Vigia (tema oscuro, mapa de parcela por
   zonas NDVI, riesgos, clima, cultivos, plagas, alertas y configuración), más un
-  **panel de administrador** para consultar y exportar los leads.
+  **panel de administrador** para consultar y exportar los leads. Interfaz en
+  **español, inglés y portugués** (ES/EN/PT) con un selector de idioma.
 - **Backend** — API REST en Node/Express sobre **PostgreSQL + PostGIS**: captura
   de interés (**lista de espera** y **boletín**) con la ubicación del campo como
   geografía, **pronóstico real** (Open-Meteo), **PDF de evidencia** para el seguro
