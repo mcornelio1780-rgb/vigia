@@ -169,6 +169,17 @@ Las rutas **admin** usan el token de `POST /api/auth/login`; las rutas
 `POST /api/users/login`. En ambos casos se envía como
 `Authorization: Bearer <token>`.
 
+`GET /api/health` y `GET /api/version` sirven para monitoreo. `uptime` son los
+segundos que lleva viva la API:
+
+```jsonc
+// GET /api/health
+{ "status": "ok", "postgis": "3.4.2", "uptime": 123 }
+
+// GET /api/version
+{ "name": "vigia-backend", "version": "0.1.0", "uptime": 123 }
+```
+
 `POST /api/leads` acepta: `email` (obligatorio), `kind` (`waitlist` | `newsletter`,
 por defecto `waitlist`), y opcionalmente `name`, `country`, `hectares`, `lat`, `lng`
 (ubicación del campo, guardada como `geography(Point,4326)`).
