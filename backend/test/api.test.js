@@ -22,6 +22,14 @@ test("GET /api/health devuelve la versión de PostGIS", async () => {
   assert.match(body.postgis, /^\d+\.\d+/);
 });
 
+test("todas las respuestas incluyen cabeceras de seguridad", async () => {
+  const res = await fetch(`${base}/api/health`);
+  assert.equal(res.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(res.headers.get("x-frame-options"), "DENY");
+  assert.equal(res.headers.get("referrer-policy"), "no-referrer");
+  assert.equal(res.headers.get("x-dns-prefetch-control"), "off");
+});
+
 test("POST /api/leads crea un lead de lista de espera con ubicación", async () => {
   const { status, body } = await api(
     base,
