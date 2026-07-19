@@ -29,6 +29,24 @@ test("mapForecast tolera respuestas vacías o inválidas", () => {
   assert.deepEqual(mapForecast({ daily: { time: null } }), []);
 });
 
+test("mapForecast tolera días con valores parciales o ausentes", () => {
+  // Solo fechas, sin arrays de valores -> ceros, sin romperse. 2026-07-19 = domingo.
+  const days = mapForecast({ daily: { time: ["2026-07-19", "2026-07-20"] } });
+  assert.equal(days.length, 2);
+  assert.deepEqual(days[0], { d: "D", de: "S", n: 0, tmax: 0, tmin: 0, p: 0, w: 0, h: 46 });
+
+  // time más largo que los arrays de valores -> los faltantes caen a 0.
+  const partial = mapForecast({
+    daily: { time: ["2026-07-20", "2026-07-21"], temperature_2m_max: [28.4], precipitation_sum: [5] },
+  });
+  assert.equal(partial[0].tmax, 28);
+  assert.equal(partial[0].p, 5);
+  assert.equal(partial[0].h, 78); // p > 1 -> humedad alta
+  assert.equal(partial[1].tmax, 0); // sin dato -> 0
+  assert.equal(partial[1].p, 0);
+  assert.equal(partial[1].h, 46);
+});
+
 test("forecastUrl arma la URL de Open-Meteo con las coordenadas", () => {
   const url = forecastUrl(-33.13, -64.35);
   assert.match(url, /^https:\/\/api\.open-meteo\.com\/v1\/forecast\?/);
