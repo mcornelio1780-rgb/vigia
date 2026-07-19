@@ -93,6 +93,7 @@ Variables de entorno (`.env`):
 | `PORT`           | `4000`                                        | Puerto de la API                            |
 | `ADMIN_PASSWORD` | `vigia-admin`                                 | Contraseña de administrador (**cámbiala**)  |
 | `AUTH_SECRET`    | `dev-secret-change-me`                        | Secreto para firmar el token (**cámbialo**) |
+| `DATABASE_SSL`   | _(desactivado)_                               | `true` para TLS con Postgres gestionado     |
 
 ### 3. Frontend
 
@@ -106,6 +107,31 @@ npm run dev                   # http://localhost:3000
 Abre <http://localhost:3000>: verás el landing de Vigia. Al enviar tu correo en
 **"Pedir acceso"** o en el boletín, el registro se guarda de verdad en PostGIS
 (pruébalo con `GET /api/leads`). Desde **"Ver demo"** entras al dashboard.
+
+## Despliegue en producción
+
+El repo incluye un **blueprint de Render** (`render.yaml`) que levanta los tres
+componentes desde los mismos Dockerfiles del desarrollo local:
+
+- **`vigia-db`** — Postgres 16 gestionado (PostGIS se habilita solo en la
+  primera migración).
+- **`vigia-api`** — la API; `DATABASE_URL` se enlaza a la base, las migraciones
+  se aplican en `preDeployCommand` y `/api/health` es el _health check_.
+- **`vigia-web`** — el frontend Next.js standalone.
+
+En [Render](https://render.com) → **New → Blueprint**, apunta al repositorio y
+define en el panel los valores que **no se versionan**:
+
+| Servicio    | Variable              | Valor                                                            |
+| ----------- | --------------------- | ---------------------------------------------------------------- |
+| `vigia-api` | `ADMIN_PASSWORD`      | contraseña del panel de administración                           |
+| `vigia-api` | `FIRMS_MAP_KEY`       | _(opcional)_ MAP_KEY de la NASA para focos de incendio en vivo   |
+| `vigia-web` | `NEXT_PUBLIC_API_URL` | la URL pública de `vigia-api`, p. ej. `https://vigia-api.onrender.com` |
+
+`AUTH_SECRET` se genera automáticamente y `DATABASE_URL`/`DATABASE_SSL` quedan
+configuradas por el blueprint. Cualquier otro proveedor con Docker + Postgres
+sirve igual: construye ambas imágenes, activa `DATABASE_SSL=true` si el Postgres
+exige TLS y fija `NEXT_PUBLIC_API_URL` en el build del frontend.
 
 ## API
 
