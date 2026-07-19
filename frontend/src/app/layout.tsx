@@ -59,9 +59,41 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "Vigia",
+        url: "https://vigia.ag",
+        logo: "https://vigia.ag/icon.svg",
+        description,
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "Vigia",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        url: "https://vigia.ag",
+        description,
+        offers: {
+          "@type": "Offer",
+          price: "9.00",
+          priceCurrency: "USD",
+          description: "Base mensual de $9 más $0.15 por hectárea.",
+        },
+      },
+    ],
+  };
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
