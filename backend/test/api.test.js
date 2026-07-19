@@ -228,6 +228,12 @@ test("POST /api/leads expone cabeceras de rate limit", async () => {
   assert.ok(res.headers.get("x-ratelimit-limit"));
 });
 
+test("GET /api/weather valida las coordenadas", async () => {
+  assert.equal((await api(base, "/api/weather?lat=999&lng=0")).status, 400);
+  assert.equal((await api(base, "/api/weather")).status, 400); // sin lat/lng
+  assert.equal((await api(base, "/api/weather?lat=0&lng=999")).status, 400);
+});
+
 test("GET /api/fires valida coordenadas y avisa si FIRMS no está configurado", async () => {
   assert.equal((await api(base, "/api/fires?lat=999&lng=0")).status, 400);
   // El entorno de test no define FIRMS_MAP_KEY → 503 con mensaje claro.
