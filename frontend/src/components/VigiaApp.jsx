@@ -1524,15 +1524,15 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
               <div>
                 <ParcelScan farm={farm} es={es} layer={layer} onZone={setZone} selected={zone} />
                 <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-                  {[["ndvi", es ? "Vigor NDVI" : "NDVI vigor"], ["fire", es ? "Riesgo incendio" : "Fire risk"], ["soil", es ? "Humedad suelo" : "Soil moisture"]].map(([k, l]) => (
+                  {[["ndvi", pick(lang, "Vigor NDVI", "NDVI vigor", "Vigor NDVI")], ["fire", pick(lang, "Riesgo incendio", "Fire risk", "Risco incêndio")], ["soil", pick(lang, "Humedad suelo", "Soil moisture", "Umidade do solo")]].map(([k, l]) => (
                     <button key={k} onClick={() => setLayer(k)} className="mono chipbtn" style={{ borderColor: layer === k ? C.green : C.line, color: layer === k ? C.green : C.t3 }}>{l}</button>
                   ))}
-                  <button className="mono chipbtn" style={{ marginLeft: "auto" }}><Ic d={ic.plus} s={11} /> {es ? "Editar polígono" : "Edit polygon"}</button>
+                  <button className="mono chipbtn" style={{ marginLeft: "auto" }}><Ic d={ic.plus} s={11} /> {pick(lang, "Editar polígono", "Edit polygon", "Editar polígono")}</button>
                 </div>
                 <div className="card" style={{ marginTop: 12 }}>
-                  <div className="mono lbl" style={{ marginBottom: 10 }}>{es ? "Contexto del terreno" : "Terrain context"}</div>
+                  <div className="mono lbl" style={{ marginBottom: 10 }}>{pick(lang, "Contexto del terreno", "Terrain context", "Contexto do terreno")}</div>
                   <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(110px,1fr))", gap: 10 }}>
-                    {[[es ? "Elevación" : "Elevation", farm.elev + " m", "SRTM"], [es ? "Pendiente media" : "Mean slope", "2.4°", "SRTM"], [es ? "Textura suelo" : "Soil texture", es ? "Franco arcilloso" : "Clay loam", "SoilGrids"], [es ? "pH del suelo" : "Soil pH", "6.4", "SoilGrids"]].map(([l, v, s]) => (
+                    {[[pick(lang, "Elevación", "Elevation", "Elevação"), farm.elev + " m", "SRTM"], [pick(lang, "Pendiente media", "Mean slope", "Declive médio"), "2.4°", "SRTM"], [pick(lang, "Textura suelo", "Soil texture", "Textura do solo"), pick(lang, "Franco arcilloso", "Clay loam", "Franco-argiloso"), "SoilGrids"], [pick(lang, "pH del suelo", "Soil pH", "pH do solo"), "6.4", "SoilGrids"]].map(([l, v, s]) => (
                       <div key={l}>
                         <div className="mono lbl">{l}</div>
                         <div style={{ fontSize: 14, fontWeight: 600, marginTop: 4 }}>{v}</div>
@@ -1543,26 +1543,26 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 </div>
               </div>
               <div className="card">
-                <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Zonas de manejo" : "Management zones"}</div>
+                <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Zonas de manejo", "Management zones", "Zonas de manejo")}</div>
                 <div style={{ display: "grid", gap: 8 }}>
                   {zones.map((z) => (
                     <button key={z.id} onClick={() => setZone(z.id === zone ? null : z.id)} style={{ textAlign: "left", cursor: "pointer", font: "inherit", color: C.t1, background: zone === z.id ? C.s3 : C.s2, border: `1px solid ${zone === z.id ? ndviColor(z.ndvi) : C.line}`, borderRadius: 9, padding: "11px 13px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <span style={{ width: 9, height: 9, borderRadius: 3, background: ndviColor(z.ndvi) }} />
-                          <span style={{ fontSize: 13, fontWeight: 600 }}>{es ? "Zona" : "Zone"} {z.id}</span>
-                          <span style={{ fontSize: 11.5, color: C.t3 }}>{z.crop[es ? 0 : 1]}</span>
+                          <span style={{ fontSize: 13, fontWeight: 600 }}>{pick(lang, "Zona", "Zone", "Zona")} {z.id}</span>
+                          <span style={{ fontSize: 11.5, color: C.t3 }}>{z.crop[lang === "es" ? 0 : 1]}</span>
                         </span>
                         <span className="mono" style={{ fontSize: 11.5, color: ndviColor(z.ndvi), fontWeight: 600 }}>{z.ndvi.toFixed(2)}</span>
                       </div>
                       <div className="mono" style={{ fontSize: 10.5, color: C.t3, marginTop: 6 }}>
-                        {z.ha} ha · {es ? "incendio" : "fire"} {z.fire}% · {es ? "humedad" : "moisture"} {z.soil}%
+                        {z.ha} ha · {pick(lang, "incendio", "fire", "incêndio")} {z.fire}% · {pick(lang, "humedad", "moisture", "umidade")} {z.soil}%
                       </div>
                     </button>
                   ))}
                 </div>
                 <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 14, lineHeight: 1.6 }}>
-                  {es ? "Un solo campo, seis zonas derivadas de la variabilidad NDVI de las últimas 4 pasadas de Sentinel-2." : "One farm, six zones derived from NDVI variability across the last 4 Sentinel-2 passes."}
+                  {pick(lang, "Un solo campo, seis zonas derivadas de la variabilidad NDVI de las últimas 4 pasadas de Sentinel-2.", "One farm, six zones derived from NDVI variability across the last 4 Sentinel-2 passes.", "Um único campo, seis zonas derivadas da variabilidade NDVI das últimas 4 passagens do Sentinel-2.")}
                 </div>
               </div>
             </div>
@@ -1572,16 +1572,16 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {tab === "weather" && (
             <>
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
-                <Metric icon={ic.sun} c={C.n2} label={es ? "Máxima hoy" : "High today"} value={weather[0].tmax} unit="°C" sub={es ? `mínima ${weather[0].tmin}°C` : `low ${weather[0].tmin}°C`} />
-                <Metric icon={ic.water} c={C.blue} label={es ? "Lluvia 48 h" : "Rain 48 h"} value={weather[0].p + weather[1].p} unit="mm" />
-                <Metric icon={ic.wind} c={C.blue} label={es ? "Viento" : "Wind"} value={weather[0].w} unit="km/h" sub={es ? `umbral ${thWind} km/h` : `threshold ${thWind} km/h`} />
-                <Metric icon={ic.drought} c={C.t2} label={es ? "Humedad rel." : "Humidity"} value={weather[0].h} unit="%" />
+                <Metric icon={ic.sun} c={C.n2} label={pick(lang, "Máxima hoy", "High today", "Máxima hoje")} value={weather[0].tmax} unit="°C" sub={pick(lang, `mínima ${weather[0].tmin}°C`, `low ${weather[0].tmin}°C`, `mínima ${weather[0].tmin}°C`)} />
+                <Metric icon={ic.water} c={C.blue} label={pick(lang, "Lluvia 48 h", "Rain 48 h", "Chuva 48 h")} value={weather[0].p + weather[1].p} unit="mm" />
+                <Metric icon={ic.wind} c={C.blue} label={pick(lang, "Viento", "Wind", "Vento")} value={weather[0].w} unit="km/h" sub={pick(lang, `umbral ${thWind} km/h`, `threshold ${thWind} km/h`, `limite ${thWind} km/h`)} />
+                <Metric icon={ic.drought} c={C.t2} label={pick(lang, "Humedad rel.", "Humidity", "Umidade rel.")} value={weather[0].h} unit="%" />
               </div>
               <div className="card" style={{ marginTop: 14 }}>
                 <div className="mono lbl" style={{ marginBottom: 18, display: "flex", justifyContent: "space-between", width: "100%" }}>
-                  <span>{es ? "Pronóstico 10 días · Open-Meteo" : "10-day forecast · Open-Meteo"}</span>
+                  <span>{pick(lang, "Pronóstico 10 días · Open-Meteo", "10-day forecast · Open-Meteo", "Previsão 10 dias · Open-Meteo")}</span>
                   <span style={{ color: weatherLive ? C.green : C.t4 }}>
-                    {weatherLive ? (es ? "● datos en vivo" : "● live data") : (es ? "demo (sin conexión)" : "demo (offline)")}
+                    {weatherLive ? pick(lang, "● datos en vivo", "● live data", "● dados ao vivo") : pick(lang, "demo (sin conexión)", "demo (offline)", "demo (sem conexão)")}
                   </span>
                 </div>
                 <div style={{ display: "flex", gap: 6, alignItems: "flex-end", height: 150 }}>
@@ -1592,14 +1592,14 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                         <div style={{ height: `${(d.p / maxP) * 46}%`, background: C.blue, borderRadius: "3px 3px 0 0", opacity: 0.85 }} title={`${d.p} mm`} />
                         <div style={{ height: `${(d.tmax / maxT) * 52}%`, background: riskColor(d.tmax * 2.2), borderRadius: "3px 3px 0 0" }} />
                       </div>
-                      <div className="mono" style={{ fontSize: 9.5, color: C.t4, marginTop: 6 }}>{es ? d.d : d.de}</div>
+                      <div className="mono" style={{ fontSize: 9.5, color: C.t4, marginTop: 6 }}>{lang === "es" ? d.d : d.de}</div>
                       <div className="mono" style={{ fontSize: 9, color: C.blue }}>{d.p}mm</div>
                     </div>
                   ))}
                 </div>
                 <div style={{ display: "flex", gap: 16, marginTop: 16 }}>
-                  <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.n2, borderRadius: 2, display: "inline-block" }} /> {es ? "temp. máxima" : "high temp"}</span>
-                  <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.blue, borderRadius: 2, display: "inline-block" }} /> {es ? "precipitación" : "rainfall"}</span>
+                  <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.n2, borderRadius: 2, display: "inline-block" }} /> {pick(lang, "temp. máxima", "high temp", "temp. máxima")}</span>
+                  <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.blue, borderRadius: 2, display: "inline-block" }} /> {pick(lang, "precipitación", "rainfall", "precipitação")}</span>
                 </div>
               </div>
             </>
