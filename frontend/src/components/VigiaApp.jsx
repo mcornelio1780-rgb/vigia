@@ -74,11 +74,18 @@ function setUserToken(t) { try { window.localStorage.setItem(USER_TOKEN_KEY, t);
 function clearUserToken() { try { window.localStorage.removeItem(USER_TOKEN_KEY); } catch {} }
 
 async function userAuth(kind, payload) {
-  const res = await fetch(`${API_URL}/api/users/${kind}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  let res;
+  try {
+    res = await fetch(`${API_URL}/api/users/${kind}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    const e = new Error("network");
+    e.network = true;
+    throw e;
+  }
   const b = await res.json().catch(() => null);
   if (!res.ok) throw new Error(b?.error || "No se pudo autenticar");
   setUserToken(b.token);
@@ -1072,7 +1079,7 @@ const Login = ({ es, lang = es ? "es" : "en", onDone, onBack }) => {
       else await userAuth("login", { email, password });
       onDone();
     } catch (e2) {
-      setErr(e2.message);
+      setErr(e2.network ? t("No pudimos conectar con el servidor. Reintenta en un momento.", "Couldn't reach the server. Please try again in a moment.", "Não foi possível conectar ao servidor. Tente novamente em instantes.") : e2.message);
     } finally {
       setBusy(false);
     }
