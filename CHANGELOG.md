@@ -26,8 +26,10 @@ sigue, de forma sencilla, [Keep a Changelog](https://keepachangelog.com/es/).
 - **Preferencias** del usuario (umbrales y canales de alerta) con saneo.
 - `GET /api/users/stats` (resumen del productor) y `GET /api/version`; `uptime`
   añadido a `/api/health`.
-- **Cabeceras de seguridad**, **rate limiting** en memoria por IP y
-  **validación compartida** de email y nombre.
+- **Cabeceras de seguridad** (incl. `Permissions-Policy` y
+  `Cross-Origin-Resource-Policy`), **rate limiting** en memoria por IP y
+  **validación compartida** de email y de longitud de nombre.
+- Respuestas de error homogéneas en JSON `{ "error": "mensaje" }`.
 - **Clima real** (Open-Meteo), **focos de calor** (NASA FIRMS) y **PDF de
   evidencia** (pdfkit), con degradación elegante cuando no hay red o clave.
 
@@ -50,4 +52,10 @@ sigue, de forma sencilla, [Keep a Changelog](https://keepachangelog.com/es/).
   gestionado.
 - **CI** (GitHub Actions) con servicio Postgres/PostGIS: pruebas del backend y
   lint/build del frontend.
-- ~59 pruebas de backend con el runner nativo de Node (`node --test`).
+- ~70 pruebas de backend (`node --test`), con una batería de **pruebas
+  unitarias sin base de datos**: contraseñas (scrypt), tokens (HMAC),
+  validación de email/nombre, saneo de preferencias, distancias FIRMS
+  (haversine), generación de PDF y mapeo del clima con datos parciales.
+- **Documentación**: formato de errores, respuestas de `/api/health` y
+  `/api/version`, idiomas ES/EN/PT, `DATABASE_SSL` en `.env.example`, README
+  del frontend y este CHANGELOG.
