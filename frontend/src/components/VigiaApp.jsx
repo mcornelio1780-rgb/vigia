@@ -1085,7 +1085,7 @@ const Login = ({ es, lang = es ? "es" : "en", onDone, onBack }) => {
         <form className="card" style={{ padding: 20 }} onSubmit={submit}>
           {tab === "up" && <><label className="mono lbl">{t("Nombre", "Name", "Nome")}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("María Fernández", "Jane Doe", "Maria Fernanda")} style={{ margin: "7px 0 14px" }} /></>}
           <label className="mono lbl">{t("Correo", "Email", "E-mail")}</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" style={{ margin: "7px 0 14px" }} />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t("tu@correo.com", "you@email.com", "seu@email.com")} style={{ margin: "7px 0 14px" }} />
           <label className="mono lbl">{t("Contraseña", "Password", "Senha")}</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={{ margin: "7px 0 4px" }} />
           {tab === "up" && <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 10, lineHeight: 1.6 }}>{t("Mínimo 6 caracteres. Al crear la cuenta aceptas el tratamiento cifrado de las coordenadas de tu campo.", "At least 6 characters. By signing up you accept encrypted processing of your field coordinates.", "Mínimo 6 caracteres. Ao criar a conta você aceita o tratamento criptografado das coordenadas do seu campo.")}</div>}
