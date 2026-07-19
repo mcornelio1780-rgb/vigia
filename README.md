@@ -220,6 +220,17 @@ mayúsculas, combinables) y la paginación `?limit=` (por defecto 100, máximo 5
 y `?offset=` (por defecto 0); los registros se devuelven del más reciente al más
 antiguo.
 
+**`POST /api/report`** genera el PDF de evidencia a partir de un JSON
+`{ farm, risks, zones, lang }`:
+
+- `farm` (**obligatorio**): datos del campo — `label`, `country`, `coord`,
+  `hectares`, `elev`… Sin `farm` responde `400`.
+- `risks`: objeto de riesgos (`fire`, `drought`, `flood`, `pest`, `frost`, `wind`).
+- `zones`: array de zonas (`{ id, crop, ndvi, ha, fire, soil }`).
+- `lang`: idioma del documento (`"es"` | `"en"`).
+
+Responde el archivo con `Content-Type: application/pdf`.
+
 **Formato de errores.** Toda respuesta de error devuelve JSON con la forma
 `{ "error": "mensaje" }` y el código HTTP correspondiente: `400` (validación),
 `401` (autenticación), `404` (no encontrado), `409` (conflicto), `413` (cuerpo
