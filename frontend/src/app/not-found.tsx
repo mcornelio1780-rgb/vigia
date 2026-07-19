@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Página no encontrada",
@@ -35,7 +36,7 @@ export default function NotFound() {
         <br />
         <span style={{ fontSize: 13 }}>This page doesn&apos;t exist. Let&apos;s head back home. · Esta página não existe. Voltar ao início.</span>
       </p>
-      <a
+      <Link
         href="/"
         style={{
           display: "inline-flex",
@@ -51,7 +52,7 @@ export default function NotFound() {
         }}
       >
         Volver al inicio · Home · Início
-      </a>
+      </Link>
     </main>
   );
 }
