@@ -752,7 +752,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
       </div>
 
       {/* CÓMO FUNCIONA */}
-      <div className="wrap"><section className="sec">
+      <div className="wrap"><section className="sec" id="como-funciona">
         <div className="eyebrow">{t("Cómo funciona", "How it works", "Como funciona")}</div>
         <h2 className="h2" style={{ marginTop: 12, maxWidth: 640 }}>{t("De un punto en el mapa a una alerta que salva tu cosecha", "From a point on the map to an alert that saves your harvest", "De um ponto no mapa a um alerta que salva sua colheita")}</h2>
         <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", marginTop: 26, gap: 18 }}>
@@ -775,7 +775,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
       </section></div>
 
       {/* RIESGOS */}
-      <div className="wrap"><section className="sec">
+      <div className="wrap"><section className="sec" id="riesgos">
         <div className="eyebrow">{t("Qué vigila", "What it watches", "O que vigia")}</div>
         <h2 className="h2" style={{ marginTop: 12, maxWidth: 620 }}>{t("Seis amenazas, un solo umbral que tú defines", "Six threats, one threshold you set yourself", "Seis ameaças, um único limite que você define")}</h2>
         <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", marginTop: 26 }}>
@@ -839,7 +839,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
       </section></div>
 
       {/* PRECIOS */}
-      <div className="wrap"><section className="sec">
+      <div className="wrap"><section className="sec" id="precio">
         <div className="eyebrow">{es ? "Precio" : "Pricing"}</div>
         <h2 className="h2" style={{ marginTop: 12 }}>{es ? "$9 al mes, más $0.15 por hectárea" : "$9 a month, plus $0.15 per hectare"}</h2>
         <p className="lead" style={{ marginTop: 10, maxWidth: 570 }}>
@@ -997,12 +997,40 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
       </section></div>
 
       <div className="wrap">
-        <footer style={{ borderTop: `1px solid ${C.line}`, padding: "22px 0 34px", display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-          <span className="mono" style={{ fontSize: 10.5, color: C.t4 }}>{BRAND} © 2026 · {DOMAIN}</span>
-          <span style={{ display: "flex", gap: 14 }}>
-            <button onClick={onAdmin} aria-label={es ? "Panel de administrador" : "Admin panel"} className="mono" style={{ fontSize: 10.5, color: C.t4, background: "none", border: "none", cursor: "pointer", padding: 0 }}>{es ? "Administrador" : "Admin"}</button>
-            <span className="mono" style={{ fontSize: 10.5, color: C.t4 }}>{es ? "Datos: NASA · ESA · NOAA · ISRIC" : "Data: NASA · ESA · NOAA · ISRIC"}</span>
-          </span>
+        <footer style={{ borderTop: `1px solid ${C.line}`, marginTop: 20, paddingTop: 36, paddingBottom: 40 }}>
+          <div style={{ display: "flex", gap: 40, flexWrap: "wrap", justifyContent: "space-between" }}>
+            <div style={{ maxWidth: 300 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
+                <span style={{ fontSize: 16, fontWeight: 700 }}>{BRAND}</span>
+              </div>
+              <p style={{ fontSize: 12.5, color: C.t3, lineHeight: 1.6, margin: "12px 0 0" }}>{t("Inteligencia climática satelital para el campo. Te avisamos antes de que veas el problema, zona por zona, en cualquier país.", "Satellite climate intelligence for farms. We warn you before you see the problem, zone by zone, in any country.", "Inteligência climática por satélite para o campo. Avisamos antes de você ver o problema, zona a zona, em qualquer país.")}</p>
+            </div>
+            <div style={{ display: "flex", gap: 48, flexWrap: "wrap" }}>
+              <div>
+                <div className="mono lbl" style={{ marginBottom: 12 }}>{t("Producto", "Product", "Produto")}</div>
+                <a href="#como-funciona" className="mono" style={{ display: "block", fontSize: 12, color: C.t2, textDecoration: "none", padding: "5px 0" }}>{t("Cómo funciona", "How it works", "Como funciona")}</a>
+                <a href="#riesgos" className="mono" style={{ display: "block", fontSize: 12, color: C.t2, textDecoration: "none", padding: "5px 0" }}>{t("Riesgos", "Risks", "Riscos")}</a>
+                <a href="#precio" className="mono" style={{ display: "block", fontSize: 12, color: C.t2, textDecoration: "none", padding: "5px 0" }}>{t("Precio", "Pricing", "Preço")}</a>
+              </div>
+              <div>
+                <div className="mono lbl" style={{ marginBottom: 12 }}>{t("Datos", "Data", "Dados")}</div>
+                <span className="mono" style={{ display: "block", fontSize: 12, color: C.t3, padding: "5px 0" }}>Sentinel-2 · ESA</span>
+                <span className="mono" style={{ display: "block", fontSize: 12, color: C.t3, padding: "5px 0" }}>NASA FIRMS</span>
+                <span className="mono" style={{ display: "block", fontSize: 12, color: C.t3, padding: "5px 0" }}>Open-Meteo</span>
+              </div>
+              <div>
+                <div className="mono lbl" style={{ marginBottom: 12 }}>{t("Empresa", "Company", "Empresa")}</div>
+                <button onClick={onEnter} className="mono" style={{ display: "block", fontSize: 12, color: C.t2, background: "none", border: "none", cursor: "pointer", padding: "5px 0", textAlign: "left" }}>{t("Contacto", "Contact", "Contato")}</button>
+                <button onClick={onAdmin} aria-label={es ? "Panel de administrador" : "Admin panel"} className="mono" style={{ display: "block", fontSize: 12, color: C.t2, background: "none", border: "none", cursor: "pointer", padding: "5px 0", textAlign: "left" }}>{t("Administrador", "Admin", "Admin")}</button>
+                <span className="mono" style={{ display: "block", fontSize: 12, color: C.t3, padding: "5px 0" }}>{t("Beta global", "Global beta", "Beta global")}</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ borderTop: `1px solid ${C.line2}`, marginTop: 28, paddingTop: 16, display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <span className="mono" style={{ fontSize: 10.5, color: C.t4 }}>{BRAND} © 2026 · {DOMAIN} · {t("Beta global · pre-lanzamiento", "Global beta · pre-launch", "Beta global · pré-lançamento")}</span>
+            <span className="mono" style={{ fontSize: 10.5, color: C.t4, maxWidth: 440 }}>{t("Los datos satelitales y agronómicos del panel de demostración son de ejemplo.", "Satellite and agronomic data in the demo dashboard are illustrative.", "Os dados de satélite e agronômicos do painel de demonstração são ilustrativos.")}</span>
+          </div>
         </footer>
       </div>
     </>
