@@ -1609,23 +1609,23 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {tab === "drought" && (
             <>
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
-                <Metric icon={ic.drought} c={riskColor(farm.risks.drought)} label={es ? "Déficit hídrico" : "Water deficit"} value={farm.risks.drought} unit="%" sub={es ? `umbral ${thDrought}%` : `threshold ${thDrought}%`} />
-                <Metric icon={ic.clock} c={C.n3} label={es ? "Sin lluvia efectiva" : "No effective rain"} value="24" unit={es ? "días" : "days"} />
-                <Metric icon={ic.leaf} c={C.n2} label={es ? "Caída de NDVI" : "NDVI drop"} value="-0.14" sub={es ? "últimas 2 pasadas" : "last 2 passes"} />
-                <Metric icon={ic.water} c={C.blue} label={es ? "Índice SPI-3" : "SPI-3 index"} value="-1.6" sub={es ? "sequía moderada" : "moderate drought"} />
+                <Metric icon={ic.drought} c={riskColor(farm.risks.drought)} label={pick(lang, "Déficit hídrico", "Water deficit", "Déficit hídrico")} value={farm.risks.drought} unit="%" sub={pick(lang, `umbral ${thDrought}%`, `threshold ${thDrought}%`, `limite ${thDrought}%`)} />
+                <Metric icon={ic.clock} c={C.n3} label={pick(lang, "Sin lluvia efectiva", "No effective rain", "Sem chuva efetiva")} value="24" unit={pick(lang, "días", "days", "dias")} />
+                <Metric icon={ic.leaf} c={C.n2} label={pick(lang, "Caída de NDVI", "NDVI drop", "Queda do NDVI")} value="-0.14" sub={pick(lang, "últimas 2 pasadas", "last 2 passes", "últimas 2 passagens")} />
+                <Metric icon={ic.water} c={C.blue} label={pick(lang, "Índice SPI-3", "SPI-3 index", "Índice SPI-3")} value="-1.6" sub={pick(lang, "sequía moderada", "moderate drought", "seca moderada")} />
               </div>
               <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 14 }}>
                 <div className="card">
-                  <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Estrés hídrico por zona" : "Water stress by zone"}</div>
+                  <div className="mono lbl" style={{ marginBottom: 14 }}>{pick(lang, "Estrés hídrico por zona", "Water stress by zone", "Estresse hídrico por zona")}</div>
                   {zones.map((z) => (
-                    <Bar key={z.id} label={`${es ? "Zona" : "Zone"} ${z.id} · ${z.crop[es ? 0 : 1]}`} v={100 - z.soil} c={riskColor(100 - z.soil)} threshold={thDrought} />
+                    <Bar key={z.id} label={`${pick(lang, "Zona", "Zone", "Zona")} ${z.id} · ${z.crop[lang === "es" ? 0 : 1]}`} v={100 - z.soil} c={riskColor(100 - z.soil)} threshold={thDrought} />
                   ))}
                   <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 8, lineHeight: 1.6 }}>
-                    {es ? "Humedad de suelo estimada con SoilGrids + balance hídrico ERA5. La línea marca tu umbral de alerta." : "Soil moisture estimated with SoilGrids + ERA5 water balance. The line marks your alert threshold."}
+                    {pick(lang, "Humedad de suelo estimada con SoilGrids + balance hídrico ERA5. La línea marca tu umbral de alerta.", "Soil moisture estimated with SoilGrids + ERA5 water balance. The line marks your alert threshold.", "Umidade do solo estimada com SoilGrids + balanço hídrico ERA5. A linha marca o seu limite de alerta.")}
                   </div>
                 </div>
                 <div className="card">
-                  <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "NDVI de las últimas 8 pasadas" : "NDVI over the last 8 passes"}</div>
+                  <div className="mono lbl" style={{ marginBottom: 14 }}>{pick(lang, "NDVI de las últimas 8 pasadas", "NDVI over the last 8 passes", "NDVI das últimas 8 passagens")}</div>
                   <svg viewBox="0 0 300 130" style={{ width: "100%" }} role="img">
                     {[0, 1, 2, 3].map((i) => <line key={i} x1="0" y1={12 + i * 34} x2="300" y2={12 + i * 34} stroke={C.line} strokeWidth="1" />)}
                     {[[C.n5, [0.79, 0.78, 0.8, 0.77, 0.75, 0.76, 0.74, 0.73]], [C.n3, [0.62, 0.6, 0.58, 0.55, 0.52, 0.5, 0.47, 0.44]], [C.n1, [0.4, 0.38, 0.35, 0.31, 0.28, 0.25, 0.22, 0.19]]].map(([col, series], si) => (
@@ -1633,17 +1633,18 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                     ))}
                   </svg>
                   <div style={{ display: "flex", gap: 14, marginTop: 10, flexWrap: "wrap" }}>
-                    <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.n5, borderRadius: 2, display: "inline-block" }} /> {es ? "zonas A-B estables" : "zones A-B stable"}</span>
-                    <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.n3, borderRadius: 2, display: "inline-block" }} /> {es ? "zonas C-D en caída" : "zones C-D falling"}</span>
-                    <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.n1, borderRadius: 2, display: "inline-block" }} /> {es ? "zona F crítica" : "zone F critical"}</span>
+                    <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.n5, borderRadius: 2, display: "inline-block" }} /> {pick(lang, "zonas A-B estables", "zones A-B stable", "zonas A-B estáveis")}</span>
+                    <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.n3, borderRadius: 2, display: "inline-block" }} /> {pick(lang, "zonas C-D en caída", "zones C-D falling", "zonas C-D em queda")}</span>
+                    <span className="mono lbl"><span style={{ width: 9, height: 9, background: C.n1, borderRadius: 2, display: "inline-block" }} /> {pick(lang, "zona F crítica", "zone F critical", "zona F crítica")}</span>
                   </div>
                 </div>
               </div>
               <div className="card" style={{ marginTop: 14, borderColor: `${C.n2}33` }}>
-                <div className="mono lbl" style={{ marginBottom: 10 }}>{es ? "Qué hacer con esto" : "What to do about it"}</div>
+                <div className="mono lbl" style={{ marginBottom: 10 }}>{pick(lang, "Qué hacer con esto", "What to do about it", "O que fazer com isso")}</div>
                 <p style={{ fontSize: 13, color: C.t2, lineHeight: 1.65, margin: 0 }}>
-                  {es ? "Las zonas C y D concentran el 42% de la superficie y llevan tres pasadas consecutivas de NDVI descendente sin lluvia efectiva. Si el pronóstico de 10 días se cumple, el déficit cruza tu umbral del 40% en aproximadamente 6 días. Priorizar riego en D antes que en C: D tiene menor retención por textura de suelo."
-                    : "Zones C and D hold 42% of the area and have logged three consecutive NDVI declines with no effective rain. If the 10-day forecast holds, the deficit crosses your 40% threshold in roughly 6 days. Prioritize irrigation in D over C: D retains less water due to soil texture."}
+                  {pick(lang, "Las zonas C y D concentran el 42% de la superficie y llevan tres pasadas consecutivas de NDVI descendente sin lluvia efectiva. Si el pronóstico de 10 días se cumple, el déficit cruza tu umbral del 40% en aproximadamente 6 días. Priorizar riego en D antes que en C: D tiene menor retención por textura de suelo.",
+                    "Zones C and D hold 42% of the area and have logged three consecutive NDVI declines with no effective rain. If the 10-day forecast holds, the deficit crosses your 40% threshold in roughly 6 days. Prioritize irrigation in D over C: D retains less water due to soil texture.",
+                    "As zonas C e D concentram 42% da superfície e acumulam três passagens consecutivas de NDVI em queda sem chuva efetiva. Se a previsão de 10 dias se confirmar, o déficit cruza o seu limite de 40% em aproximadamente 6 dias. Priorizar irrigação em D antes de C: D tem menor retenção pela textura do solo.")}
                 </p>
               </div>
             </>
@@ -1653,13 +1654,13 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {tab === "crops" && (
             <>
               <div className="card">
-                <div className="mono lbl" style={{ marginBottom: 6 }}>{es ? "Variedades recomendadas para esta ubicación" : "Recommended varieties for this location"}</div>
+                <div className="mono lbl" style={{ marginBottom: 6 }}>{pick(lang, "Variedades recomendadas para esta ubicación", "Recommended varieties for this location", "Variedades recomendadas para este local")}</div>
                 <p style={{ fontSize: 12.5, color: C.t3, margin: "0 0 16px", lineHeight: 1.55 }}>
-                  {es ? `Cruzando clima de 40 años, suelo SoilGrids y elevación ${farm.elev} m. El precio proviene del mercado de referencia de tu país.` : `Cross-referencing 40 years of climate, SoilGrids soil data and ${farm.elev} m elevation. Price comes from your country's reference market.`}
+                  {pick(lang, `Cruzando clima de 40 años, suelo SoilGrids y elevación ${farm.elev} m. El precio proviene del mercado de referencia de tu país.`, `Cross-referencing 40 years of climate, SoilGrids soil data and ${farm.elev} m elevation. Price comes from your country's reference market.`, `Cruzando clima de 40 anos, solo SoilGrids e elevação ${farm.elev} m. O preço vem do mercado de referência do seu país.`)}
                 </p>
                 <div style={{ overflowX: "auto" }}>
                   <table>
-                    <thead><tr><th style={{ minWidth: 200 }}>{es ? "Variedad" : "Variety"}</th><th>{es ? "Aptitud" : "Fit"}</th><th>{es ? "Precio" : "Price"}</th><th>{es ? "Mercado" : "Market"}</th></tr></thead>
+                    <thead><tr><th style={{ minWidth: 200 }}>{pick(lang, "Variedad", "Variety", "Variedade")}</th><th>{pick(lang, "Aptitud", "Fit", "Aptidão")}</th><th>{pick(lang, "Precio", "Price", "Preço")}</th><th>{pick(lang, "Mercado", "Market", "Mercado")}</th></tr></thead>
                     <tbody>
                       {farm.crops.map((c, i) => (
                         <tr key={i}>
@@ -1682,7 +1683,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 </div>
               </div>
               <div className="card" style={{ marginTop: 14 }}>
-                <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Ventana de siembra sugerida" : "Suggested planting window"}</div>
+                <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Ventana de siembra sugerida", "Suggested planting window", "Janela de plantio sugerida")}</div>
                 <div style={{ display: "flex", gap: 3 }}>
                   {["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map((m, i) => {
                     const ok = i >= 8 || i <= 1;
@@ -1702,12 +1703,12 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {tab === "pests" && (
             <>
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
-                <Metric icon={ic.bug} c={riskColor(farm.risks.pest)} label={es ? "Riesgo de brote" : "Outbreak risk"} value={farm.risks.pest} unit="%" />
-                <Metric icon={ic.sun} c={C.n3} label={es ? "Grados-día acum." : "Growing degree days"} value="842" sub={es ? "desde siembra" : "since planting"} />
-                <Metric icon={ic.drought} c={C.t2} label={es ? "Humedad favorable" : "Favorable humidity"} value={weather[0].h > 70 ? (es ? "Sí" : "Yes") : "No"} sub={`${weather[0].h}%`} />
+                <Metric icon={ic.bug} c={riskColor(farm.risks.pest)} label={pick(lang, "Riesgo de brote", "Outbreak risk", "Risco de surto")} value={farm.risks.pest} unit="%" />
+                <Metric icon={ic.sun} c={C.n3} label={pick(lang, "Grados-día acum.", "Growing degree days", "Graus-dia acum.")} value="842" sub={pick(lang, "desde siembra", "since planting", "desde o plantio")} />
+                <Metric icon={ic.drought} c={C.t2} label={pick(lang, "Humedad favorable", "Favorable humidity", "Umidade favorável")} value={weather[0].h > 70 ? pick(lang, "Sí", "Yes", "Sim") : pick(lang, "No", "No", "Não")} sub={`${weather[0].h}%`} />
               </div>
               <div className="card" style={{ marginTop: 14 }}>
-                <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Plagas con ventana climática abierta" : "Pests with an open climate window"}</div>
+                <div className="mono lbl" style={{ marginBottom: 14 }}>{pick(lang, "Plagas con ventana climática abierta", "Pests with an open climate window", "Pragas com janela climática aberta")}</div>
                 <div style={{ display: "grid", gap: 9 }}>
                   {[
                     { n: "Spodoptera frugiperda", c: { es: "Gusano cogollero", en: "Fall armyworm" }, r: farm.risks.pest, w: { es: "Temperaturas de 24-30 °C sostenidas 5 días", en: "24-30 °C sustained for 5 days" } },
