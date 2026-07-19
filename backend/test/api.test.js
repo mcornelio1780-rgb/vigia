@@ -72,6 +72,7 @@ test("POST /api/leads acepta el boletín sin ubicación", async () => {
 });
 
 test("POST /api/leads valida email, kind, hectares y coordenadas", async () => {
+  assert.equal((await api(base, "/api/leads", json("POST", {}))).status, 400); // sin email
   assert.equal((await api(base, "/api/leads", json("POST", { email: "no-es-email" }))).status, 400);
   assert.equal((await api(base, "/api/leads", json("POST", { email: "a@b.com", kind: "otro" }))).status, 400);
   assert.equal((await api(base, "/api/leads", json("POST", { email: "a@b.com", hectares: -5 }))).status, 400);
