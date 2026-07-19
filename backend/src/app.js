@@ -105,6 +105,9 @@ export function createApp() {
   app.use("/api/leads", leadsRouter);
   app.use("/api/users", usersRouter);
 
+  // Ruta no encontrada: responde JSON en vez del 404 HTML por defecto.
+  app.use((_req, res) => res.status(404).json({ error: "No encontrado" }));
+
   app.use((err, _req, res, _next) => {
     if (err.type === "entity.too.large" || err.status === 413) {
       return res.status(413).json({ error: "Cuerpo de la solicitud demasiado grande" });

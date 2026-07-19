@@ -33,6 +33,14 @@ test("GET /api/version devuelve nombre, versión y uptime", async () => {
   assert.ok(body.uptime >= 0);
 });
 
+test("una ruta inexistente devuelve 404 en JSON", async () => {
+  const { status, body } = await api(base, "/api/no-existe");
+  assert.equal(status, 404);
+  assert.ok(body.error); // { error: "No encontrado" }, no HTML
+  // Una ruta válida sigue funcionando.
+  assert.equal((await api(base, "/api/health")).status, 200);
+});
+
 test("todas las respuestas incluyen cabeceras de seguridad", async () => {
   const res = await fetch(`${base}/api/health`);
   assert.equal(res.headers.get("x-content-type-options"), "nosniff");
