@@ -31,6 +31,19 @@ async function fetchLeadStats() {
   return res.json();
 }
 
+// Pronóstico real vía backend (Open-Meteo). Devuelve la serie de días o
+// null si no hay red disponible, para que el dashboard use su demo.
+async function fetchWeather(lat, lng) {
+  try {
+    const res = await fetch(`${API_URL}/api/weather?lat=${lat}&lng=${lng}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return Array.isArray(data.days) && data.days.length ? data.days : null;
+  } catch {
+    return null;
+  }
+}
+
 const C = {
   bg: "#080D0B", s1: "#0D1512", s2: "#121C18", s3: "#182620",
   line: "rgba(120,190,150,0.10)", line2: "rgba(120,190,150,0.22)",
@@ -105,7 +118,7 @@ const SHAPE_B = {
 /* ── Campos: seis continentes ── */
 const FARMS = {
   iowa: {
-    label: "Story County, Iowa", country: "USA", cc: "US", coord: "42°02′N 93°37′O", tz: "UTC−5",
+    label: "Story County, Iowa", country: "USA", cc: "US", coord: "42°02′N 93°37′O", tz: "UTC−5", lat: 42.03, lng: -93.62,
     shape: SHAPE_A, ha: 640, elev: 285, crop: { es: "Maíz / Soja", en: "Corn / Soybean" },
     zones: [0.81, 0.76, 0.68, 0.44, 0.71, 0.33],
     zoneCrop: [["Maíz — R2", "Corn — R2"], ["Maíz — R2", "Corn — R2"], ["Soja — R4", "Soybean — R4"], ["Soja — R4", "Soybean — R4"], ["Maíz — R2", "Corn — R2"], ["Franja de borde", "Field margin"]],
@@ -118,7 +131,7 @@ const FARMS = {
     ],
   },
   nsw: {
-    label: "Riverina, NSW", country: "Australia", cc: "AU", coord: "34°17′S 146°03′E", tz: "UTC+11",
+    label: "Riverina, NSW", country: "Australia", cc: "AU", coord: "34°17′S 146°03′E", tz: "UTC+11", lat: -34.28, lng: 146.05,
     shape: SHAPE_B, ha: 1240, elev: 132, crop: { es: "Trigo / Pastura", en: "Wheat / Pasture" },
     zones: [0.52, 0.41, 0.29, 0.18, 0.36, 0.15],
     zoneCrop: [["Trigo — encañado", "Wheat — stem elong."], ["Trigo — encañado", "Wheat — stem elong."], ["Pastura", "Pasture"], ["Pastura", "Pasture"], ["Barbecho", "Fallow"], ["Barbecho", "Fallow"]],
@@ -131,7 +144,7 @@ const FARMS = {
     ],
   },
   matogrosso: {
-    label: "Sorriso, Mato Grosso", country: "Brasil", cc: "BR", coord: "12°32′S 55°42′O", tz: "UTC−4",
+    label: "Sorriso, Mato Grosso", country: "Brasil", cc: "BR", coord: "12°32′S 55°42′O", tz: "UTC−4", lat: -12.53, lng: -55.70,
     shape: SHAPE_A, ha: 2100, elev: 365, crop: { es: "Soja / Maíz safrinha", en: "Soybean / 2nd corn" },
     zones: [0.84, 0.79, 0.73, 0.62, 0.77, 0.48],
     zoneCrop: [["Soja — R5", "Soybean — R5"], ["Soja — R5", "Soybean — R5"], ["Soja — R5", "Soybean — R5"], ["Maíz safrinha", "2nd-season corn"], ["Soja — R5", "Soybean — R5"], ["Reserva legal", "Legal reserve"]],
@@ -144,7 +157,7 @@ const FARMS = {
     ],
   },
   punjab: {
-    label: "Ludhiana, Punjab", country: "India", cc: "IN", coord: "30°54′N 75°51′E", tz: "UTC+5:30",
+    label: "Ludhiana, Punjab", country: "India", cc: "IN", coord: "30°54′N 75°51′E", tz: "UTC+5:30", lat: 30.90, lng: 75.85,
     shape: SHAPE_B, ha: 96, elev: 244, crop: { es: "Arroz / Trigo", en: "Rice / Wheat" },
     zones: [0.69, 0.64, 0.51, 0.38, 0.58, 0.26],
     zoneCrop: [["Arroz — macollaje", "Rice — tillering"], ["Arroz — macollaje", "Rice — tillering"], ["Arroz — macollaje", "Rice — tillering"], ["Trigo (post-cosecha)", "Wheat (post-harvest)"], ["Arroz", "Rice"], ["Canal / borde", "Canal / margin"]],
@@ -157,7 +170,7 @@ const FARMS = {
     ],
   },
   andalucia: {
-    label: "Écija, Andalucía", country: "España", cc: "ES", coord: "37°32′N 5°04′O", tz: "UTC+2",
+    label: "Écija, Andalucía", country: "España", cc: "ES", coord: "37°32′N 5°04′O", tz: "UTC+2", lat: 37.53, lng: -5.07,
     shape: SHAPE_A, ha: 310, elev: 110, crop: { es: "Olivar / Girasol", en: "Olive / Sunflower" },
     zones: [0.58, 0.49, 0.37, 0.24, 0.44, 0.17],
     zoneCrop: [["Olivar intensivo", "Intensive olive"], ["Olivar intensivo", "Intensive olive"], ["Girasol", "Sunflower"], ["Girasol", "Sunflower"], ["Olivar tradicional", "Traditional olive"], ["Erial", "Wasteland"]],
@@ -170,7 +183,7 @@ const FARMS = {
     ],
   },
   cordoba: {
-    label: "Río Cuarto, Córdoba", country: "Argentina", cc: "AR", coord: "33°08′S 64°21′O", tz: "UTC−3",
+    label: "Río Cuarto, Córdoba", country: "Argentina", cc: "AR", coord: "33°08′S 64°21′O", tz: "UTC−3", lat: -33.13, lng: -64.35,
     shape: SHAPE_B, ha: 480, elev: 421, crop: { es: "Soja / Maíz", en: "Soybean / Corn" },
     zones: [0.79, 0.71, 0.54, 0.36, 0.63, 0.19],
     zoneCrop: [["Soja — R3", "Soybean — R3"], ["Soja — R3", "Soybean — R3"], ["Maíz — V8", "Corn — V8"], ["Maíz — V8", "Corn — V8"], ["Pastura", "Pasture"], ["Barbecho", "Fallow"]],
@@ -735,7 +748,16 @@ const Dashboard = ({ es, setLang, onLogout }) => {
   const [zone, setZone] = useState(null);
   const [nav, setNav] = useState(false);
   const farm = FARMS[farmKey];
-  const weather = useMemo(() => buildWeather(farm), [farmKey]);
+  const weatherDemo = useMemo(() => buildWeather(farm), [farmKey]);
+  const [liveWeather, setLiveWeather] = useState(null);
+  useEffect(() => {
+    let active = true;
+    setLiveWeather(null);
+    fetchWeather(farm.lat, farm.lng).then((d) => { if (active) setLiveWeather(d); });
+    return () => { active = false; };
+  }, [farmKey]);
+  const weather = liveWeather ?? weatherDemo;
+  const weatherLive = !!liveWeather;
 
   /* settings */
   const [wa, setWa] = useState(true), [sms, setSms] = useState(true), [mail, setMail] = useState(true), [push, setPush] = useState(false);
@@ -915,7 +937,12 @@ const Dashboard = ({ es, setLang, onLogout }) => {
                 <Metric icon={ic.drought} c={C.t2} label={es ? "Humedad rel." : "Humidity"} value={weather[0].h} unit="%" />
               </div>
               <div className="card" style={{ marginTop: 14 }}>
-                <div className="mono lbl" style={{ marginBottom: 18 }}>{es ? "Pronóstico 10 días · Open-Meteo + ERA5" : "10-day forecast · Open-Meteo + ERA5"}</div>
+                <div className="mono lbl" style={{ marginBottom: 18, display: "flex", justifyContent: "space-between", width: "100%" }}>
+                  <span>{es ? "Pronóstico 10 días · Open-Meteo" : "10-day forecast · Open-Meteo"}</span>
+                  <span style={{ color: weatherLive ? C.green : C.t4 }}>
+                    {weatherLive ? (es ? "● datos en vivo" : "● live data") : (es ? "demo (sin conexión)" : "demo (offline)")}
+                  </span>
+                </div>
                 <div style={{ display: "flex", gap: 6, alignItems: "flex-end", height: 150 }}>
                   {weather.map((d, i) => (
                     <div key={i} style={{ flex: 1, textAlign: "center" }}>
