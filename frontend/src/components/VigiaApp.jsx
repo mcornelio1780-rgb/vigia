@@ -1472,7 +1472,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {/* ── VISTA GENERAL ── */}
           {tab === "overview" && (
             <>
-              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
+              <div className="grid metrics" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
                 <Metric icon={ic.fire} c={riskColor(farm.risks.fire)} label={pick(lang, "Riesgo mayor", "Top risk", "Risco maior")} value={worst} unit="%" sub={pick(lang, "incendio · zona F", "wildfire · zone F", "incêndio · zona F")} />
                 <Metric icon={ic.leaf} c={ndviColor(Number(avgNdvi))} label="NDVI" value={avgNdvi} sub={pick(lang, "promedio ponderado", "weighted average", "média ponderada")} />
                 <Metric icon={ic.map} label={pick(lang, "Superficie", "Area", "Superfície")} value={Number(farm.ha).toLocaleString(pick(lang, "es", "en", "pt"))} unit="ha" sub={pick(lang, "6 zonas de manejo", "6 management zones", "6 zonas de manejo")} />
@@ -1575,7 +1575,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {/* ── CLIMA ── */}
           {tab === "weather" && (
             <>
-              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
+              <div className="grid metrics" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
                 <Metric icon={ic.sun} c={C.n2} label={pick(lang, "Máxima hoy", "High today", "Máxima hoje")} value={weather[0].tmax} unit="°C" sub={pick(lang, `mínima ${weather[0].tmin}°C`, `low ${weather[0].tmin}°C`, `mínima ${weather[0].tmin}°C`)} />
                 <Metric icon={ic.water} c={C.blue} label={pick(lang, "Lluvia 48 h", "Rain 48 h", "Chuva 48 h")} value={weather[0].p + weather[1].p} unit="mm" />
                 <Metric icon={ic.wind} c={C.blue} label={pick(lang, "Viento", "Wind", "Vento")} value={weather[0].w} unit="km/h" sub={pick(lang, `umbral ${thWind} km/h`, `threshold ${thWind} km/h`, `limite ${thWind} km/h`)} />
@@ -1612,7 +1612,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {/* ── SEQUÍAS ── */}
           {tab === "drought" && (
             <>
-              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
+              <div className="grid metrics" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
                 <Metric icon={ic.drought} c={riskColor(farm.risks.drought)} label={pick(lang, "Déficit hídrico", "Water deficit", "Déficit hídrico")} value={farm.risks.drought} unit="%" sub={pick(lang, `umbral ${thDrought}%`, `threshold ${thDrought}%`, `limite ${thDrought}%`)} />
                 <Metric icon={ic.clock} c={C.n3} label={pick(lang, "Sin lluvia efectiva", "No effective rain", "Sem chuva efetiva")} value="24" unit={pick(lang, "días", "days", "dias")} />
                 <Metric icon={ic.leaf} c={C.n2} label={pick(lang, "Caída de NDVI", "NDVI drop", "Queda do NDVI")} value="-0.14" sub={pick(lang, "últimas 2 pasadas", "last 2 passes", "últimas 2 passagens")} />
@@ -1706,7 +1706,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {/* ── PLAGAS ── */}
           {tab === "pests" && (
             <>
-              <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
+              <div className="grid metrics" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
                 <Metric icon={ic.bug} c={riskColor(farm.risks.pest)} label={pick(lang, "Riesgo de brote", "Outbreak risk", "Risco de surto")} value={farm.risks.pest} unit="%" />
                 <Metric icon={ic.sun} c={C.n3} label={pick(lang, "Grados-día acum.", "Growing degree days", "Graus-dia acum.")} value="842" sub={pick(lang, "desde siembra", "since planting", "desde o plantio")} />
                 <Metric icon={ic.drought} c={C.t2} label={pick(lang, "Humedad favorable", "Favorable humidity", "Umidade favorável")} value={weather[0].h > 70 ? pick(lang, "Sí", "Yes", "Sim") : pick(lang, "No", "No", "Não")} sub={`${weather[0].h}%`} />
@@ -2114,6 +2114,7 @@ export default function VigiaApp() {
         @media(max-width:880px){
           .hero{grid-template-columns:1fr;gap:30px;padding-top:32px}
           .grid{grid-template-columns:1fr !important}
+          .grid.metrics{grid-template-columns:repeat(auto-fit,minmax(140px,1fr)) !important}
           .side{position:fixed;left:-230px;z-index:20;transition:left .2s;box-shadow:0 0 40px rgba(0,0,0,.6)}
           .side.open{left:0}
           .burger{display:inline-block}
