@@ -320,9 +320,9 @@ const FARMS = {
     risks: { fire: 12, drought: 38, flood: 61, pest: 44, frost: 8, wind: 52 },
     base: { t: 26, p: 14, h: 63, w: 21 },
     crops: [
-      { n: "Zea mays var. indentata", c: { es: "Maíz dentado 'P1197'", en: "Dent corn 'P1197'" }, fit: 94, price: "$4.62 / bu", src: "CBOT" },
-      { n: "Glycine max 'AG28XF3'", c: { es: "Soja grupo II", en: "Soybean group II" }, fit: 88, price: "$10.84 / bu", src: "CBOT" },
-      { n: "Sorghum bicolor", c: { es: "Sorgo tolerante a sequía", en: "Drought-tolerant sorghum" }, fit: 71, price: "$4.05 / bu", src: "USDA" },
+      { n: "Zea mays var. indentata", c: { es: "Maíz dentado 'P1197'", en: "Dent corn 'P1197'", pt: "Milho dentado 'P1197'" }, fit: 94, price: "$4.62 / bu", src: "CBOT" },
+      { n: "Glycine max 'AG28XF3'", c: { es: "Soja grupo II", en: "Soybean group II", pt: "Soja grupo II" }, fit: 88, price: "$10.84 / bu", src: "CBOT" },
+      { n: "Sorghum bicolor", c: { es: "Sorgo tolerante a sequía", en: "Drought-tolerant sorghum", pt: "Sorgo tolerante à seca" }, fit: 71, price: "$4.05 / bu", src: "USDA" },
     ],
   },
   nsw: {
@@ -333,9 +333,9 @@ const FARMS = {
     risks: { fire: 78, drought: 84, flood: 6, pest: 22, frost: 14, wind: 58 },
     base: { t: 34, p: 1, h: 24, w: 33 },
     crops: [
-      { n: "Triticum aestivum 'Scepter'", c: { es: "Trigo panadero de ciclo corto", en: "Short-season bread wheat" }, fit: 89, price: "A$362 / t", src: "ASX" },
-      { n: "Hordeum vulgare 'Compass'", c: { es: "Cebada tolerante a calor", en: "Heat-tolerant barley" }, fit: 92, price: "A$318 / t", src: "ASX" },
-      { n: "Cicer arietinum 'PBA Seamer'", c: { es: "Garbanzo desert-hardy", en: "Desert-hardy chickpea" }, fit: 84, price: "A$742 / t", src: "ASX" },
+      { n: "Triticum aestivum 'Scepter'", c: { es: "Trigo panadero de ciclo corto", en: "Short-season bread wheat", pt: "Trigo de panificação de ciclo curto" }, fit: 89, price: "A$362 / t", src: "ASX" },
+      { n: "Hordeum vulgare 'Compass'", c: { es: "Cebada tolerante a calor", en: "Heat-tolerant barley", pt: "Cevada tolerante ao calor" }, fit: 92, price: "A$318 / t", src: "ASX" },
+      { n: "Cicer arietinum 'PBA Seamer'", c: { es: "Garbanzo desert-hardy", en: "Desert-hardy chickpea", pt: "Grão-de-bico resistente ao deserto" }, fit: 84, price: "A$742 / t", src: "ASX" },
     ],
   },
   matogrosso: {
@@ -346,9 +346,9 @@ const FARMS = {
     risks: { fire: 41, drought: 19, flood: 47, pest: 68, frost: 2, wind: 29 },
     base: { t: 31, p: 42, h: 81, w: 12 },
     crops: [
-      { n: "Glycine max 'TMG 7067'", c: { es: "Soja RR2 ciclo 110 d", en: "Soybean RR2, 110-day" }, fit: 95, price: "R$132 / sc", src: "B3" },
-      { n: "Zea mays 'DKB 390'", c: { es: "Maíz safrinha", en: "Second-crop corn" }, fit: 87, price: "R$61 / sc", src: "B3" },
-      { n: "Gossypium hirsutum 'FM 985'", c: { es: "Algodón de fibra larga", en: "Long-staple cotton" }, fit: 79, price: "R$4.12 / lb", src: "ICE" },
+      { n: "Glycine max 'TMG 7067'", c: { es: "Soja RR2 ciclo 110 d", en: "Soybean RR2, 110-day", pt: "Soja RR2 ciclo 110 d" }, fit: 95, price: "R$132 / sc", src: "B3" },
+      { n: "Zea mays 'DKB 390'", c: { es: "Maíz safrinha", en: "Second-crop corn", pt: "Milho safrinha" }, fit: 87, price: "R$61 / sc", src: "B3" },
+      { n: "Gossypium hirsutum 'FM 985'", c: { es: "Algodón de fibra larga", en: "Long-staple cotton", pt: "Algodão de fibra longa" }, fit: 79, price: "R$4.12 / lb", src: "ICE" },
     ],
   },
   punjab: {
@@ -359,9 +359,9 @@ const FARMS = {
     risks: { fire: 34, drought: 56, flood: 39, pest: 62, frost: 11, wind: 24 },
     base: { t: 38, p: 6, h: 47, w: 15 },
     crops: [
-      { n: "Oryza sativa 'PR-126'", c: { es: "Arroz de ciclo corto", en: "Short-duration rice" }, fit: 91, price: "₹2,320 / q", src: "MSP" },
-      { n: "Triticum aestivum 'HD-3226'", c: { es: "Trigo resistente a roya", en: "Rust-resistant wheat" }, fit: 88, price: "₹2,275 / q", src: "MSP" },
-      { n: "Vigna radiata 'SML 668'", c: { es: "Mung de verano", en: "Summer mungbean" }, fit: 82, price: "₹8,558 / q", src: "MSP" },
+      { n: "Oryza sativa 'PR-126'", c: { es: "Arroz de ciclo corto", en: "Short-duration rice", pt: "Arroz de ciclo curto" }, fit: 91, price: "₹2,320 / q", src: "MSP" },
+      { n: "Triticum aestivum 'HD-3226'", c: { es: "Trigo resistente a roya", en: "Rust-resistant wheat", pt: "Trigo resistente à ferrugem" }, fit: 88, price: "₹2,275 / q", src: "MSP" },
+      { n: "Vigna radiata 'SML 668'", c: { es: "Mung de verano", en: "Summer mungbean", pt: "Feijão-mungo de verão" }, fit: 82, price: "₹8,558 / q", src: "MSP" },
     ],
   },
   andalucia: {
@@ -372,9 +372,9 @@ const FARMS = {
     risks: { fire: 67, drought: 73, flood: 9, pest: 51, frost: 18, wind: 31 },
     base: { t: 39, p: 0, h: 28, w: 19 },
     crops: [
-      { n: "Olea europaea 'Arbequina'", c: { es: "Olivo superintensivo", en: "Super-high-density olive" }, fit: 90, price: "€7.85 / kg", src: "POOLred" },
-      { n: "Helianthus annuus 'SY Bacardi'", c: { es: "Girasol alto oleico", en: "High-oleic sunflower" }, fit: 84, price: "€520 / t", src: "MATIF" },
-      { n: "Cicer arietinum 'Pedrosillano'", c: { es: "Garbanzo de secano", en: "Rainfed chickpea" }, fit: 76, price: "€1,150 / t", src: "Lonja" },
+      { n: "Olea europaea 'Arbequina'", c: { es: "Olivo superintensivo", en: "Super-high-density olive", pt: "Oliveira superintensiva" }, fit: 90, price: "€7.85 / kg", src: "POOLred" },
+      { n: "Helianthus annuus 'SY Bacardi'", c: { es: "Girasol alto oleico", en: "High-oleic sunflower", pt: "Girassol alto oleico" }, fit: 84, price: "€520 / t", src: "MATIF" },
+      { n: "Cicer arietinum 'Pedrosillano'", c: { es: "Garbanzo de secano", en: "Rainfed chickpea", pt: "Grão-de-bico de sequeiro" }, fit: 76, price: "€1,150 / t", src: "Lonja" },
     ],
   },
   cordoba: {
@@ -385,9 +385,9 @@ const FARMS = {
     risks: { fire: 74, drought: 58, flood: 12, pest: 37, frost: 21, wind: 46 },
     base: { t: 33, p: 3, h: 31, w: 38 },
     crops: [
-      { n: "Glycine max 'DM 4670'", c: { es: "Soja grupo IV corto", en: "Soybean group IV short" }, fit: 93, price: "US$318 / t", src: "MATBA" },
-      { n: "Zea mays 'DK 7220'", c: { es: "Maíz tardío", en: "Late-planted corn" }, fit: 86, price: "US$196 / t", src: "MATBA" },
-      { n: "Sorghum bicolor 'ACA 558'", c: { es: "Sorgo granífero", en: "Grain sorghum" }, fit: 81, price: "US$183 / t", src: "MATBA" },
+      { n: "Glycine max 'DM 4670'", c: { es: "Soja grupo IV corto", en: "Soybean group IV short", pt: "Soja grupo IV curto" }, fit: 93, price: "US$318 / t", src: "MATBA" },
+      { n: "Zea mays 'DK 7220'", c: { es: "Maíz tardío", en: "Late-planted corn", pt: "Milho tardio" }, fit: 86, price: "US$196 / t", src: "MATBA" },
+      { n: "Sorghum bicolor 'ACA 558'", c: { es: "Sorgo granífero", en: "Grain sorghum", pt: "Sorgo granífero" }, fit: 81, price: "US$183 / t", src: "MATBA" },
     ],
   },
 };
@@ -424,7 +424,7 @@ function synthFarm(saved) {
       frost: Math.round(2 + rnd(5) * 40), wind: Math.round(15 + rnd(6) * 55),
     },
     base: { t: Math.round(18 + rnd(8) * 18), p: Math.round(rnd(9) * 30), h: Math.round(30 + rnd(10) * 50), w: Math.round(8 + rnd(11) * 30) },
-    crops: [{ n: "—", c: { es: "Recomendación pendiente", en: "Recommendation pending" }, fit: Math.round(70 + rnd(12) * 25), price: "—", src: "—" }],
+    crops: [{ n: "—", c: { es: "Recomendación pendiente", en: "Recommendation pending", pt: "Recomendação pendente" }, fit: Math.round(70 + rnd(12) * 25), price: "—", src: "—" }],
     lat: saved.lat,
     lng: saved.lng,
     saved: true,
@@ -1671,7 +1671,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                       {farm.crops.map((c, i) => (
                         <tr key={i}>
                           <td>
-                            <div style={{ fontSize: 13, fontWeight: 600 }}>{c.c[es ? "es" : "en"]}</div>
+                            <div style={{ fontSize: 13, fontWeight: 600 }}>{pick(lang, c.c.es, c.c.en, c.c.pt)}</div>
                             <div className="mono" style={{ fontSize: 10.5, color: C.t3, fontStyle: "italic", marginTop: 3 }}>{c.n}</div>
                           </td>
                           <td>
@@ -1717,16 +1717,16 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 <div className="mono lbl" style={{ marginBottom: 14 }}>{pick(lang, "Plagas con ventana climática abierta", "Pests with an open climate window", "Pragas com janela climática aberta")}</div>
                 <div style={{ display: "grid", gap: 9 }}>
                   {[
-                    { n: "Spodoptera frugiperda", c: { es: "Gusano cogollero", en: "Fall armyworm" }, r: farm.risks.pest, w: { es: "Temperaturas de 24-30 °C sostenidas 5 días", en: "24-30 °C sustained for 5 days" } },
-                    { n: "Helicoverpa armigera", c: { es: "Oruga bolillera", en: "Cotton bollworm" }, r: Math.round(farm.risks.pest * 0.7), w: { es: "Humedad sobre 60% en floración", en: "Humidity above 60% at flowering" } },
-                    { n: "Puccinia triticina", c: { es: "Roya de la hoja", en: "Leaf rust" }, r: Math.round(farm.risks.pest * 0.5), w: { es: "Rocío nocturno + 15-22 °C", en: "Night dew + 15-22 °C" } },
+                    { n: "Spodoptera frugiperda", c: { es: "Gusano cogollero", en: "Fall armyworm", pt: "Lagarta-do-cartucho" }, r: farm.risks.pest, w: { es: "Temperaturas de 24-30 °C sostenidas 5 días", en: "24-30 °C sustained for 5 days", pt: "24-30 °C sustentadas por 5 dias" } },
+                    { n: "Helicoverpa armigera", c: { es: "Oruga bolillera", en: "Cotton bollworm", pt: "Lagarta-da-maçã" }, r: Math.round(farm.risks.pest * 0.7), w: { es: "Humedad sobre 60% en floración", en: "Humidity above 60% at flowering", pt: "Umidade acima de 60% na floração" } },
+                    { n: "Puccinia triticina", c: { es: "Roya de la hoja", en: "Leaf rust", pt: "Ferrugem da folha" }, r: Math.round(farm.risks.pest * 0.5), w: { es: "Rocío nocturno + 15-22 °C", en: "Night dew + 15-22 °C", pt: "Orvalho noturno + 15-22 °C" } },
                   ].map((p, i) => (
                     <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", padding: "12px 13px", background: C.s2, borderRadius: 9, border: `1px solid ${C.line}` }}>
                       <span style={{ width: 30, height: 30, borderRadius: 8, background: `${C.violet}1a`, display: "grid", placeItems: "center", flexShrink: 0 }}><Ic d={ic.bug} s={15} c={C.violet} /></span>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{p.c[es ? "es" : "en"]}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>{pick(lang, p.c.es, p.c.en, p.c.pt)}</div>
                         <div className="mono" style={{ fontSize: 10.5, color: C.t3, fontStyle: "italic" }}>{p.n}</div>
-                        <div style={{ fontSize: 11.5, color: C.t2, marginTop: 5 }}>{p.w[es ? "es" : "en"]}</div>
+                        <div style={{ fontSize: 11.5, color: C.t2, marginTop: 5 }}>{pick(lang, p.w.es, p.w.en, p.w.pt)}</div>
                       </div>
                       <span className="mono" style={{ fontSize: 15, fontWeight: 700, color: riskColor(p.r) }}>{p.r}%</span>
                     </div>
