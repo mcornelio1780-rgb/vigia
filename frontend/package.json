@@ -1,7 +1,8 @@
 {
-  "name": "frontend",
+  "name": "vigia-frontend",
   "version": "0.1.0",
   "private": true,
+  "description": "Frontend de Vigia (panel Next.js)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
