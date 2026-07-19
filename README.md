@@ -137,18 +137,36 @@ exige TLS y fija `NEXT_PUBLIC_API_URL` en el build del frontend.
 
 Base: `http://localhost:4000`
 
-| Método | Ruta                | Auth  | Descripción                                                    |
-| ------ | ------------------- | ----- | -------------------------------------------------------------- |
-| `GET`  | `/api/health`       | —     | Estado de la API y versión de PostGIS                          |
-| `GET`  | `/api/leads/stats`  | —     | Conteos públicos (lista de espera, boletín, países)            |
-| `POST` | `/api/leads`        | —     | Alta en lista de espera o boletín (idempotente por email+kind) |
-| `GET`  | `/api/leads`        | admin | Listado de registros (filtro opcional `?kind=`)                |
-| `GET`  | `/api/weather`      | —     | Pronóstico real del campo (`?lat=&lng=`, Open-Meteo); 502 sin red |
-| `POST` | `/api/report`       | —     | Genera un PDF de evidencia satelital del campo                  |
-| `POST` | `/api/auth/login`   | —     | `{password}` → `{token}` de administrador                      |
-| `GET`  | `/api/auth/me`      | admin | Verifica el token de administrador                             |
+| Método   | Ruta                   | Auth    | Descripción                                                        |
+| -------- | ---------------------- | ------- | ------------------------------------------------------------------ |
+| `GET`    | `/api/health`          | —       | Estado de la API, versión de PostGIS y uptime                      |
+| `GET`    | `/api/version`         | —       | Nombre, versión (de `package.json`) y uptime                       |
+| `GET`    | `/api/weather`         | —       | Pronóstico real del campo (`?lat=&lng=`, Open-Meteo); 502 sin red  |
+| `GET`    | `/api/fires`           | —       | Focos de calor cercanos (`?lat=&lng=`, NASA FIRMS); 503 sin `FIRMS_MAP_KEY` |
+| `POST`   | `/api/report`          | —       | Genera un PDF de evidencia satelital del campo                     |
+| `POST`   | `/api/leads`           | —       | Alta en lista de espera o boletín (idempotente por email+kind)     |
+| `GET`    | `/api/leads/stats`     | —       | Conteos públicos (lista de espera, boletín, países)                |
+| `GET`    | `/api/leads`           | admin   | Listado de registros (filtro opcional `?kind=`)                    |
+| `POST`   | `/api/auth/login`      | —       | `{password}` → `{token}` de administrador                          |
+| `GET`    | `/api/auth/me`         | admin   | Verifica el token de administrador                                 |
+| `POST`   | `/api/users/signup`    | —       | Alta de productor (`{email, password, name}`) → `{user, token}`    |
+| `POST`   | `/api/users/login`     | —       | Inicio de sesión del productor → `{user, token}`                   |
+| `GET`    | `/api/users/me`        | usuario | Perfil del productor y sus campos                                  |
+| `PUT`    | `/api/users/me`        | usuario | Actualiza el nombre del perfil                                     |
+| `DELETE` | `/api/users/me`        | usuario | Elimina la cuenta y sus campos (en cascada)                        |
+| `GET`    | `/api/users/export`    | usuario | Descarga en JSON el perfil, los campos y las preferencias          |
+| `PUT`    | `/api/users/password`  | usuario | Cambia la contraseña (verifica la actual)                          |
+| `GET`    | `/api/users/farms`     | usuario | Lista los campos del productor                                     |
+| `POST`   | `/api/users/farms`     | usuario | Crea un campo (`{name, lat?, lng?, hectares?}`)                    |
+| `PUT`    | `/api/users/farms/:id` | usuario | Edita un campo propio (actualización parcial)                     |
+| `DELETE` | `/api/users/farms/:id` | usuario | Borra un campo propio                                              |
+| `GET`    | `/api/users/settings`  | usuario | Preferencias (umbrales y canales de alerta)                        |
+| `PUT`    | `/api/users/settings`  | usuario | Guarda (fusiona) las preferencias                                  |
 
-Las rutas **admin** requieren `Authorization: Bearer <token>` de `/api/auth/login`.
+Las rutas **admin** usan el token de `POST /api/auth/login`; las rutas
+**usuario** usan el token que devuelven `POST /api/users/signup` y
+`POST /api/users/login`. En ambos casos se envía como
+`Authorization: Bearer <token>`.
 
 `POST /api/leads` acepta: `email` (obligatorio), `kind` (`waitlist` | `newsletter`,
 por defecto `waitlist`), y opcionalmente `name`, `country`, `hectares`, `lat`, `lng`
