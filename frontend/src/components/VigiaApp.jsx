@@ -1767,7 +1767,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 <label className="mono lbl">{es ? "Teléfono (WhatsApp y SMS)" : "Phone (WhatsApp and SMS)"}</label>
                 <input defaultValue="+54 358 412 7788" style={{ margin: "6px 0 12px" }} />
                 <label className="mono lbl">{es ? "Idioma de las alertas" : "Alert language"}</label>
-                <select className="mono sel" defaultValue="es" style={{ width: "100%", margin: "6px 0 0" }}>
+                <select className="mono sel" defaultValue="es" aria-label={es ? "Idioma de las alertas" : "Alert language"} style={{ width: "100%", margin: "6px 0 0" }}>
                   <option value="es">Español</option><option value="en">English</option><option value="pt">Português</option><option value="hi">हिन्दी</option>
                 </select>
               </div>
