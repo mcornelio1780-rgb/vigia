@@ -119,6 +119,24 @@ test("GET/PUT /api/users/settings guarda y carga preferencias", async () => {
   assert.equal(after.body.thFlood, 50);
 });
 
+test("DELETE /api/users/farms/:id borra solo el campo propio", async () => {
+  const a = await signup("owner@x.com", "clave-larga");
+  const b = await signup("other@x.com", "clave-larga");
+  const authA = { Authorization: `Bearer ${a.body.token}`, "Content-Type": "application/json" };
+  const created = await api(base, "/api/users/farms", { method: "POST", headers: authA, body: JSON.stringify({ name: "Borrable" }) });
+  const id = created.body.id;
+
+  // Otro usuario no puede borrarlo
+  const delOther = await api(base, `/api/users/farms/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${b.body.token}` } });
+  assert.equal(delOther.status, 404);
+
+  // El dueño sí
+  const del = await api(base, `/api/users/farms/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${a.body.token}` } });
+  assert.equal(del.status, 200);
+  const list = await api(base, "/api/users/farms", { headers: { Authorization: `Bearer ${a.body.token}` } });
+  assert.equal(list.body.length, 0);
+});
+
 test("los campos de un usuario no son visibles para otro", async () => {
   const a = await signup("a@x.com", "clave-larga");
   const b = await signup("b@x.com", "clave-larga");

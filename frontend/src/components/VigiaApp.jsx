@@ -84,6 +84,12 @@ async function fetchMe() {
     return await res.json();
   } catch { return null; }
 }
+async function deleteFarm(id) {
+  const t = getUserToken();
+  if (!t) throw new Error("Inicia sesión");
+  const res = await fetch(`${API_URL}/api/users/farms/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${t}` } });
+  if (!res.ok) throw new Error("No se pudo quitar el campo");
+}
 async function saveFarm(payload) {
   const t = getUserToken();
   if (!t) throw new Error("Inicia sesión para guardar tu campo");
@@ -315,6 +321,45 @@ const FARMS = {
   },
 };
 const FARM_KEYS = Object.keys(FARMS);
+
+// Formatea coordenadas numéricas a texto (para campos guardados por el usuario).
+function fmtCoord(lat, lng) {
+  if (lat == null || lng == null) return "—";
+  return `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? "N" : "S"} ${Math.abs(lng).toFixed(2)}°${lng >= 0 ? "E" : "O"}`;
+}
+
+// Construye un campo tipo-FARMS a partir de uno guardado por el usuario:
+// coordenadas reales (para clima/incendios en vivo) + agronomía demo determinista.
+function synthFarm(saved) {
+  const key = String(saved.id || saved.name || "x");
+  const seed = [...key].reduce((a, c) => a + c.charCodeAt(0), 0);
+  const rnd = (i) => Math.abs(Math.sin(seed * 9301 + i * 49297)) % 1;
+  const zones = Array.from({ length: 6 }, (_, i) => Math.round((0.28 + rnd(i) * 0.6) * 100) / 100);
+  return {
+    label: saved.name,
+    country: saved.country || "—",
+    cc: "",
+    coord: fmtCoord(saved.lat, saved.lng),
+    tz: "",
+    shape: seed % 2 ? SHAPE_B : SHAPE_A,
+    ha: saved.hectares || 100,
+    elev: Math.round(50 + rnd(7) * 900),
+    crop: { es: "Tu cultivo", en: "Your crop" },
+    zones,
+    zoneCrop: zones.map(() => ["Cultivo", "Crop"]),
+    risks: {
+      fire: Math.round(20 + rnd(1) * 70), drought: Math.round(15 + rnd(2) * 70),
+      flood: Math.round(5 + rnd(3) * 60), pest: Math.round(15 + rnd(4) * 55),
+      frost: Math.round(2 + rnd(5) * 40), wind: Math.round(15 + rnd(6) * 55),
+    },
+    base: { t: Math.round(18 + rnd(8) * 18), p: Math.round(rnd(9) * 30), h: Math.round(30 + rnd(10) * 50), w: Math.round(8 + rnd(11) * 30) },
+    crops: [{ n: "—", c: { es: "Recomendación pendiente", en: "Recommendation pending" }, fit: Math.round(70 + rnd(12) * 25), price: "—", src: "—" }],
+    lat: saved.lat,
+    lng: saved.lng,
+    saved: true,
+    id: saved.id,
+  };
+}
 
 /* Clima determinista por campo */
 const buildWeather = (f) => {
@@ -898,7 +943,11 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
   const [layer, setLayer] = useState("ndvi");
   const [zone, setZone] = useState(null);
   const [nav, setNav] = useState(false);
-  const farm = FARMS[farmKey];
+  const [me, setMe] = useState(null);
+  const savedFarms = me?.farms || [];
+  // Resuelve el campo activo: uno guardado del usuario (saved:<id>) o uno demo.
+  const savedFarm = farmKey.startsWith("saved:") ? savedFarms.find((s) => `saved:${s.id}` === farmKey) : null;
+  const farm = savedFarm ? synthFarm(savedFarm) : (FARMS[farmKey] || FARMS.cordoba);
   const weatherDemo = useMemo(() => buildWeather(farm), [farmKey]);
   const [liveWeather, setLiveWeather] = useState(null);
   useEffect(() => {
@@ -919,7 +968,6 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
   }, [farmKey]);
 
   // Cuenta de usuario: carga el perfil y sus campos guardados.
-  const [me, setMe] = useState(null);
   const [savedMsg, setSavedMsg] = useState("");
   useEffect(() => { fetchMe().then(setMe); }, []);
   const persistFarm = async () => {
@@ -928,6 +976,16 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
       await saveFarm({ name: farm.label, lat: farm.lat, lng: farm.lng, hectares: farm.ha });
       setMe(await fetchMe());
       setSavedMsg(es ? "Campo guardado" : "Field saved");
+    } catch (e) { setSavedMsg(e.message); }
+  };
+  const removeFarm = async () => {
+    setSavedMsg("");
+    try {
+      await deleteFarm(farm.id);
+      setMe(await fetchMe());
+      setFarmKey("cordoba");
+      setZone(null);
+      setSavedMsg(es ? "Campo quitado" : "Field removed");
     } catch (e) { setSavedMsg(e.message); }
   };
 
@@ -1039,13 +1097,25 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <select value={farmKey} onChange={(e) => { setFarmKey(e.target.value); setZone(null); }} className="mono sel" aria-label={es ? "Campo" : "Farm"}>
-              {FARM_KEYS.map((k) => <option key={k} value={k}>{FARMS[k].label} — {FARMS[k].country}</option>)}
+            <select value={farmKey} onChange={(e) => { setFarmKey(e.target.value); setZone(null); setSavedMsg(""); }} className="mono sel" aria-label={es ? "Campo" : "Farm"}>
+              {savedFarms.length > 0 && (
+                <optgroup label={es ? "Mis campos" : "My fields"}>
+                  {savedFarms.map((f) => <option key={f.id} value={`saved:${f.id}`}>{f.name}</option>)}
+                </optgroup>
+              )}
+              <optgroup label={es ? "Campos demo" : "Demo fields"}>
+                {FARM_KEYS.map((k) => <option key={k} value={k}>{FARMS[k].label} — {FARMS[k].country}</option>)}
+              </optgroup>
             </select>
             <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label="Cambiar idioma">{langLabel(lang)}</button>
-            {me && (
+            {me && !farm.saved && (
               <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                <Ic d={ic.pin} s={12} /> {savedMsg || (es ? `Guardar campo (${me.farms?.length ?? 0})` : `Save field (${me.farms?.length ?? 0})`)}
+                <Ic d={ic.pin} s={12} /> {savedMsg || (es ? "Guardar campo" : "Save field")}
+              </button>
+            )}
+            {me && farm.saved && (
+              <button className="btn ghost sm" onClick={removeFarm} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: C.n1 }}>
+                {savedMsg || (es ? "Quitar campo" : "Remove field")}
               </button>
             )}
             <span className="mono lbl" style={{ color: C.green }}><span className="dot" /> {es ? "próximo análisis 4h 12m" : "next analysis 4h 12m"}</span>

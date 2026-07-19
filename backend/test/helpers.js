@@ -8,6 +8,7 @@ process.env.DATABASE_URL =
   process.env.TEST_DATABASE_URL || "postgres://vigia:vigia@localhost:5432/vigia_test";
 process.env.ADMIN_PASSWORD = "test-admin";
 process.env.AUTH_SECRET = "test-secret";
+process.env.RATE_LIMIT_MAX = "100000"; // los tests hacen muchas llamadas desde la misma IP
 
 const { createApp } = await import("../src/app.js");
 const { pool } = await import("../src/db.js");

@@ -140,6 +140,18 @@ router.post("/farms", requireUser, async (req, res, next) => {
   }
 });
 
+// DELETE /api/users/farms/:id -> borra un campo del propio usuario
+router.delete("/farms/:id", requireUser, async (req, res, next) => {
+  try {
+    const { rowCount } = await query("DELETE FROM farms WHERE id = $1 AND user_id = $2", [req.params.id, req.user.id]);
+    if (!rowCount) return res.status(404).json({ error: "Campo no encontrado" });
+    res.json({ ok: true });
+  } catch (err) {
+    if (err.code === "22P02") return res.status(400).json({ error: "id inválido" });
+    next(err);
+  }
+});
+
 // GET /api/users/settings -> preferencias (con valores por defecto)
 router.get("/settings", requireUser, async (req, res, next) => {
   try {
