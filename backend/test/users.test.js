@@ -137,6 +137,29 @@ test("DELETE /api/users/farms/:id borra solo el campo propio", async () => {
   assert.equal(list.body.length, 0);
 });
 
+test("PUT /api/users/me actualiza el nombre del perfil", async () => {
+  const s = await signup("prof@field.ar", "clave-larga", "Nombre Viejo");
+  const auth = { Authorization: `Bearer ${s.body.token}`, "Content-Type": "application/json" };
+
+  // Sin sesión -> 401
+  assert.equal((await api(base, "/api/users/me", json("PUT", { name: "X" }))).status, 401);
+
+  // Nombre demasiado largo -> 400
+  assert.equal(
+    (await api(base, "/api/users/me", { method: "PUT", headers: auth, body: JSON.stringify({ name: "z".repeat(121) }) })).status,
+    400
+  );
+
+  // Cambio correcto -> 200 y persiste
+  const upd = await api(base, "/api/users/me", { method: "PUT", headers: auth, body: JSON.stringify({ name: "  Nombre Nuevo  " }) });
+  assert.equal(upd.status, 200);
+  assert.equal(upd.body.user.name, "Nombre Nuevo"); // se recorta el espacio
+  assert.equal(upd.body.user.email, "prof@field.ar");
+
+  const me = await api(base, "/api/users/me", { headers: { Authorization: `Bearer ${s.body.token}` } });
+  assert.equal(me.body.user.name, "Nombre Nuevo");
+});
+
 test("PUT /api/users/password cambia la contraseña con la actual correcta", async () => {
   const s = await signup("chg@field.ar", "clave-vieja", "Ana");
   const auth = { Authorization: `Bearer ${s.body.token}`, "Content-Type": "application/json" };

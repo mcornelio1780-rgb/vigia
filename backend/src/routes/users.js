@@ -95,6 +95,25 @@ router.get("/me", requireUser, async (req, res, next) => {
   }
 });
 
+// PUT /api/users/me { name } -> actualiza el nombre del perfil
+router.put("/me", requireUser, async (req, res, next) => {
+  try {
+    const { name } = req.body || {};
+    const clean = name == null ? null : String(name).trim();
+    if (clean != null && clean.length > 120) {
+      return res.status(400).json({ error: "el nombre es demasiado largo (máx. 120)" });
+    }
+    const { rows } = await query(
+      "UPDATE users SET name = $1 WHERE id = $2 RETURNING id, email, name",
+      [clean || null, req.user.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: "usuario no encontrado" });
+    res.json({ user: rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PUT /api/users/password { current, next } -> cambia la contraseña
 router.put("/password", authLimiter, requireUser, async (req, res, next) => {
   try {

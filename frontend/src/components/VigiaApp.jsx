@@ -84,6 +84,18 @@ async function fetchMe() {
     return await res.json();
   } catch { return null; }
 }
+async function updateProfile(name) {
+  const t = getUserToken();
+  if (!t) throw new Error("Inicia sesión para editar tu perfil");
+  const res = await fetch(`${API_URL}/api/users/me`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${t}` },
+    body: JSON.stringify({ name }),
+  });
+  const b = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(b?.error || "No se pudo actualizar el perfil");
+  return b;
+}
 async function deleteFarm(id) {
   const t = getUserToken();
   if (!t) throw new Error("Inicia sesión");
@@ -1070,6 +1082,22 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     finally { setPwBusy(false); }
   };
 
+  /* perfil real: el nombre se carga de la sesión y se guarda en el backend */
+  const [profName, setProfName] = useState("");
+  const [profMsg, setProfMsg] = useState(""), [profBusy, setProfBusy] = useState(false);
+  useEffect(() => { setProfName(me?.user?.name || ""); }, [me]);
+  const submitProfile = async () => {
+    if (profBusy) return;
+    setProfMsg("");
+    setProfBusy(true);
+    try {
+      const r = await updateProfile(profName.trim());
+      setMe((prev) => (prev ? { ...prev, user: { ...prev.user, ...r.user } } : prev));
+      setProfMsg(es ? "Perfil actualizado" : "Profile updated");
+    } catch (e) { setProfMsg(e.message); }
+    finally { setProfBusy(false); }
+  };
+
   const zones = farm.zones.map((v, i) => ({
     id: "ABCDEF"[i], ndvi: v, ha: Math.round((farm.ha / 6) * (0.7 + (i % 3) * 0.3)),
     crop: farm.zoneCrop[i], fire: Math.min(97, Math.round(farm.risks.fire * (1.35 - v))), soil: Math.round(v * 100 * 0.55 + 12),
@@ -1561,9 +1589,23 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
               <div className="card">
                 <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Perfil" : "Profile"}</div>
                 <label className="mono lbl">{es ? "Nombre" : "Name"}</label>
-                <input defaultValue="María Fernández" style={{ margin: "6px 0 12px" }} />
+                <input
+                  value={me ? profName : "María Fernández"}
+                  onChange={(e) => setProfName(e.target.value)}
+                  readOnly={!me}
+                  placeholder={es ? "Tu nombre" : "Your name"}
+                  style={{ margin: "6px 0 8px" }}
+                />
+                {me && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "0 0 12px", flexWrap: "wrap" }}>
+                    <button className="btn sm" onClick={submitProfile} disabled={profBusy}>
+                      {profBusy ? (es ? "Guardando…" : "Saving…") : (es ? "Guardar perfil" : "Save profile")}
+                    </button>
+                    {profMsg && <span className="mono lbl" style={{ color: /actualiz|updated/i.test(profMsg) ? C.green : C.n1 }}>{profMsg}</span>}
+                  </div>
+                )}
                 <label className="mono lbl">{es ? "Correo" : "Email"}</label>
-                <input defaultValue="maria@campo.ar" style={{ margin: "6px 0 12px" }} />
+                <input value={me ? (me.user?.email || "") : "maria@campo.ar"} readOnly style={{ margin: "6px 0 12px", opacity: 0.75 }} />
                 <label className="mono lbl">{es ? "Teléfono (WhatsApp y SMS)" : "Phone (WhatsApp and SMS)"}</label>
                 <input defaultValue="+54 358 412 7788" style={{ margin: "6px 0 12px" }} />
                 <label className="mono lbl">{es ? "Idioma de las alertas" : "Alert language"}</label>
