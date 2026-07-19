@@ -1,6 +1,23 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { renderReportToBuffer, clean } from "../src/report.js";
+import { renderReportToBuffer, clean, buildReportPdf } from "../src/report.js";
+
+// Documento PDFKit simulado: cualquier método es encadenable (devuelve el
+// propio proxy) y registra cuántas veces se llamó. No dibuja nada real.
+function makeFakeDoc(calls) {
+  const proxy = new Proxy(
+    {},
+    {
+      get(_t, prop) {
+        return (..._args) => {
+          calls[prop] = (calls[prop] || 0) + 1;
+          return proxy;
+        };
+      },
+    }
+  );
+  return proxy;
+}
 
 const SAMPLE = {
   lang: "es",
@@ -29,6 +46,17 @@ test("renderReportToBuffer tolera datos mínimos sin romperse", async () => {
 test("renderReportToBuffer funciona en inglés", async () => {
   const buf = await renderReportToBuffer({ ...SAMPLE, lang: "en" });
   assert.ok(buf.length > 1000);
+});
+
+test("buildReportPdf no lanza con un doc simulado (datos completos y mínimos)", () => {
+  const calls = {};
+  const doc = makeFakeDoc(calls);
+  assert.doesNotThrow(() => buildReportPdf(doc, SAMPLE));
+  assert.ok(calls.text > 0, "debería escribir texto en el documento");
+  // Datos mínimos: solo un farm vacío, tampoco debe lanzar.
+  assert.doesNotThrow(() => buildReportPdf(doc, { farm: {} }));
+  // Y sin datos en absoluto (usa los valores por defecto internos).
+  assert.doesNotThrow(() => buildReportPdf(doc));
 });
 
 test("clean normaliza primas y comillas tipográficas a ASCII", () => {
