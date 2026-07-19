@@ -2,11 +2,13 @@
 // Requiere una MAP_KEY gratuita (FIRMS_MAP_KEY). El parseo del CSV es una
 // función pura y testeable; la llamada de red se aísla en fetchFires.
 
-const MAP_KEY = process.env.FIRMS_MAP_KEY || "";
-const SOURCE = process.env.FIRMS_SOURCE || "VIIRS_SNPP_NRT";
+// Se leen del entorno en cada llamada (no en la carga del módulo) para que
+// reflejen la configuración vigente y sean testeables.
+const mapKey = () => process.env.FIRMS_MAP_KEY || "";
+const source = () => process.env.FIRMS_SOURCE || "VIIRS_SNPP_NRT";
 
 export function firmsConfigured() {
-  return Boolean(MAP_KEY);
+  return Boolean(mapKey());
 }
 
 // Parsea el CSV de FIRMS (cabecera + filas) mapeando por nombre de columna.
@@ -52,7 +54,7 @@ export function distanceKm(aLat, aLng, bLat, bLng) {
 export function firmsUrl(lat, lng, days) {
   const w = (lng - 0.5).toFixed(4), e = (lng + 0.5).toFixed(4);
   const s = (lat - 0.5).toFixed(4), n = (lat + 0.5).toFixed(4);
-  return `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${MAP_KEY}/${SOURCE}/${w},${s},${e},${n}/${days}`;
+  return `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${mapKey()}/${source()}/${w},${s},${e},${n}/${days}`;
 }
 
 // Descarga y filtra los focos a menos de `radiusKm` del campo.

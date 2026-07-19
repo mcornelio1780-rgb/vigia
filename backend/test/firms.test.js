@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mapFires, distanceKm, firmsUrl } from "../src/firms.js";
+import { mapFires, distanceKm, firmsUrl, firmsConfigured } from "../src/firms.js";
 
 // Fixture con el formato CSV real de FIRMS (área/VIIRS).
 const CSV = [
@@ -39,6 +39,19 @@ test("distanceKm coincide con distancias conocidas (haversine)", () => {
   // Buenos Aires -> Córdoba ≈ 646 km.
   const baCba = distanceKm(-34.61, -58.38, -31.42, -64.19);
   assert.ok(Math.abs(baCba - 646) < 15, `esperado ~646, dio ${baCba}`);
+});
+
+test("firmsConfigured refleja la presencia de FIRMS_MAP_KEY", () => {
+  const prev = process.env.FIRMS_MAP_KEY;
+  try {
+    delete process.env.FIRMS_MAP_KEY;
+    assert.equal(firmsConfigured(), false);
+    process.env.FIRMS_MAP_KEY = "clave-demo";
+    assert.equal(firmsConfigured(), true);
+  } finally {
+    if (prev === undefined) delete process.env.FIRMS_MAP_KEY;
+    else process.env.FIRMS_MAP_KEY = prev;
+  }
 });
 
 test("firmsUrl arma un bounding box alrededor del punto", () => {
