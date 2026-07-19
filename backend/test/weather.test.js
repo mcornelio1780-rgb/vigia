@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mapForecast, forecastUrl } from "../src/weather.js";
+import { mapForecast, forecastUrl, fetchForecast } from "../src/weather.js";
 
 // Fixture con la forma real de la respuesta diaria de Open-Meteo.
 const SAMPLE = {
@@ -53,4 +53,21 @@ test("forecastUrl arma la URL de Open-Meteo con las coordenadas", () => {
   assert.match(url, /latitude=-33\.13/);
   assert.match(url, /longitude=-64\.35/);
   assert.match(url, /forecast_days=10/);
+});
+
+test("fetchForecast mapea la respuesta ok y lanza si el upstream falla", async (t) => {
+  const realFetch = globalThis.fetch;
+  try {
+    // Respuesta correcta -> devuelve la serie mapeada.
+    globalThis.fetch = async () => ({ ok: true, json: async () => SAMPLE });
+    const days = await fetchForecast(-33, -64);
+    assert.equal(days.length, 3);
+    assert.equal(days[0].tmax, 28);
+
+    // Upstream con error -> fetchForecast rechaza.
+    globalThis.fetch = async () => ({ ok: false, status: 502 });
+    await assert.rejects(() => fetchForecast(-33, -64));
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 });
