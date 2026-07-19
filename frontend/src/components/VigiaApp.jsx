@@ -1947,7 +1947,8 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
 };
 
 /* ══════════════════ ADMIN — LEADS ══════════════════ */
-const AdminLeads = ({ es, onBack }) => {
+const AdminLeads = ({ es, lang = es ? "es" : "en", onBack }) => {
+  const t = (esS, enS, ptS) => pick(lang, esS, enS, ptS);
   const [token, setToken] = useState(null);
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
@@ -1980,24 +1981,24 @@ const AdminLeads = ({ es, onBack }) => {
     URL.revokeObjectURL(url);
   };
 
-  const kinds = [["", es ? "Todos" : "All"], ["waitlist", es ? "Lista de espera" : "Waitlist"], ["newsletter", es ? "Boletín" : "Newsletter"]];
+  const kinds = [["", t("Todos", "All", "Todos")], ["waitlist", t("Lista de espera", "Waitlist", "Lista de espera")], ["newsletter", t("Boletín", "Newsletter", "Boletim")]];
 
   return (
     <div className="wrap" style={{ paddingTop: 20, paddingBottom: 40 }}>
-      <button className="btn ghost sm" onClick={onBack} style={{ marginBottom: 18 }}>← {es ? "Volver" : "Back"}</button>
+      <button className="btn ghost sm" onClick={onBack} style={{ marginBottom: 18 }}>← {t("Volver", "Back", "Voltar")}</button>
       <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 18 }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
         <span style={{ fontSize: 18, fontWeight: 700 }}>{BRAND}</span>
-        <span className="mono pill">{es ? "Administrador" : "Admin"}</span>
+        <span className="mono pill">{t("Administrador", "Admin", "Administrador")}</span>
       </div>
 
       {!token ? (
         <form onSubmit={login} className="card" style={{ maxWidth: 360, padding: 20 }}>
-          <div className="mono lbl" style={{ marginBottom: 10 }}>{es ? "Acceso de administrador" : "Admin access"}</div>
-          <label className="mono lbl">{es ? "Contraseña" : "Password"}</label>
+          <div className="mono lbl" style={{ marginBottom: 10 }}>{t("Acceso de administrador", "Admin access", "Acesso de administrador")}</div>
+          <label className="mono lbl">{t("Contraseña", "Password", "Senha")}</label>
           <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" style={{ margin: "7px 0 4px" }} autoFocus />
           <button className="btn" type="submit" disabled={busy} style={{ width: "100%", marginTop: 14, opacity: busy ? 0.6 : 1 }}>
-            {busy ? (es ? "Entrando…" : "Signing in…") : es ? "Entrar" : "Log in"}
+            {busy ? t("Entrando…", "Signing in…", "Entrando…") : t("Entrar", "Log in", "Entrar")}
           </button>
           {err && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 10 }}>{err}</div>}
         </form>
@@ -2007,18 +2008,18 @@ const AdminLeads = ({ es, onBack }) => {
             {kinds.map(([k, l]) => (
               <button key={k} onClick={() => changeKind(k)} className="mono chipbtn" style={{ borderColor: kind === k ? C.green : C.line, color: kind === k ? C.green : C.t3 }}>{l}</button>
             ))}
-            <span className="mono lbl" style={{ marginLeft: "auto" }}>{leads.length} {es ? "registros" : "records"}</span>
+            <span className="mono lbl" style={{ marginLeft: "auto" }}>{leads.length} {t("registros", "records", "registros")}</span>
             <button className="btn ghost sm" onClick={exportCsv} disabled={!leads.length}><Ic d={ic.down} s={12} /> CSV</button>
-            <button className="btn ghost sm" onClick={() => { setToken(null); setLeads([]); setPw(""); }}>{es ? "Salir" : "Log out"}</button>
+            <button className="btn ghost sm" onClick={() => { setToken(null); setLeads([]); setPw(""); }}>{t("Salir", "Log out", "Sair")}</button>
           </div>
           <div className="card" style={{ overflowX: "auto" }}>
             {loading ? (
-              <div className="mono lbl" style={{ padding: 12 }}>{es ? "Cargando…" : "Loading…"}</div>
+              <div className="mono lbl" style={{ padding: 12 }}>{t("Cargando…", "Loading…", "Carregando…")}</div>
             ) : leads.length ? (
               <table>
                 <thead><tr>
-                  <th>Email</th><th>{es ? "Tipo" : "Kind"}</th><th>{es ? "Nombre" : "Name"}</th>
-                  <th>{es ? "País" : "Country"}</th><th>ha</th><th>{es ? "Fecha" : "Date"}</th>
+                  <th>Email</th><th>{t("Tipo", "Kind", "Tipo")}</th><th>{t("Nombre", "Name", "Nome")}</th>
+                  <th>{t("País", "Country", "País")}</th><th>ha</th><th>{t("Fecha", "Date", "Data")}</th>
                 </tr></thead>
                 <tbody>
                   {leads.map((l) => (
@@ -2034,7 +2035,7 @@ const AdminLeads = ({ es, onBack }) => {
                 </tbody>
               </table>
             ) : (
-              <div className="mono lbl" style={{ padding: 12 }}>{es ? "Sin registros" : "No records"}</div>
+              <div className="mono lbl" style={{ padding: 12 }}>{t("Sin registros", "No records", "Sem registros")}</div>
             )}
           </div>
           {err && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 10 }}>{err}</div>}
@@ -2122,7 +2123,7 @@ export default function VigiaApp() {
       {view === "landing" && <Landing es={es} lang={lang} setLang={setLang} live={live} setLive={setLive} onEnter={() => setView("login")} onAdmin={() => setView("admin")} />}
       {view === "login" && <Login es={es} lang={lang} onDone={() => setView("app")} onBack={() => setView("landing")} />}
       {view === "app" && <Dashboard es={es} lang={lang} setLang={setLang} onLogout={() => setView("landing")} />}
-      {view === "admin" && <AdminLeads es={es} onBack={() => setView("landing")} />}
+      {view === "admin" && <AdminLeads es={es} lang={lang} onBack={() => setView("landing")} />}
     </div>
   );
 }
