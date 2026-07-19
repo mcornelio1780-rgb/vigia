@@ -632,27 +632,27 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
   };
 
   const risks = [
-    { i: ic.fire, c: C.n1, t: es ? "Incendios" : "Wildfires", d: es ? "Focos activos de NASA FIRMS, refrescados cada 6 h" : "Active fire spots from NASA FIRMS, refreshed every 6 h" },
-    { i: ic.drought, c: C.n2, t: es ? "Sequías" : "Droughts", d: es ? "Déficit hídrico acumulado y NDVI en caída, zona por zona" : "Accumulated water deficit and falling NDVI, zone by zone" },
-    { i: ic.water, c: C.blue, t: es ? "Inundaciones" : "Floods", d: es ? "Precipitación prevista cruzada con topografía SRTM" : "Forecast rainfall crossed with SRTM topography" },
-    { i: ic.wind, c: C.blue, t: es ? "Viento y granizo" : "Wind and hail", d: es ? "Ráfagas por encima del umbral que tú configuras" : "Gusts above the threshold you set" },
-    { i: ic.bug, c: C.violet, t: es ? "Plagas" : "Pests", d: es ? "Ventanas climáticas que favorecen un brote" : "Climate windows that favor an outbreak" },
-    { i: ic.frost, c: C.t2, t: es ? "Heladas" : "Frost", d: es ? "Mínimas a nivel de suelo con 72 h de anticipación" : "Ground-level minimums, 72 h ahead" },
+    { i: ic.fire, c: C.n1, t: t("Incendios", "Wildfires", "Incêndios"), d: t("Focos activos de NASA FIRMS, refrescados cada 6 h", "Active fire spots from NASA FIRMS, refreshed every 6 h", "Focos ativos da NASA FIRMS, atualizados a cada 6 h") },
+    { i: ic.drought, c: C.n2, t: t("Sequías", "Droughts", "Secas"), d: t("Déficit hídrico acumulado y NDVI en caída, zona por zona", "Accumulated water deficit and falling NDVI, zone by zone", "Déficit hídrico acumulado e NDVI em queda, zona por zona") },
+    { i: ic.water, c: C.blue, t: t("Inundaciones", "Floods", "Enchentes"), d: t("Precipitación prevista cruzada con topografía SRTM", "Forecast rainfall crossed with SRTM topography", "Precipitação prevista cruzada com topografia SRTM") },
+    { i: ic.wind, c: C.blue, t: t("Viento y granizo", "Wind and hail", "Vento e granizo"), d: t("Ráfagas por encima del umbral que tú configuras", "Gusts above the threshold you set", "Rajadas acima do limite que você configura") },
+    { i: ic.bug, c: C.violet, t: t("Plagas", "Pests", "Pragas"), d: t("Ventanas climáticas que favorecen un brote", "Climate windows that favor an outbreak", "Janelas climáticas que favorecem um surto") },
+    { i: ic.frost, c: C.t2, t: t("Heladas", "Frost", "Geadas"), d: t("Mínimas a nivel de suelo con 72 h de anticipación", "Ground-level minimums, 72 h ahead", "Mínimas ao nível do solo com 72 h de antecedência") },
   ];
   const steps = [
-    { n: "01", t: es ? "Dibujas tu campo una vez" : "Draw your farm once", d: es ? "Un polígono sobre el mapa o pegas las coordenadas. El sistema lo divide en zonas de manejo según lo que ve el satélite." : "One polygon on the map, or paste coordinates. The system splits it into management zones based on what the satellite sees." },
-    { n: "02", t: es ? "Cada 6 horas bajamos datos frescos" : "Every 6 hours we pull fresh data", d: es ? "NASA FIRMS, Sentinel-2, ERA5, SoilGrids y Open-Meteo. Recalculamos el riesgo de cada zona, no del campo entero." : "NASA FIRMS, Sentinel-2, ERA5, SoilGrids and Open-Meteo. We recompute risk per zone, not for the whole farm." },
-    { n: "03", t: es ? "Te avisamos antes, estés donde estés" : "You get the warning first, wherever you are", d: es ? "Si un riesgo cruza tu umbral sale un WhatsApp, un SMS y un correo al instante, con un PDF que sirve para el seguro." : "If a risk crosses your threshold, a WhatsApp, SMS and email go out at once, with a PDF your insurer can use." },
+    { n: "01", t: t("Dibujas tu campo una vez", "Draw your farm once", "Você desenha seu campo uma vez"), d: t("Un polígono sobre el mapa o pegas las coordenadas. El sistema lo divide en zonas de manejo según lo que ve el satélite.", "One polygon on the map, or paste coordinates. The system splits it into management zones based on what the satellite sees.", "Um polígono no mapa ou você cola as coordenadas. O sistema o divide em zonas de manejo conforme o que o satélite vê.") },
+    { n: "02", t: t("Cada 6 horas bajamos datos frescos", "Every 6 hours we pull fresh data", "A cada 6 horas baixamos dados novos"), d: t("NASA FIRMS, Sentinel-2, ERA5, SoilGrids y Open-Meteo. Recalculamos el riesgo de cada zona, no del campo entero.", "NASA FIRMS, Sentinel-2, ERA5, SoilGrids and Open-Meteo. We recompute risk per zone, not for the whole farm.", "NASA FIRMS, Sentinel-2, ERA5, SoilGrids e Open-Meteo. Recalculamos o risco de cada zona, não do campo inteiro.") },
+    { n: "03", t: t("Te avisamos antes, estés donde estés", "You get the warning first, wherever you are", "Avisamos antes, onde quer que você esteja"), d: t("Si un riesgo cruza tu umbral sale un WhatsApp, un SMS y un correo al instante, con un PDF que sirve para el seguro.", "If a risk crosses your threshold, a WhatsApp, SMS and email go out at once, with a PDF your insurer can use.", "Se um risco cruza seu limite, sai um WhatsApp, um SMS e um e-mail na hora, com um PDF que serve para o seguro.") },
   ];
   const compare = [
-    [es ? "Precio de entrada" : "Entry price", "$9 + $0.15/ha", es ? "~$25.000/mes" : "~$25,000/mo", es ? "Por ha/año" : "Per ha/year"],
-    [es ? "Incendios en tiempo casi real" : "Near real-time wildfires", "on", "on", "on"],
-    [es ? "Sequía por zona, no por campo" : "Drought per zone, not per farm", "on", "off", "off"],
-    [es ? "Variedad recomendada con nombre científico" : "Recommended variety, scientific name", "on", "off", "half"],
-    [es ? "Precio de mercado del cultivo" : "Crop market price", "on", "off", "off"],
-    [es ? "Alertas por WhatsApp y SMS" : "WhatsApp and SMS alerts", "on", "off", "on"],
-    [es ? "PDF con evidencia para el seguro" : "PDF evidence for insurance", "on", "off", "off"],
-    [es ? "Idiomas" : "Languages", "ES · EN · PT · HI", "EN", "EN · ES"],
+    [t("Precio de entrada", "Entry price", "Preço de entrada"), "$9 + $0.15/ha", t("~$25.000/mes", "~$25,000/mo", "~$25.000/mês"), t("Por ha/año", "Per ha/year", "Por ha/ano")],
+    [t("Incendios en tiempo casi real", "Near real-time wildfires", "Incêndios quase em tempo real"), "on", "on", "on"],
+    [t("Sequía por zona, no por campo", "Drought per zone, not per farm", "Seca por zona, não por campo"), "on", "off", "off"],
+    [t("Variedad recomendada con nombre científico", "Recommended variety, scientific name", "Variedade recomendada com nome científico"), "on", "off", "half"],
+    [t("Precio de mercado del cultivo", "Crop market price", "Preço de mercado da cultura"), "on", "off", "off"],
+    [t("Alertas por WhatsApp y SMS", "WhatsApp and SMS alerts", "Alertas por WhatsApp e SMS"), "on", "off", "on"],
+    [t("PDF con evidencia para el seguro", "PDF evidence for insurance", "PDF com evidência para o seguro"), "on", "off", "off"],
+    [t("Idiomas", "Languages", "Idiomas"), "ES · EN · PT · HI", "EN", "EN · ES"],
   ];
   const sources = ["NASA FIRMS", "ESA Copernicus Sentinel-2", "NOAA / ERA5", "SoilGrids ISRIC", "NASA SRTM", "Open-Meteo"];
 
@@ -666,11 +666,11 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
               <circle cx="12" cy="10.5" r="2.6" fill={C.green} />
             </svg>
             <span style={{ fontSize: 18.5, fontWeight: 700, letterSpacing: "-.02em" }}>{BRAND}</span>
-            {!live && <span className="mono pill">{es ? "Beta global" : "Global beta"}</span>}
+            {!live && <span className="mono pill">{t("Beta global", "Global beta", "Beta global")}</span>}
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button className="btn ghost sm mono" onClick={() => setLive(!live)} style={{ fontSize: 10, color: C.t3 }}>
-              {live ? (es ? "modo: activo" : "mode: live") : (es ? "modo: pre-lanzamiento" : "mode: pre-launch")}
+              {live ? t("modo: activo", "mode: live", "modo: ativo") : t("modo: pre-lanzamiento", "mode: pre-launch", "modo: pré-lançamento")}
             </button>
             <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label={pick(lang, "Cambiar idioma", "Change language", "Mudar idioma")}>{langLabel(lang)}</button>
             <button className="btn sm" onClick={onEnter}>{live ? t("Entrar", "Log in", "Entrar") : t("Ver demo", "See demo", "Ver demonstração")}</button>
@@ -701,9 +701,9 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
             {live ? (
               <div style={{ display: "flex", gap: 10, marginTop: 26, flexWrap: "wrap" }}>
                 <button className="btn" onClick={onEnter} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                  {es ? "Analizar mi campo gratis" : "Analyze my farm free"} <Ic d={ic.arrow} s={15} c="#04140B" />
+                  {t("Analizar mi campo gratis", "Analyze my farm free", "Analisar meu campo grátis")} <Ic d={ic.arrow} s={15} c="#04140B" />
                 </button>
-                <button className="btn ghost">{es ? "Ver precios" : "See pricing"}</button>
+                <button className="btn ghost">{t("Ver precios", "See pricing", "Ver preços")}</button>
               </div>
             ) : (
               <div style={{ marginTop: 26, maxWidth: 460 }}>
@@ -711,26 +711,27 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
                   <div className="card" style={{ borderColor: `${C.green}44`, display: "flex", gap: 11, alignItems: "flex-start" }}>
                     <Ic d={ic.chk} s={17} c={C.green} />
                     <div>
-                      <div style={{ fontSize: 13.5, fontWeight: 600 }}>{es ? "Estás en la lista" : "You're on the list"}</div>
+                      <div style={{ fontSize: 13.5, fontWeight: 600 }}>{t("Estás en la lista", "You're on the list", "Você está na lista")}</div>
                       <div style={{ fontSize: 12.5, color: C.t2, marginTop: 3, lineHeight: 1.55 }}>
-                        {es ? "Te escribimos con tu acceso y el precio base congelado por un año. Si tienes campos en más de un país, respóndenos y los cargamos juntos." : "We'll write with your access and the base price locked for a year. If you farm in more than one country, reply and we'll load them together."}
+                        {t("Te escribimos con tu acceso y el precio base congelado por un año. Si tienes campos en más de un país, respóndenos y los cargamos juntos.", "We'll write with your access and the base price locked for a year. If you farm in more than one country, reply and we'll load them together.", "Escrevemos com o seu acesso e o preço base congelado por um ano. Se você tem campos em mais de um país, responda e os carregamos juntos.")}
                       </div>
                     </div>
                   </div>
                 ) : (
                   <>
                     <div style={{ display: "flex", gap: 8 }}>
-                      <input value={wl} onChange={(e) => setWl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submitWaitlist()} placeholder={es ? "tu@correo.com" : "you@email.com"} aria-label="Email" />
+                      <input value={wl} onChange={(e) => setWl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submitWaitlist()} placeholder={t("tu@correo.com", "you@email.com", "seu@email.com")} aria-label="Email" />
                       <button className="btn" onClick={submitWaitlist} disabled={wlBusy} style={{ whiteSpace: "nowrap", opacity: wlBusy ? 0.6 : 1 }}>{wlBusy ? t("Enviando…", "Sending…", "Enviando…") : t("Pedir acceso", "Request access", "Pedir acesso")}</button>
                     </div>
                     {wlErr && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 8 }}>{wlErr}</div>}
                     <div className="mono" style={{ fontSize: 10.5, color: C.t3, marginTop: 10, lineHeight: 1.7 }}>
-                      {es ? "El satélite ya cubre el planeta entero: si tu campo tiene coordenadas, lo monitoreamos." : "The satellites already cover the whole planet: if your farm has coordinates, we monitor it."}
+                      {t("El satélite ya cubre el planeta entero: si tu campo tiene coordenadas, lo monitoreamos.", "The satellites already cover the whole planet: if your farm has coordinates, we monitor it.", "O satélite já cobre o planeta inteiro: se o seu campo tem coordenadas, nós o monitoramos.")}
                       <br />{stats
-                        ? (es
-                            ? `${stats.total} en lista · ${stats.countries} ${stats.countries === 1 ? "país" : "países"} · 6 continentes`
-                            : `${stats.total} on the list · ${stats.countries} ${stats.countries === 1 ? "country" : "countries"} · 6 continents`)
-                        : (es ? "Súmate a la lista global de campos monitoreados." : "Join the global list of monitored farms.")}
+                        ? t(
+                            `${stats.total} en lista · ${stats.countries} ${stats.countries === 1 ? "país" : "países"} · 6 continentes`,
+                            `${stats.total} on the list · ${stats.countries} ${stats.countries === 1 ? "country" : "countries"} · 6 continents`,
+                            `${stats.total} na lista · ${stats.countries} ${stats.countries === 1 ? "país" : "países"} · 6 continentes`)
+                        : t("Súmate a la lista global de campos monitoreados.", "Join the global list of monitored farms.", "Entre para a lista global de campos monitorados.")}
                     </div>
                     <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 12, letterSpacing: ".02em" }}>
                       {t("Con datos de la ESA · Sentinel-2, la NASA · FIRMS y Open-Meteo", "Powered by ESA · Sentinel-2, NASA · FIRMS and Open-Meteo", "Com dados da ESA · Sentinel-2, NASA · FIRMS e Open-Meteo")}
@@ -745,7 +746,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
 
         {/* Selector de campo demo — cobertura global explícita */}
         <div style={{ display: "flex", gap: 7, flexWrap: "wrap", alignItems: "center", paddingBottom: 8 }}>
-          <span className="mono lbl" style={{ marginRight: 4 }}><Ic d={ic.globe} s={12} c={C.t3} /> {es ? "Ver un campo real en:" : "See a real farm in:"}</span>
+          <span className="mono lbl" style={{ marginRight: 4 }}><Ic d={ic.globe} s={12} c={C.t3} /> {t("Ver un campo real en:", "See a real farm in:", "Ver um campo real em:")}</span>
           {FARM_KEYS.map((k) => (
             <button key={k} onClick={() => setDemo(k)} className="mono chipbtn" style={{ borderColor: demo === k ? C.green : C.line, color: demo === k ? C.green : C.t2 }}>
               {FARMS[k].cc} · {FARMS[k].country}
@@ -815,7 +816,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
 
       {/* CICLO */}
       <div className="wrap"><section className="sec">
-        <div className="eyebrow">{es ? "El ciclo, cada 6 horas" : "The cycle, every 6 hours"}</div>
+        <div className="eyebrow">{t("El ciclo, cada 6 horas", "The cycle, every 6 hours", "O ciclo, a cada 6 horas")}</div>
         <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", marginTop: 26, gap: 22 }}>
           {steps.map((s) => (
             <div key={s.n}>
@@ -828,14 +829,16 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
         <div className="card" style={{ marginTop: 34, borderColor: `${C.n1}33`, background: C.s2, display: "flex", gap: 14, alignItems: "flex-start", maxWidth: 640 }}>
           <span style={{ width: 34, height: 34, borderRadius: 9, background: `${C.n1}1f`, display: "grid", placeItems: "center", flexShrink: 0 }}><Ic d={ic.chat} s={17} c={C.n1} /></span>
           <div>
-            <div className="mono" style={{ fontSize: 10, color: C.t3, textTransform: "uppercase", letterSpacing: ".1em" }}>{es ? "WhatsApp · hoy 04:12" : "WhatsApp · today 04:12"}</div>
+            <div className="mono" style={{ fontSize: 10, color: C.t3, textTransform: "uppercase", letterSpacing: ".1em" }}>{t("WhatsApp · hoy 04:12", "WhatsApp · today 04:12", "WhatsApp · hoje 04:12")}</div>
             <p style={{ fontSize: 13.5, lineHeight: 1.6, margin: "8px 0 0" }}>
-              {es ? `${BRAND}: riesgo de incendio 74% en la zona F de tu campo (16 ha, barbecho). Foco de calor a 2,3 km al noreste, viento 38 km/h hacia tu lote. Adjunto PDF con coordenadas y hora satelital.`
-                : `${BRAND}: 74% wildfire risk in zone F of your farm (16 ha, fallow). Heat spot 2.3 km northeast, wind 38 km/h toward your block. PDF attached with coordinates and satellite timestamp.`}
+              {t(
+                `${BRAND}: riesgo de incendio 74% en la zona F de tu campo (16 ha, barbecho). Foco de calor a 2,3 km al noreste, viento 38 km/h hacia tu lote. Adjunto PDF con coordenadas y hora satelital.`,
+                `${BRAND}: 74% wildfire risk in zone F of your farm (16 ha, fallow). Heat spot 2.3 km northeast, wind 38 km/h toward your block. PDF attached with coordinates and satellite timestamp.`,
+                `${BRAND}: risco de incêndio 74% na zona F do seu campo (16 ha, pousio). Foco de calor a 2,3 km a nordeste, vento 38 km/h em direção ao seu lote. Anexo PDF com coordenadas e hora do satélite.`)}
             </p>
             <div style={{ display: "flex", gap: 14, marginTop: 12, flexWrap: "wrap" }}>
-              <span className="mono lbl"><Ic d={ic.file} s={12} c={C.t3} /> {es ? "reporte-incendio.pdf" : "wildfire-report.pdf"}</span>
-              <span className="mono lbl"><Ic d={ic.clock} s={12} c={C.t3} /> {es ? "enviado en 40 s" : "sent in 40 s"}</span>
+              <span className="mono lbl"><Ic d={ic.file} s={12} c={C.t3} /> {t("reporte-incendio.pdf", "wildfire-report.pdf", "relatorio-incendio.pdf")}</span>
+              <span className="mono lbl"><Ic d={ic.clock} s={12} c={C.t3} /> {t("enviado en 40 s", "sent in 40 s", "enviado em 40 s")}</span>
             </div>
           </div>
         </div>
@@ -843,34 +846,34 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
 
       {/* PRECIOS */}
       <div className="wrap"><section className="sec" id="precio">
-        <div className="eyebrow">{es ? "Precio" : "Pricing"}</div>
-        <h2 className="h2" style={{ marginTop: 12 }}>{es ? "$9 al mes, más $0.15 por hectárea" : "$9 a month, plus $0.15 per hectare"}</h2>
+        <div className="eyebrow">{t("Precio", "Pricing", "Preço")}</div>
+        <h2 className="h2" style={{ marginTop: 12 }}>{t("$9 al mes, más $0.15 por hectárea", "$9 a month, plus $0.15 per hectare", "$9 por mês, mais $0.15 por hectare")}</h2>
         <p className="lead" style={{ marginTop: 10, maxWidth: 570 }}>
-          {es ? "El mismo precio en Iowa, en Punjab o en Mato Grosso. Sin contrato anual, sin mínimo de hectáreas, sin llamada de ventas." : "Same price in Iowa, Punjab or Mato Grosso. No annual contract, no hectare minimum, no sales call."}
+          {t("El mismo precio en Iowa, en Punjab o en Mato Grosso. Sin contrato anual, sin mínimo de hectáreas, sin llamada de ventas.", "Same price in Iowa, Punjab or Mato Grosso. No annual contract, no hectare minimum, no sales call.", "O mesmo preço em Iowa, no Punjab ou no Mato Grosso. Sem contrato anual, sem mínimo de hectares, sem ligação de vendas.")}
         </p>
         <div className="grid" style={{ gridTemplateColumns: "1.05fr .95fr", marginTop: 28, gap: 18 }}>
           <div className="card" style={{ borderColor: C.line2 }}>
-            <div className="mono lbl" style={{ marginBottom: 16 }}>{es ? "Calcula tu mensualidad" : "Work out your monthly bill"}</div>
+            <div className="mono lbl" style={{ marginBottom: 16 }}>{t("Calcula tu mensualidad", "Work out your monthly bill", "Calcule sua mensalidade")}</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
               <span style={{ fontSize: 42, fontWeight: 700, letterSpacing: "-.03em", color: C.green }}>${price}</span>
-              <span style={{ fontSize: 13, color: C.t3 }}>{es ? "/ mes" : "/ month"}</span>
+              <span style={{ fontSize: 13, color: C.t3 }}>{t("/ mes", "/ month", "/ mês")}</span>
             </div>
             <div className="mono" style={{ fontSize: 11, color: C.t3, marginTop: 5 }}>$9 + $0.15 × {ha} ha</div>
             <input type="range" min="10" max="2500" step="10" value={ha} onChange={(e) => setHa(Number(e.target.value))} aria-label="ha" style={{ marginTop: 20 }} />
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
               <span className="mono lbl">10 ha</span><span className="mono lbl" style={{ color: C.t1 }}>{ha} ha</span><span className="mono lbl">2500 ha</span>
             </div>
-            <button className="btn" style={{ width: "100%", marginTop: 20 }} onClick={onEnter}>{live ? (es ? `Empezar con ${ha} ha` : `Start with ${ha} ha`) : (es ? "Reservar este precio" : "Lock this price")}</button>
-            <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 10, textAlign: "center" }}>{es ? "Pago con Stripe · cancelas cuando quieras" : "Stripe checkout · cancel anytime"}</div>
+            <button className="btn" style={{ width: "100%", marginTop: 20 }} onClick={onEnter}>{live ? t(`Empezar con ${ha} ha`, `Start with ${ha} ha`, `Começar com ${ha} ha`) : t("Reservar este precio", "Lock this price", "Reservar este preço")}</button>
+            <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 10, textAlign: "center" }}>{t("Pago con Stripe · cancelas cuando quieras", "Stripe checkout · cancel anytime", "Pagamento com Stripe · cancele quando quiser")}</div>
           </div>
           <div className="card">
-            <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Incluido en cualquier tamaño y país" : "Included at any size, any country"}</div>
-            {[es ? "Análisis cada 6 horas de todas tus zonas" : "Every zone re-analyzed every 6 hours",
-              es ? "Alertas por WhatsApp, SMS y correo" : "WhatsApp, SMS and email alerts",
-              es ? "Umbrales configurables por tipo de riesgo" : "Configurable thresholds per risk type",
-              es ? "PDF con evidencia satelital para el seguro" : "PDF with satellite evidence for your insurer",
-              es ? "Variedad recomendada y precio de mercado local" : "Recommended variety and local market price",
-              es ? "Español, inglés, portugués e hindi" : "Spanish, English, Portuguese and Hindi"].map((f, i) => (
+            <div className="mono lbl" style={{ marginBottom: 14 }}>{t("Incluido en cualquier tamaño y país", "Included at any size, any country", "Incluído em qualquer tamanho e país")}</div>
+            {[t("Análisis cada 6 horas de todas tus zonas", "Every zone re-analyzed every 6 hours", "Análise a cada 6 horas de todas as suas zonas"),
+              t("Alertas por WhatsApp, SMS y correo", "WhatsApp, SMS and email alerts", "Alertas por WhatsApp, SMS e e-mail"),
+              t("Umbrales configurables por tipo de riesgo", "Configurable thresholds per risk type", "Limites configuráveis por tipo de risco"),
+              t("PDF con evidencia satelital para el seguro", "PDF with satellite evidence for your insurer", "PDF com evidência de satélite para o seguro"),
+              t("Variedad recomendada y precio de mercado local", "Recommended variety and local market price", "Variedade recomendada e preço de mercado local"),
+              t("Español, inglés, portugués e hindi", "Spanish, English, Portuguese and Hindi", "Espanhol, inglês, português e hindi")].map((f, i) => (
               <div key={i} style={{ display: "flex", gap: 9, alignItems: "flex-start", padding: "8px 0", borderBottom: i < 5 ? `1px solid ${C.line}` : "none" }}>
                 <Ic d={ic.chk} s={14} c={C.green} /><span style={{ fontSize: 12.8, color: C.t2, lineHeight: 1.45 }}>{f}</span>
               </div>
@@ -881,7 +884,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
           {[50, 200, 640, 2100].map((t) => (
             <button key={t} onClick={() => setHa(t)} className="card" style={{ textAlign: "left", cursor: "pointer", borderColor: ha === t ? C.green : C.line, background: ha === t ? "rgba(61,220,132,.06)" : C.s1, color: C.t1, font: "inherit" }}>
               <div className="mono lbl">{t} ha</div>
-              <div style={{ fontSize: 23, fontWeight: 700, marginTop: 6, letterSpacing: "-.02em" }}>${(9 + t * 0.15).toFixed(2)}<span style={{ fontSize: 11.5, fontWeight: 400, color: C.t3 }}>{es ? "/mes" : "/mo"}</span></div>
+              <div style={{ fontSize: 23, fontWeight: 700, marginTop: 6, letterSpacing: "-.02em" }}>${(9 + t * 0.15).toFixed(2)}<span style={{ fontSize: 11.5, fontWeight: 400, color: C.t3 }}>{pick(lang, "/mes", "/mo", "/mês")}</span></div>
             </button>
           ))}
         </div>
@@ -889,17 +892,17 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
 
       {/* COMPARATIVA */}
       <div className="wrap"><section className="sec">
-        <div className="eyebrow">{es ? "Frente a lo que ya existe" : "Against what already exists"}</div>
+        <div className="eyebrow">{t("Frente a lo que ya existe", "Against what already exists", "Frente ao que já existe")}</div>
         <div style={{ marginTop: 22, overflowX: "auto" }}>
           <table>
-            <thead><tr><th style={{ minWidth: 220 }}></th><th style={{ color: C.green }}>{BRAND}</th><th>{es ? "Plataformas enterprise" : "Enterprise platforms"}</th><th>{es ? "Suites agronómicas" : "Agronomy suites"}</th></tr></thead>
+            <thead><tr><th style={{ minWidth: 220 }}></th><th style={{ color: C.green }}>{BRAND}</th><th>{t("Plataformas enterprise", "Enterprise platforms", "Plataformas enterprise")}</th><th>{t("Suites agronómicas", "Agronomy suites", "Suítes agronômicas")}</th></tr></thead>
             <tbody>
               {compare.map((row, i) => (
                 <tr key={i}>
                   <td style={{ color: C.t2 }}>{row[0]}</td>
                   {row.slice(1).map((cell, j) => (
                     <td key={j} style={{ color: j === 0 ? C.t1 : C.t3, fontWeight: j === 0 ? 600 : 400 }}>
-                      {cell === "on" ? <Ic d={ic.chk} s={15} c={j === 0 ? C.green : C.t3} /> : cell === "off" ? <span style={{ color: C.t4 }}>—</span> : cell === "half" ? <span style={{ color: C.n3 }}>{es ? "parcial" : "partial"}</span> : cell}
+                      {cell === "on" ? <Ic d={ic.chk} s={15} c={j === 0 ? C.green : C.t3} /> : cell === "off" ? <span style={{ color: C.t4 }}>—</span> : cell === "half" ? <span style={{ color: C.n3 }}>{t("parcial", "partial", "parcial")}</span> : cell}
                     </td>
                   ))}
                 </tr>
@@ -913,18 +916,18 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
       <div className="wrap"><section className="sec">
         <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 30 }}>
           <div>
-            <div className="eyebrow">{es ? "De dónde salen los datos" : "Where the data comes from"}</div>
+            <div className="eyebrow">{t("De dónde salen los datos", "Where the data comes from", "De onde vêm os dados")}</div>
             <p className="lead" style={{ marginTop: 12, fontSize: 13.5 }}>
-              {es ? "Todo viene de constelaciones y modelos públicos que cubren el planeta completo. No vendemos imágenes: vendemos la lectura de tu campo, ya cruzada y traducida a una decisión." : "Everything comes from public constellations and models that cover the entire planet. We don't sell imagery: we sell the reading of your farm, cross-checked and turned into a decision."}
+              {t("Todo viene de constelaciones y modelos públicos que cubren el planeta completo. No vendemos imágenes: vendemos la lectura de tu campo, ya cruzada y traducida a una decisión.", "Everything comes from public constellations and models that cover the entire planet. We don't sell imagery: we sell the reading of your farm, cross-checked and turned into a decision.", "Tudo vem de constelações e modelos públicos que cobrem o planeta inteiro. Não vendemos imagens: vendemos a leitura do seu campo, já cruzada e traduzida em uma decisão.")}
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: 16 }}>
               {sources.map((s) => <span key={s} className="mono" style={{ fontSize: 10.5, color: C.t2, border: `1px solid ${C.line}`, borderRadius: 6, padding: "5px 9px" }}>{s}</span>)}
             </div>
           </div>
           <div>
-            <div className="eyebrow">{es ? "Tus coordenadas son tuyas" : "Your coordinates stay yours"}</div>
+            <div className="eyebrow">{t("Tus coordenadas son tuyas", "Your coordinates stay yours", "Suas coordenadas são suas")}</div>
             <p className="lead" style={{ marginTop: 12, fontSize: 13.5 }}>
-              {es ? "La ubicación exacta viaja cifrada y se guarda cifrada. No la compartimos con nadie, ni con aseguradoras, salvo que tú envíes el reporte. Exportas o borras todo desde Configuración." : "Your exact location travels encrypted and is stored encrypted. We share it with no one, insurers included, unless you send the report yourself. Export or delete everything from Settings."}
+              {t("La ubicación exacta viaja cifrada y se guarda cifrada. No la compartimos con nadie, ni con aseguradoras, salvo que tú envíes el reporte. Exportas o borras todo desde Configuración.", "Your exact location travels encrypted and is stored encrypted. We share it with no one, insurers included, unless you send the report yourself. Export or delete everything from Settings.", "A localização exata viaja criptografada e é armazenada criptografada. Não a compartilhamos com ninguém, nem com seguradoras, a menos que você envie o relatório. Exporte ou apague tudo em Configurações.")}
             </p>
             <div style={{ display: "flex", gap: 16, marginTop: 16, flexWrap: "wrap" }}>
               <span className="mono lbl"><Ic d={ic.lock} s={12} c={C.t3} /> AES-256</span>
@@ -960,26 +963,26 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
         <div className="card" style={{ borderColor: C.line2, background: C.s2, padding: 26 }}>
           <div className="grid" style={{ gridTemplateColumns: "1.15fr 1fr", gap: 26, alignItems: "center" }}>
             <div>
-              <div className="eyebrow"><Ic d={ic.mail} s={12} c={C.t3} /> {es ? "Boletín semanal" : "Weekly briefing"}</div>
-              <h2 className="h2" style={{ marginTop: 12, fontSize: 22 }}>{es ? "El parte climático de tu región, cada lunes" : "Your region's climate briefing, every Monday"}</h2>
+              <div className="eyebrow"><Ic d={ic.mail} s={12} c={C.t3} /> {t("Boletín semanal", "Weekly briefing", "Boletim semanal")}</div>
+              <h2 className="h2" style={{ marginTop: 12, fontSize: 22 }}>{t("El parte climático de tu región, cada lunes", "Your region's climate briefing, every Monday", "O boletim climático da sua região, toda segunda")}</h2>
               <p className="lead" style={{ marginTop: 9, fontSize: 13.3 }}>
-                {es ? "Anomalías de El Niño y La Niña, ventanas de siembra, precios de commodities y qué está pasando con el clima en las zonas agrícolas del mundo. Sin costo y sin ser cliente." : "El Niño and La Niña anomalies, planting windows, commodity prices and what the weather is doing across the world's farming belts. Free, no account needed."}
+                {t("Anomalías de El Niño y La Niña, ventanas de siembra, precios de commodities y qué está pasando con el clima en las zonas agrícolas del mundo. Sin costo y sin ser cliente.", "El Niño and La Niña anomalies, planting windows, commodity prices and what the weather is doing across the world's farming belts. Free, no account needed.", "Anomalias de El Niño e La Niña, janelas de plantio, preços de commodities e o que está acontecendo com o clima nas regiões agrícolas do mundo. Grátis e sem ser cliente.")}
               </p>
             </div>
             <div>
               {nlSent ? (
                 <div style={{ display: "flex", gap: 10, alignItems: "center", padding: "14px 16px", background: `${C.green}12`, border: `1px solid ${C.green}44`, borderRadius: 10 }}>
                   <Ic d={ic.chk} s={16} c={C.green} />
-                  <span style={{ fontSize: 13 }}>{es ? "Suscrito. El primer parte llega el lunes." : "Subscribed. First briefing arrives Monday."}</span>
+                  <span style={{ fontSize: 13 }}>{t("Suscrito. El primer parte llega el lunes.", "Subscribed. First briefing arrives Monday.", "Inscrito. O primeiro boletim chega na segunda.")}</span>
                 </div>
               ) : (
                 <>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <input value={nl} onChange={(e) => setNl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submitNewsletter()} placeholder={es ? "tu@correo.com" : "you@email.com"} aria-label={es ? "Correo para el boletín" : "Newsletter email"} />
-                    <button className="btn" onClick={submitNewsletter} style={{ whiteSpace: "nowrap" }}>{es ? "Suscribirme" : "Subscribe"}</button>
+                    <input value={nl} onChange={(e) => setNl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submitNewsletter()} placeholder={t("tu@correo.com", "you@email.com", "seu@email.com")} aria-label={t("Correo para el boletín", "Newsletter email", "E-mail para o boletim")} />
+                    <button className="btn" onClick={submitNewsletter} style={{ whiteSpace: "nowrap" }}>{t("Suscribirme", "Subscribe", "Inscrever-me")}</button>
                   </div>
                   {nlErr && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 8 }}>{nlErr}</div>}
-                  <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 9 }}>{es ? "Un correo por semana. Te das de baja en un clic." : "One email a week. Unsubscribe in one click."}</div>
+                  <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 9 }}>{t("Un correo por semana. Te das de baja en un clic.", "One email a week. Unsubscribe in one click.", "Um e-mail por semana. Cancele em um clique.")}</div>
                 </>
               )}
             </div>
@@ -992,11 +995,11 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
         <h2 className="h2" style={{ maxWidth: 570, margin: "0 auto" }}>{t("¿Cuánto perdiste la última vez que el clima te agarró desprevenido?", "What did it cost you last time the weather caught you off guard?", "Quanto você perdeu da última vez que o clima te pegou de surpresa?")}</h2>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 24, flexWrap: "wrap" }}>
           <button className="btn" onClick={onEnter} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-            {live ? (es ? "Analizar mi campo gratis" : "Analyze my farm free") : (es ? "Pedir acceso a la beta" : "Request beta access")} <Ic d={ic.arrow} s={15} c="#04140B" />
+            {live ? t("Analizar mi campo gratis", "Analyze my farm free", "Analisar meu campo grátis") : t("Pedir acceso a la beta", "Request beta access", "Pedir acesso à beta")} <Ic d={ic.arrow} s={15} c="#04140B" />
           </button>
-          <button className="btn ghost">{es ? "Hablar con nosotros" : "Talk to us"}</button>
+          <button className="btn ghost">{t("Hablar con nosotros", "Talk to us", "Fale conosco")}</button>
         </div>
-        <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 18 }}>{es ? "Disponible para campos en cualquier país · soporte en 4 idiomas" : "Available for farms in any country · support in 4 languages"}</div>
+        <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 18 }}>{t("Disponible para campos en cualquier país · soporte en 4 idiomas", "Available for farms in any country · support in 4 languages", "Disponível para campos em qualquer país · suporte em 4 idiomas")}</div>
       </section></div>
 
       <div className="wrap">
@@ -1025,7 +1028,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
               <div>
                 <div className="mono lbl" style={{ marginBottom: 12 }}>{t("Empresa", "Company", "Empresa")}</div>
                 <button onClick={onEnter} className="mono" style={{ display: "block", fontSize: 12, color: C.t2, background: "none", border: "none", cursor: "pointer", padding: "5px 0", textAlign: "left" }}>{t("Contacto", "Contact", "Contato")}</button>
-                <button onClick={onAdmin} aria-label={es ? "Panel de administrador" : "Admin panel"} className="mono" style={{ display: "block", fontSize: 12, color: C.t2, background: "none", border: "none", cursor: "pointer", padding: "5px 0", textAlign: "left" }}>{t("Administrador", "Admin", "Admin")}</button>
+                <button onClick={onAdmin} aria-label={t("Panel de administrador", "Admin panel", "Painel de administrador")} className="mono" style={{ display: "block", fontSize: 12, color: C.t2, background: "none", border: "none", cursor: "pointer", padding: "5px 0", textAlign: "left" }}>{t("Administrador", "Admin", "Admin")}</button>
                 <span className="mono" style={{ display: "block", fontSize: 12, color: C.t3, padding: "5px 0" }}>{t("Beta global", "Global beta", "Beta global")}</span>
               </div>
             </div>
