@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,10 +16,14 @@ export { pool };
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-// Aplica el esquema y deja la tabla de leads vacía.
+// Aplica todas las migraciones y deja las tablas vacías.
 export async function resetDb() {
-  await pool.query(await readFile(join(here, "..", "migrations", "001_init.sql"), "utf8"));
-  await pool.query("TRUNCATE leads RESTART IDENTITY");
+  const dir = join(here, "..", "migrations");
+  const files = (await readdir(dir)).filter((f) => f.endsWith(".sql")).sort();
+  for (const f of files) {
+    await pool.query(await readFile(join(dir, f), "utf8"));
+  }
+  await pool.query("TRUNCATE leads, farms, users RESTART IDENTITY CASCADE");
 }
 
 let server;

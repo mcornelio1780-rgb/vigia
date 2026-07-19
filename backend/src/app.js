@@ -3,6 +3,7 @@ import cors from "cors";
 import { query } from "./db.js";
 import authRouter from "./routes/auth.js";
 import leadsRouter from "./routes/leads.js";
+import usersRouter from "./routes/users.js";
 import { fetchForecast } from "./weather.js";
 import { fetchFires, firmsConfigured } from "./firms.js";
 import { rateLimit } from "./ratelimit.js";
@@ -83,6 +84,7 @@ export function createApp() {
 
   app.use("/api/auth", authRouter);
   app.use("/api/leads", leadsRouter);
+  app.use("/api/users", usersRouter);
 
   app.use((err, _req, res, _next) => {
     if (err.type === "entity.too.large" || err.status === 413) {

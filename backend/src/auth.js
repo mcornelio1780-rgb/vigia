@@ -23,8 +23,10 @@ export function checkPassword(password) {
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
-export function issueToken(role = "admin") {
-  const payload = { role, exp: Math.floor(Date.now() / 1000) + TTL_SECONDS };
+// Acepta un rol (string, p. ej. "admin") o un payload ({ role, sub }).
+export function issueToken(input = "admin") {
+  const base = typeof input === "string" ? { role: input } : { ...input };
+  const payload = { ...base, exp: Math.floor(Date.now() / 1000) + TTL_SECONDS };
   const body = base64url(JSON.stringify(payload));
   return { token: `${body}.${sign(body)}`, expires_at: payload.exp };
 }
@@ -57,5 +59,17 @@ export function requireAdmin(req, res, next) {
     return res.status(401).json({ error: "Se requiere autenticación de administrador" });
   }
   req.user = payload;
+  next();
+}
+
+// Middleware Express: exige un token de usuario (rol "user") con su id (sub).
+export function requireUser(req, res, next) {
+  const header = req.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
+  const payload = token && verifyToken(token);
+  if (!payload || payload.role !== "user" || !payload.sub) {
+    return res.status(401).json({ error: "Se requiere iniciar sesión" });
+  }
+  req.user = { id: payload.sub };
   next();
 }

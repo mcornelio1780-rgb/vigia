@@ -49,6 +49,47 @@ async function fetchLeads(token, kind) {
   return res.json();
 }
 
+/* ── Cuentas de usuario (token en localStorage) ── */
+const USER_TOKEN_KEY = "vigia_user_token";
+function getUserToken() {
+  try { return typeof window !== "undefined" ? window.localStorage.getItem(USER_TOKEN_KEY) : null; } catch { return null; }
+}
+function setUserToken(t) { try { window.localStorage.setItem(USER_TOKEN_KEY, t); } catch {} }
+function clearUserToken() { try { window.localStorage.removeItem(USER_TOKEN_KEY); } catch {} }
+
+async function userAuth(kind, payload) {
+  const res = await fetch(`${API_URL}/api/users/${kind}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const b = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(b?.error || "No se pudo autenticar");
+  setUserToken(b.token);
+  return b.user;
+}
+async function fetchMe() {
+  const t = getUserToken();
+  if (!t) return null;
+  try {
+    const res = await fetch(`${API_URL}/api/users/me`, { headers: { Authorization: `Bearer ${t}` } });
+    if (!res.ok) { clearUserToken(); return null; }
+    return await res.json();
+  } catch { return null; }
+}
+async function saveFarm(payload) {
+  const t = getUserToken();
+  if (!t) throw new Error("Inicia sesión para guardar tu campo");
+  const res = await fetch(`${API_URL}/api/users/farms`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${t}` },
+    body: JSON.stringify(payload),
+  });
+  const b = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(b?.error || "No se pudo guardar el campo");
+  return b;
+}
+
 // Genera el PDF de evidencia en el backend y dispara la descarga.
 async function downloadReport(payload) {
   const res = await fetch(`${API_URL}/api/report`, {
@@ -760,6 +801,28 @@ const Landing = ({ es, setLang, onEnter, live, setLive, onAdmin }) => {
 /* ══════════════════ LOGIN ══════════════════ */
 const Login = ({ es, onDone, onBack }) => {
   const [tab, setTab] = useState("in");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setErr("");
+    try {
+      if (tab === "up") await userAuth("signup", { email, password, name });
+      else await userAuth("login", { email, password });
+      onDone();
+    } catch (e2) {
+      setErr(e2.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 22 }}>
       <div style={{ width: "100%", maxWidth: 380 }}>
@@ -770,23 +833,24 @@ const Login = ({ es, onDone, onBack }) => {
         </div>
         <div style={{ display: "flex", gap: 4, marginBottom: 18 }}>
           {[["in", es ? "Entrar" : "Log in"], ["up", es ? "Crear cuenta" : "Sign up"]].map(([k, l]) => (
-            <button key={k} onClick={() => setTab(k)} className="mono chipbtn" style={{ borderColor: tab === k ? C.green : C.line, color: tab === k ? C.green : C.t3 }}>{l}</button>
+            <button key={k} onClick={() => { setTab(k); setErr(""); }} className="mono chipbtn" style={{ borderColor: tab === k ? C.green : C.line, color: tab === k ? C.green : C.t3 }}>{l}</button>
           ))}
         </div>
-        <div className="card" style={{ padding: 20 }}>
-          {tab === "up" && <><label className="mono lbl">{es ? "Nombre" : "Name"}</label><input placeholder={es ? "María Fernández" : "Jane Doe"} style={{ margin: "7px 0 14px" }} /></>}
+        <form className="card" style={{ padding: 20 }} onSubmit={submit}>
+          {tab === "up" && <><label className="mono lbl">{es ? "Nombre" : "Name"}</label><input value={name} onChange={(e) => setName(e.target.value)} placeholder={es ? "María Fernández" : "Jane Doe"} style={{ margin: "7px 0 14px" }} /></>}
           <label className="mono lbl">{es ? "Correo" : "Email"}</label>
-          <input placeholder="tu@correo.com" style={{ margin: "7px 0 14px" }} />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" style={{ margin: "7px 0 14px" }} />
           <label className="mono lbl">{es ? "Contraseña" : "Password"}</label>
-          <input type="password" placeholder="••••••••" style={{ margin: "7px 0 4px" }} />
-          {tab === "up" && <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 10, lineHeight: 1.6 }}>{es ? "Al crear la cuenta aceptas el tratamiento cifrado de las coordenadas de tu campo." : "By signing up you accept encrypted processing of your field coordinates."}</div>}
-          <button className="btn" style={{ width: "100%", marginTop: 16 }} onClick={onDone}>{tab === "in" ? (es ? "Entrar" : "Log in") : (es ? "Crear cuenta" : "Create account")}</button>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" style={{ margin: "7px 0 4px" }} />
+          {tab === "up" && <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 10, lineHeight: 1.6 }}>{es ? "Mínimo 6 caracteres. Al crear la cuenta aceptas el tratamiento cifrado de las coordenadas de tu campo." : "At least 6 characters. By signing up you accept encrypted processing of your field coordinates."}</div>}
+          {err && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 12 }}>{err}</div>}
+          <button className="btn" type="submit" disabled={busy} style={{ width: "100%", marginTop: 16, opacity: busy ? 0.6 : 1 }}>{busy ? (es ? "Un momento…" : "One moment…") : tab === "in" ? (es ? "Entrar" : "Log in") : (es ? "Crear cuenta" : "Create account")}</button>
           <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
             <div style={{ flex: 1, height: 1, background: C.line }} /><span className="mono" style={{ fontSize: 10, color: C.t4 }}>{es ? "o" : "or"}</span><div style={{ flex: 1, height: 1, background: C.line }} />
           </div>
-          <button className="btn ghost" style={{ width: "100%" }} onClick={onDone}>{es ? "Continuar con Google" : "Continue with Google"}</button>
-        </div>
-        <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 16, textAlign: "center" }}>{es ? "Demo: cualquier dato entra al dashboard" : "Demo: any input enters the dashboard"}</div>
+          <button className="btn ghost" type="button" style={{ width: "100%" }} onClick={onDone}>{es ? "Continuar sin cuenta (demo)" : "Continue without account (demo)"}</button>
+        </form>
+        <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 16, textAlign: "center" }}>{es ? "Tu cuenta guarda tus campos de verdad." : "Your account saves your fields for real."}</div>
       </div>
     </div>
   );
@@ -818,6 +882,19 @@ const Dashboard = ({ es, setLang, onLogout }) => {
     fetchFires(farm.lat, farm.lng).then((d) => { if (active) setFires(d); });
     return () => { active = false; };
   }, [farmKey]);
+
+  // Cuenta de usuario: carga el perfil y sus campos guardados.
+  const [me, setMe] = useState(null);
+  const [savedMsg, setSavedMsg] = useState("");
+  useEffect(() => { fetchMe().then(setMe); }, []);
+  const persistFarm = async () => {
+    setSavedMsg("");
+    try {
+      await saveFarm({ name: farm.label, lat: farm.lat, lng: farm.lng, hectares: farm.ha });
+      setMe(await fetchMe());
+      setSavedMsg(es ? "Campo guardado" : "Field saved");
+    } catch (e) { setSavedMsg(e.message); }
+  };
 
   /* settings */
   const [wa, setWa] = useState(true), [sms, setSms] = useState(true), [mail, setMail] = useState(true), [push, setPush] = useState(false);
@@ -913,6 +990,11 @@ const Dashboard = ({ es, setLang, onLogout }) => {
               {FARM_KEYS.map((k) => <option key={k} value={k}>{FARMS[k].label} — {FARMS[k].country}</option>)}
             </select>
             <button className="btn ghost sm" onClick={() => setLang(es ? "en" : "es")}>{es ? "EN" : "ES"}</button>
+            {me && (
+              <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <Ic d={ic.pin} s={12} /> {savedMsg || (es ? `Guardar campo (${me.farms?.length ?? 0})` : `Save field (${me.farms?.length ?? 0})`)}
+              </button>
+            )}
             <span className="mono lbl" style={{ color: C.green }}><span className="dot" /> {es ? "próximo análisis 4h 12m" : "next analysis 4h 12m"}</span>
           </div>
         </header>
