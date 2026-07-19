@@ -119,6 +119,49 @@ test("GET/PUT /api/users/settings guarda y carga preferencias", async () => {
   assert.equal(after.body.thFlood, 50);
 });
 
+test("PUT /api/users/farms/:id edita un campo propio y valida propiedad", async () => {
+  const a = await signup("fa@x.com", "clave-larga");
+  const b = await signup("fb@x.com", "clave-larga");
+  const authA = { Authorization: `Bearer ${a.body.token}`, "Content-Type": "application/json" };
+
+  const created = await api(base, "/api/users/farms", {
+    method: "POST",
+    headers: authA,
+    body: JSON.stringify({ name: "Lote Viejo", hectares: 100, lat: -33.1, lng: -64.3 }),
+  });
+  const id = created.body.id;
+
+  // Sin sesión -> 401
+  assert.equal((await api(base, `/api/users/farms/${id}`, json("PUT", { name: "X" }))).status, 401);
+
+  // name obligatorio -> 400
+  assert.equal((await api(base, `/api/users/farms/${id}`, { method: "PUT", headers: authA, body: JSON.stringify({ name: "  " }) })).status, 400);
+
+  // hectares inválido -> 400
+  assert.equal((await api(base, `/api/users/farms/${id}`, { method: "PUT", headers: authA, body: JSON.stringify({ name: "L", hectares: -3 }) })).status, 400);
+
+  // coordenadas inválidas -> 400
+  assert.equal((await api(base, `/api/users/farms/${id}`, { method: "PUT", headers: authA, body: JSON.stringify({ name: "L", lat: 999, lng: 0 }) })).status, 400);
+
+  // id con formato inválido -> 400
+  assert.equal((await api(base, "/api/users/farms/no-uuid", { method: "PUT", headers: authA, body: JSON.stringify({ name: "L" }) })).status, 400);
+
+  // Editar solo el nombre preserva ubicación y hectáreas
+  const upd = await api(base, `/api/users/farms/${id}`, { method: "PUT", headers: authA, body: JSON.stringify({ name: "Lote Nuevo" }) });
+  assert.equal(upd.status, 200);
+  assert.equal(upd.body.name, "Lote Nuevo");
+  assert.equal(upd.body.hectares, 100); // preservado
+  assert.ok(Math.abs(upd.body.lat - -33.1) < 1e-6); // preservada
+
+  // Un usuario ajeno no puede editarlo -> 404
+  const other = await api(base, `/api/users/farms/${id}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${b.body.token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ name: "Ajeno" }),
+  });
+  assert.equal(other.status, 404);
+});
+
 test("DELETE /api/users/farms/:id borra solo el campo propio", async () => {
   const a = await signup("owner@x.com", "clave-larga");
   const b = await signup("other@x.com", "clave-larga");

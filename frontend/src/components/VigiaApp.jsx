@@ -121,6 +121,18 @@ async function saveFarm(payload) {
   if (!res.ok) throw new Error(b?.error || "No se pudo guardar el campo");
   return b;
 }
+async function updateFarm(id, payload) {
+  const t = getUserToken();
+  if (!t) throw new Error("Inicia sesión");
+  const res = await fetch(`${API_URL}/api/users/farms/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${t}` },
+    body: JSON.stringify(payload),
+  });
+  const b = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(b?.error || "No se pudo editar el campo");
+  return b;
+}
 async function fetchSettings() {
   const t = getUserToken();
   if (!t) return null;
@@ -1037,6 +1049,33 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     } catch (e) { setSavedMsg(e.message); }
   };
 
+  // Edición de un campo propio (nombre y, opcionalmente, hectáreas).
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [rf, setRf] = useState({ name: "", ha: "" });
+  const [rfBusy, setRfBusy] = useState(false);
+  const [rfErr, setRfErr] = useState("");
+  const openRename = () => {
+    setRfErr("");
+    setRf({ name: savedFarm?.name || farm.label, ha: savedFarm?.hectares != null ? String(savedFarm.hectares) : "" });
+    setRenameOpen(true);
+  };
+  const submitRename = async (e) => {
+    e.preventDefault();
+    if (rfBusy) return;
+    if (!rf.name.trim()) { setRfErr(es ? "El nombre es obligatorio" : "Name is required"); return; }
+    setRfBusy(true);
+    setRfErr("");
+    try {
+      const payload = { name: rf.name.trim() };
+      if (rf.ha !== "") payload.hectares = rf.ha;
+      await updateFarm(savedFarm?.id || farm.id, payload);
+      setMe(await fetchMe());
+      setRenameOpen(false);
+      setSavedMsg(es ? "Campo actualizado" : "Field updated");
+    } catch (e2) { setRfErr(e2.message); }
+    finally { setRfBusy(false); }
+  };
+
   // Alta de un campo nuevo por coordenadas.
   const [addOpen, setAddOpen] = useState(false);
   const [nf, setNf] = useState({ name: "", lat: "", lng: "", ha: "" });
@@ -1227,7 +1266,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <select value={farmKey} onChange={(e) => { setFarmKey(e.target.value); setZone(null); setSavedMsg(""); }} className="mono sel" aria-label={es ? "Campo" : "Farm"}>
+            <select value={farmKey} onChange={(e) => { setFarmKey(e.target.value); setZone(null); setSavedMsg(""); setRenameOpen(false); }} className="mono sel" aria-label={es ? "Campo" : "Farm"}>
               {savedFarms.length > 0 && (
                 <optgroup label={es ? "Mis campos" : "My fields"}>
                   {savedFarms.map((f) => <option key={f.id} value={`saved:${f.id}`}>{f.name}</option>)}
@@ -1241,6 +1280,11 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             {me && !farm.saved && (
               <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <Ic d={ic.pin} s={12} /> {savedMsg || (es ? "Guardar campo" : "Save field")}
+              </button>
+            )}
+            {me && farm.saved && (
+              <button className="btn ghost sm" onClick={openRename} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <Ic d={ic.gear} s={12} /> {es ? "Editar campo" : "Edit field"}
               </button>
             )}
             {me && farm.saved && (
@@ -1282,6 +1326,27 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 <button className="btn ghost sm" type="button" onClick={() => setAddOpen(false)}>{es ? "Cancelar" : "Cancel"}</button>
               </div>
               {nfErr && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 10 }}>{nfErr}</div>}
+            </form>
+          )}
+          {renameOpen && me && farm.saved && (
+            <form className="card" onSubmit={submitRename} style={{ marginBottom: 14 }}>
+              <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Editar campo" : "Edit field"}</div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+                <label style={{ flex: "2 1 200px" }}>
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>{es ? "Nombre" : "Name"}</div>
+                  <input value={rf.name} onChange={(e) => setRf({ ...rf, name: e.target.value })} placeholder={es ? "Lote Norte" : "North field"} required />
+                </label>
+                <label style={{ flex: "1 1 90px" }}>
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>ha</div>
+                  <input value={rf.ha} onChange={(e) => setRf({ ...rf, ha: e.target.value })} placeholder="480" inputMode="numeric" />
+                </label>
+                <button className="btn sm" type="submit" disabled={rfBusy} style={{ opacity: rfBusy ? 0.6 : 1 }}>{rfBusy ? (es ? "Guardando…" : "Saving…") : es ? "Guardar" : "Save"}</button>
+                <button className="btn ghost sm" type="button" onClick={() => setRenameOpen(false)}>{es ? "Cancelar" : "Cancel"}</button>
+              </div>
+              <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 10 }}>
+                {es ? "La ubicación del campo se conserva." : "The field location is preserved."}
+              </div>
+              {rfErr && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 8 }}>{rfErr}</div>}
             </form>
           )}
           {/* ── VISTA GENERAL ── */}

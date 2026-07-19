@@ -210,6 +210,63 @@ router.post("/farms", requireUser, async (req, res, next) => {
   }
 });
 
+// PUT /api/users/farms/:id { name, hectares?, lat?, lng? } -> edita un campo
+// propio. Actualización parcial: solo cambia lo que se envía (editar el nombre
+// no borra la ubicación ni las hectáreas ya guardadas).
+router.put("/farms/:id", requireUser, async (req, res, next) => {
+  try {
+    const { name, lat, lng, hectares } = req.body || {};
+    if (!name || !String(name).trim()) return res.status(400).json({ error: "name es obligatorio" });
+
+    const sets = ["name = $1"];
+    const params = [String(name).trim()];
+
+    if (hectares !== undefined) {
+      if (hectares === null || hectares === "") {
+        sets.push("hectares = NULL");
+      } else {
+        const ha = Number(hectares);
+        if (!Number.isFinite(ha) || ha < 0) return res.status(400).json({ error: "hectares inválido" });
+        params.push(Math.round(ha));
+        sets.push(`hectares = $${params.length}`);
+      }
+    }
+
+    if (lat !== undefined || lng !== undefined) {
+      if (lat === null || lng === null || lat === "" || lng === "") {
+        sets.push("location = NULL");
+      } else {
+        const latN = Number(lat);
+        const lngN = Number(lng);
+        if (Number.isNaN(latN) || Number.isNaN(lngN) || latN < -90 || latN > 90 || lngN < -180 || lngN > 180) {
+          return res.status(400).json({ error: "lat y lng deben ser coordenadas válidas" });
+        }
+        params.push(lngN);
+        const lngIdx = params.length;
+        params.push(latN);
+        const latIdx = params.length;
+        sets.push(`location = ST_SetSRID(ST_MakePoint($${lngIdx}, $${latIdx}), 4326)::geography`);
+      }
+    }
+
+    params.push(req.params.id);
+    const idIdx = params.length;
+    params.push(req.user.id);
+    const uidIdx = params.length;
+
+    const { rows } = await query(
+      `UPDATE farms SET ${sets.join(", ")} WHERE id = $${idIdx} AND user_id = $${uidIdx} RETURNING id`,
+      params
+    );
+    if (!rows.length) return res.status(404).json({ error: "Campo no encontrado" });
+    const updated = await query(`${FARM_SELECT} WHERE id = $1`, [rows[0].id]);
+    res.json(updated.rows[0]);
+  } catch (err) {
+    if (err.code === "22P02") return res.status(400).json({ error: "id inválido" });
+    next(err);
+  }
+});
+
 // DELETE /api/users/farms/:id -> borra un campo del propio usuario
 router.delete("/farms/:id", requireUser, async (req, res, next) => {
   try {
