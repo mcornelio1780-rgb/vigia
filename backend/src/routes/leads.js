@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { query } from "../db.js";
 import { requireAdmin } from "../auth.js";
+import { rateLimit } from "../ratelimit.js";
 
 const router = Router();
+const createLimiter = rateLimit({ windowMs: 60_000, max: 30 });
 
 const KINDS = ["waitlist", "newsletter"];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -56,7 +58,7 @@ router.get("/", requireAdmin, async (req, res, next) => {
 
 // POST /api/leads — alta pública (lista de espera o boletín). Idempotente
 // por (email, kind): un segundo envío actualiza los datos, no duplica.
-router.post("/", async (req, res, next) => {
+router.post("/", createLimiter, async (req, res, next) => {
   try {
     const { email, kind = "waitlist", name, country, hectares, lat, lng } = req.body || {};
     if (!email || typeof email !== "string" || !EMAIL_RE.test(email.trim())) {

@@ -129,6 +129,25 @@ test("POST /api/report sin farm devuelve 400", async () => {
   assert.equal(status, 400);
 });
 
+test("un cuerpo demasiado grande devuelve 413", async () => {
+  const big = "x".repeat(300 * 1024); // > 256kb
+  const res = await fetch(`${base}/api/leads`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "a@b.com", note: big }),
+  });
+  assert.equal(res.status, 413);
+});
+
+test("POST /api/leads expone cabeceras de rate limit", async () => {
+  const res = await fetch(`${base}/api/leads`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "hdr@x.com", kind: "waitlist" }),
+  });
+  assert.ok(res.headers.get("x-ratelimit-limit"));
+});
+
 test("GET /api/fires valida coordenadas y avisa si FIRMS no está configurado", async () => {
   assert.equal((await api(base, "/api/fires?lat=999&lng=0")).status, 400);
   // El entorno de test no define FIRMS_MAP_KEY → 503 con mensaje claro.

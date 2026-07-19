@@ -5,6 +5,7 @@ import authRouter from "./routes/auth.js";
 import leadsRouter from "./routes/leads.js";
 import { fetchForecast } from "./weather.js";
 import { fetchFires, firmsConfigured } from "./firms.js";
+import { rateLimit } from "./ratelimit.js";
 import PDFDocument from "pdfkit";
 import { buildReportPdf } from "./report.js";
 
@@ -12,8 +13,11 @@ import { buildReportPdf } from "./report.js";
 // importarla desde los tests.
 export function createApp() {
   const app = express();
+  app.set("trust proxy", true); // IP real detrás del proxy para el rate limiting
   app.use(cors());
-  app.use(express.json());
+  app.use(express.json({ limit: "256kb" }));
+
+  const reportLimiter = rateLimit({ windowMs: 60_000, max: 20 });
 
   app.get("/api/health", async (_req, res) => {
     try {
@@ -41,7 +45,7 @@ export function createApp() {
   });
 
   // Genera un PDF de evidencia satelital del campo (para el seguro).
-  app.post("/api/report", (req, res) => {
+  app.post("/api/report", reportLimiter, (req, res) => {
     const data = req.body || {};
     if (!data.farm || typeof data.farm !== "object") {
       return res.status(400).json({ error: "Se requiere el objeto 'farm' del campo" });
@@ -81,6 +85,12 @@ export function createApp() {
   app.use("/api/leads", leadsRouter);
 
   app.use((err, _req, res, _next) => {
+    if (err.type === "entity.too.large" || err.status === 413) {
+      return res.status(413).json({ error: "Cuerpo de la solicitud demasiado grande" });
+    }
+    if (err.type === "entity.parse.failed" || err.status === 400) {
+      return res.status(400).json({ error: "JSON inválido" });
+    }
     console.error(err);
     res.status(500).json({ error: "Error interno del servidor" });
   });
