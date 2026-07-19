@@ -133,6 +133,15 @@ async function updateFarm(id, payload) {
   if (!res.ok) throw new Error(b?.error || "No se pudo editar el campo");
   return b;
 }
+async function fetchUserStats() {
+  const t = getUserToken();
+  if (!t) return null;
+  try {
+    const res = await fetch(`${API_URL}/api/users/stats`, { headers: { Authorization: `Bearer ${t}` } });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
 async function fetchSettings() {
   const t = getUserToken();
   if (!t) return null;
@@ -1030,6 +1039,13 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
   // Cuenta de usuario: carga el perfil y sus campos guardados.
   const [savedMsg, setSavedMsg] = useState("");
   useEffect(() => { fetchMe().then(setMe); }, []);
+
+  // Resumen real de la cuenta (nº de campos, hectáreas, etc.), solo con sesión.
+  const [stats, setStats] = useState(null);
+  useEffect(() => {
+    if (!me) { setStats(null); return; }
+    fetchUserStats().then(setStats);
+  }, [me]);
   const persistFarm = async () => {
     setSavedMsg("");
     try {
@@ -1695,6 +1711,32 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
               )}
             </div>
             <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              {me && stats && (
+                <div className="card" style={{ gridColumn: "1 / -1" }}>
+                  <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Tu cuenta" : "Your account"}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 14 }}>
+                    <div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{stats.farms}</div>
+                      <div className="mono lbl">{es ? "Campos" : "Fields"}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{stats.hectares}</div>
+                      <div className="mono lbl">{es ? "Hectáreas totales" : "Total hectares"}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{stats.located}</div>
+                      <div className="mono lbl">{es ? "Con ubicación" : "With location"}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, marginTop: 6 }}>{stats.memberSince ? new Date(stats.memberSince).toLocaleDateString(es ? "es" : "en") : "—"}</div>
+                      <div className="mono lbl">{es ? "Miembro desde" : "Member since"}</div>
+                    </div>
+                  </div>
+                  <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 12 }}>
+                    {es ? "Datos reales de tu cuenta." : "Real data from your account."}
+                  </div>
+                </div>
+              )}
               <div className="card">
                 <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Perfil" : "Profile"}</div>
                 <label className="mono lbl">{es ? "Nombre" : "Name"}</label>
