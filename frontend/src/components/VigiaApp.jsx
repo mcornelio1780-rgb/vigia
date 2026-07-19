@@ -31,6 +31,24 @@ async function fetchLeadStats() {
   return res.json();
 }
 
+// Autenticación de administrador y listado de leads.
+async function adminLogin(password) {
+  const res = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  const b = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(b?.error || "Contraseña incorrecta");
+  return b.token;
+}
+async function fetchLeads(token, kind) {
+  const qs = kind ? `?kind=${kind}` : "";
+  const res = await fetch(`${API_URL}/api/leads${qs}`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) throw new Error("No autorizado");
+  return res.json();
+}
+
 // Genera el PDF de evidencia en el backend y dispara la descarga.
 async function downloadReport(payload) {
   const res = await fetch(`${API_URL}/api/report`, {
@@ -392,7 +410,7 @@ const Slider = ({ label, v, set, min, max, unit, c }) => (
 );
 
 /* ══════════════════ LANDING ══════════════════ */
-const Landing = ({ es, setLang, onEnter, live, setLive }) => {
+const Landing = ({ es, setLang, onEnter, live, setLive, onAdmin }) => {
   const [wl, setWl] = useState(""); const [wlSent, setWlSent] = useState(false); const [wlErr, setWlErr] = useState(""); const [wlBusy, setWlBusy] = useState(false);
   const [nl, setNl] = useState(""); const [nlSent, setNlSent] = useState(false); const [nlErr, setNlErr] = useState("");
   const [ha, setHa] = useState(200);
@@ -717,7 +735,10 @@ const Landing = ({ es, setLang, onEnter, live, setLive }) => {
       <div className="wrap">
         <footer style={{ borderTop: `1px solid ${C.line}`, padding: "22px 0 34px", display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <span className="mono" style={{ fontSize: 10.5, color: C.t4 }}>{BRAND} © 2026 · {DOMAIN}</span>
-          <span className="mono" style={{ fontSize: 10.5, color: C.t4 }}>{es ? "Datos: NASA · ESA · NOAA · ISRIC" : "Data: NASA · ESA · NOAA · ISRIC"}</span>
+          <span style={{ display: "flex", gap: 14 }}>
+            <button onClick={onAdmin} className="mono" style={{ fontSize: 10.5, color: C.t4, background: "none", border: "none", cursor: "pointer", padding: 0 }}>{es ? "Administrador" : "Admin"}</button>
+            <span className="mono" style={{ fontSize: 10.5, color: C.t4 }}>{es ? "Datos: NASA · ESA · NOAA · ISRIC" : "Data: NASA · ESA · NOAA · ISRIC"}</span>
+          </span>
         </footer>
       </div>
     </>
@@ -1269,6 +1290,104 @@ const Dashboard = ({ es, setLang, onLogout }) => {
   );
 };
 
+/* ══════════════════ ADMIN — LEADS ══════════════════ */
+const AdminLeads = ({ es, onBack }) => {
+  const [token, setToken] = useState(null);
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [leads, setLeads] = useState([]);
+  const [kind, setKind] = useState("");
+
+  const load = async (tk, k) => {
+    setLoading(true); setErr("");
+    try { setLeads(await fetchLeads(tk, k)); }
+    catch (e) { setErr(e.message); }
+    finally { setLoading(false); }
+  };
+  const login = async (e) => {
+    e.preventDefault();
+    setBusy(true); setErr("");
+    try { const tk = await adminLogin(pw); setToken(tk); await load(tk, kind); }
+    catch (e) { setErr(e.message); }
+    finally { setBusy(false); }
+  };
+  const changeKind = (k) => { setKind(k); if (token) load(token, k); };
+  const exportCsv = () => {
+    const head = ["email", "kind", "name", "country", "hectares", "lat", "lng", "created_at"];
+    const rows = [head, ...leads.map((l) => [l.email, l.kind, l.name || "", l.country || "", l.hectares ?? "", l.lat ?? "", l.lng ?? "", l.created_at])];
+    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = "vigia-leads.csv"; document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const kinds = [["", es ? "Todos" : "All"], ["waitlist", es ? "Lista de espera" : "Waitlist"], ["newsletter", es ? "Boletín" : "Newsletter"]];
+
+  return (
+    <div className="wrap" style={{ paddingTop: 20, paddingBottom: 40 }}>
+      <button className="btn ghost sm" onClick={onBack} style={{ marginBottom: 18 }}>← {es ? "Volver" : "Back"}</button>
+      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 18 }}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-2-7-6-7-10a7 7 0 0114 0c0 4-2.5 8-7 10z" stroke={C.green} strokeWidth="1.6" /><circle cx="12" cy="10.5" r="2.6" fill={C.green} /></svg>
+        <span style={{ fontSize: 18, fontWeight: 700 }}>{BRAND}</span>
+        <span className="mono pill">{es ? "Administrador" : "Admin"}</span>
+      </div>
+
+      {!token ? (
+        <form onSubmit={login} className="card" style={{ maxWidth: 360, padding: 20 }}>
+          <div className="mono lbl" style={{ marginBottom: 10 }}>{es ? "Acceso de administrador" : "Admin access"}</div>
+          <label className="mono lbl">{es ? "Contraseña" : "Password"}</label>
+          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" style={{ margin: "7px 0 4px" }} autoFocus />
+          <button className="btn" type="submit" disabled={busy} style={{ width: "100%", marginTop: 14, opacity: busy ? 0.6 : 1 }}>
+            {busy ? (es ? "Entrando…" : "Signing in…") : es ? "Entrar" : "Log in"}
+          </button>
+          {err && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 10 }}>{err}</div>}
+        </form>
+      ) : (
+        <>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+            {kinds.map(([k, l]) => (
+              <button key={k} onClick={() => changeKind(k)} className="mono chipbtn" style={{ borderColor: kind === k ? C.green : C.line, color: kind === k ? C.green : C.t3 }}>{l}</button>
+            ))}
+            <span className="mono lbl" style={{ marginLeft: "auto" }}>{leads.length} {es ? "registros" : "records"}</span>
+            <button className="btn ghost sm" onClick={exportCsv} disabled={!leads.length}><Ic d={ic.down} s={12} /> CSV</button>
+            <button className="btn ghost sm" onClick={() => { setToken(null); setLeads([]); setPw(""); }}>{es ? "Salir" : "Log out"}</button>
+          </div>
+          <div className="card" style={{ overflowX: "auto" }}>
+            {loading ? (
+              <div className="mono lbl" style={{ padding: 12 }}>{es ? "Cargando…" : "Loading…"}</div>
+            ) : leads.length ? (
+              <table>
+                <thead><tr>
+                  <th>Email</th><th>{es ? "Tipo" : "Kind"}</th><th>{es ? "Nombre" : "Name"}</th>
+                  <th>{es ? "País" : "Country"}</th><th>ha</th><th>{es ? "Fecha" : "Date"}</th>
+                </tr></thead>
+                <tbody>
+                  {leads.map((l) => (
+                    <tr key={l.id}>
+                      <td style={{ color: C.t1 }}>{l.email}</td>
+                      <td><span className="mono" style={{ color: l.kind === "waitlist" ? C.green : C.blue }}>{l.kind}</span></td>
+                      <td style={{ color: C.t2 }}>{l.name || "—"}</td>
+                      <td style={{ color: C.t2 }}>{l.country || "—"}</td>
+                      <td className="mono" style={{ color: C.t2 }}>{l.hectares ?? "—"}</td>
+                      <td className="mono" style={{ color: C.t3, fontSize: 10.5 }}>{String(l.created_at).slice(0, 10)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="mono lbl" style={{ padding: 12 }}>{es ? "Sin registros" : "No records"}</div>
+            )}
+          </div>
+          {err && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 10 }}>{err}</div>}
+        </>
+      )}
+    </div>
+  );
+};
+
 /* ══════════════════ ROOT ══════════════════ */
 export default function VigiaApp() {
   const [view, setView] = useState("landing");
@@ -1339,9 +1458,10 @@ export default function VigiaApp() {
         }
       `}</style>
 
-      {view === "landing" && <Landing es={es} setLang={setLang} live={live} setLive={setLive} onEnter={() => setView("login")} />}
+      {view === "landing" && <Landing es={es} setLang={setLang} live={live} setLive={setLive} onEnter={() => setView("login")} onAdmin={() => setView("admin")} />}
       {view === "login" && <Login es={es} onDone={() => setView("app")} onBack={() => setView("landing")} />}
       {view === "app" && <Dashboard es={es} setLang={setLang} onLogout={() => setView("landing")} />}
+      {view === "admin" && <AdminLeads es={es} onBack={() => setView("landing")} />}
     </div>
   );
 }
