@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   api,
+  assetUrl,
   Category,
   Report,
   ReportStatus,
@@ -11,6 +12,7 @@ import {
   STATUS_LABELS,
 } from "@/lib/api";
 import ReportForm from "@/components/ReportForm";
+import AdminBar from "@/components/AdminBar";
 
 const ReportMap = dynamic(() => import("@/components/ReportMap"), {
   ssr: false,
@@ -37,6 +39,7 @@ export default function Home() {
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState<{ lat: number; lng: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const filters = useMemo(
     () => ({ category: categoryFilter || undefined, status: statusFilter || undefined }),
@@ -56,9 +59,12 @@ export default function Home() {
 
   useEffect(() => {
     api.categories().then(setCategories).catch(() => {});
+    api.verify().then(setIsAdmin).catch(() => {});
   }, []);
 
   useEffect(() => {
+    // refresh() hace fetch y actualiza el estado tras el await (no es setState síncrono).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [refresh]);
 
@@ -82,9 +88,12 @@ export default function Home() {
     <main className="flex h-dvh flex-col bg-white text-neutral-900 md:flex-row">
       <aside className="flex w-full flex-col border-r border-neutral-200 md:w-96">
         <header className="border-b border-neutral-200 px-4 py-3">
-          <h1 className="text-xl font-bold tracking-tight">
-            Vigia <span className="text-sm font-normal text-neutral-500">reportes ciudadanos</span>
-          </h1>
+          <div className="flex items-start justify-between gap-2">
+            <h1 className="text-xl font-bold tracking-tight">
+              Vigia <span className="text-sm font-normal text-neutral-500">reportes ciudadanos</span>
+            </h1>
+            <AdminBar isAdmin={isAdmin} onChange={setIsAdmin} />
+          </div>
           {stats && (
             <p className="mt-1 text-xs text-neutral-600">
               {stats.total} reportes ·{" "}
@@ -180,26 +189,40 @@ export default function Home() {
                 </p>
                 {selected?.id === r.id && (
                   <div className="mt-2 pl-[18px]">
+                    {r.photo_url && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={assetUrl(r.photo_url)}
+                        alt={r.title}
+                        className="mb-2 h-40 w-full rounded border border-neutral-200 object-cover"
+                      />
+                    )}
                     {r.description && <p className="text-xs text-neutral-700">{r.description}</p>}
-                    <div className="mt-2 flex gap-1">
-                      {(Object.keys(STATUS_LABELS) as ReportStatus[]).map((s) => (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (s !== r.status) handleStatusChange(r, s);
-                          }}
-                          className={`cursor-pointer rounded border px-2 py-0.5 text-[10px] ${
-                            s === r.status
-                              ? "border-neutral-900 bg-neutral-900 text-white"
-                              : "border-neutral-300 text-neutral-600 hover:bg-neutral-100"
-                          }`}
-                        >
-                          {STATUS_LABELS[s]}
-                        </button>
-                      ))}
-                    </div>
+                    {isAdmin ? (
+                      <div className="mt-2 flex gap-1">
+                        {(Object.keys(STATUS_LABELS) as ReportStatus[]).map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (s !== r.status) handleStatusChange(r, s);
+                            }}
+                            className={`cursor-pointer rounded border px-2 py-0.5 text-[10px] ${
+                              s === r.status
+                                ? "border-neutral-900 bg-neutral-900 text-white"
+                                : "border-neutral-300 text-neutral-600 hover:bg-neutral-100"
+                            }`}
+                          >
+                            {STATUS_LABELS[s]}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-[11px] italic text-neutral-400">
+                        Inicia sesión como admin para cambiar el estado.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

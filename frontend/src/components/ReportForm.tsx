@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { api, Category, NewReport, Report } from "@/lib/api";
 
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
 type Props = {
   categories: Category[];
   draft: { lat: number; lng: number } | null;
@@ -15,8 +17,25 @@ export default function ReportForm({ categories, draft, onCreated, onCancel }: P
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState(categories[0]?.slug ?? "");
   const [reporterName, setReporterName] = useState("");
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null;
+    if (file && file.size > MAX_PHOTO_BYTES) {
+      setError("La imagen no debe superar 5 MB.");
+      e.target.value = "";
+      return;
+    }
+    setError(null);
+    setPhoto(file);
+    setPhotoPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return file ? URL.createObjectURL(file) : null;
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,7 +54,9 @@ export default function ReportForm({ categories, draft, onCreated, onCancel }: P
       };
       if (description.trim()) input.description = description.trim();
       if (reporterName.trim()) input.reporter_name = reporterName.trim();
+      if (photo) input.photo_url = await api.uploadImage(photo);
       const created = await api.createReport(input);
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
       onCreated(created);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo crear el reporte");
@@ -104,6 +125,27 @@ export default function ReportForm({ categories, draft, onCreated, onCancel }: P
           onChange={(e) => setReporterName(e.target.value)}
           className="w-full rounded border border-neutral-300 bg-white px-2 py-1.5 text-sm"
         />
+      </div>
+
+      <div>
+        <label htmlFor="nr-photo" className="mb-1 block text-xs font-medium text-neutral-600">
+          Foto (opcional)
+        </label>
+        <input
+          id="nr-photo"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          onChange={handlePhotoChange}
+          className="w-full text-xs text-neutral-600 file:mr-2 file:rounded file:border-0 file:bg-neutral-200 file:px-2 file:py-1 file:text-xs hover:file:bg-neutral-300"
+        />
+        {photoPreview && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photoPreview}
+            alt="Vista previa"
+            className="mt-2 h-28 w-full rounded border border-neutral-200 object-cover"
+          />
+        )}
       </div>
 
       <p className="text-xs text-neutral-600">

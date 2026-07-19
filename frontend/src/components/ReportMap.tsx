@@ -12,7 +12,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Report, STATUS_LABELS } from "@/lib/api";
+import { Report, STATUS_LABELS, assetUrl } from "@/lib/api";
 
 const DEFAULT_CENTER: [number, number] = [19.4326, -99.1332];
 
@@ -78,6 +78,14 @@ export default function ReportMap({ reports, selected, onSelect, picking, draft,
         >
           <Popup>
             <div className="min-w-44">
+              {r.photo_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={assetUrl(r.photo_url)}
+                  alt={r.title}
+                  className="mb-1 h-24 w-full rounded object-cover"
+                />
+              )}
               <p className="font-semibold">{r.title}</p>
               <p className="text-xs text-neutral-600">
                 {r.category.name} · {STATUS_LABELS[r.status]}

@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { query } from "../db.js";
+import { requireAdmin } from "../auth.js";
 
 const router = Router();
 
 const REPORT_SELECT = `
-  SELECT r.id, r.title, r.description, r.status, r.reporter_name,
+  SELECT r.id, r.title, r.description, r.status, r.reporter_name, r.photo_url,
          r.created_at, r.updated_at,
          ST_Y(r.location::geometry) AS lat,
          ST_X(r.location::geometry) AS lng,
@@ -115,7 +116,7 @@ router.get("/:id", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const { title, description, category, lat, lng, reporter_name } = req.body || {};
+    const { title, description, category, lat, lng, reporter_name, photo_url } = req.body || {};
     if (!title || typeof title !== "string" || !title.trim()) {
       return res.status(400).json({ error: "title es obligatorio" });
     }
@@ -127,6 +128,10 @@ router.post("/", async (req, res, next) => {
     if (Number.isNaN(latN) || Number.isNaN(lngN) || latN < -90 || latN > 90 || lngN < -180 || lngN > 180) {
       return res.status(400).json({ error: "lat y lng deben ser coordenadas válidas" });
     }
+    // Solo se aceptan rutas relativas subidas vía /api/uploads, no URLs arbitrarias.
+    if (photo_url != null && !(typeof photo_url === "string" && photo_url.startsWith("/uploads/"))) {
+      return res.status(400).json({ error: "photo_url debe ser una ruta /uploads/... devuelta por /api/uploads" });
+    }
 
     const cat = await query("SELECT id FROM categories WHERE slug = $1", [category]);
     if (!cat.rows.length) {
@@ -134,10 +139,10 @@ router.post("/", async (req, res, next) => {
     }
 
     const { rows } = await query(
-      `INSERT INTO reports (title, description, category_id, reporter_name, location)
-       VALUES ($1, $2, $3, $4, ST_SetSRID(ST_MakePoint($5, $6), 4326)::geography)
+      `INSERT INTO reports (title, description, category_id, reporter_name, photo_url, location)
+       VALUES ($1, $2, $3, $4, $5, ST_SetSRID(ST_MakePoint($6, $7), 4326)::geography)
        RETURNING id`,
-      [title.trim(), description || null, cat.rows[0].id, reporter_name || null, lngN, latN]
+      [title.trim(), description || null, cat.rows[0].id, reporter_name || null, photo_url || null, lngN, latN]
     );
     const created = await query(`${REPORT_SELECT} WHERE r.id = $1`, [rows[0].id]);
     res.status(201).json(created.rows[0]);
@@ -146,7 +151,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.patch("/:id/status", async (req, res, next) => {
+router.patch("/:id/status", requireAdmin, async (req, res, next) => {
   try {
     const { status } = req.body || {};
     const allowed = ["abierto", "en_proceso", "resuelto"];
