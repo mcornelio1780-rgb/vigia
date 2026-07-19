@@ -1144,7 +1144,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     try {
       await saveFarm({ name: farm.label, lat: farm.lat, lng: farm.lng, hectares: farm.ha });
       setMe(await fetchMe());
-      setSavedMsg(es ? "Campo guardado" : "Field saved");
+      setSavedMsg(pick(lang, "Campo guardado", "Field saved", "Campo salvo"));
     } catch (e) { setSavedMsg(e.message); }
   };
   const removeFarm = async () => {
@@ -1154,7 +1154,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
       setMe(await fetchMe());
       setFarmKey("cordoba");
       setZone(null);
-      setSavedMsg(es ? "Campo quitado" : "Field removed");
+      setSavedMsg(pick(lang, "Campo quitado", "Field removed", "Campo removido"));
     } catch (e) { setSavedMsg(e.message); }
   };
 
@@ -1171,7 +1171,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
   const submitRename = async (e) => {
     e.preventDefault();
     if (rfBusy) return;
-    if (!rf.name.trim()) { setRfErr(es ? "El nombre es obligatorio" : "Name is required"); return; }
+    if (!rf.name.trim()) { setRfErr(pick(lang, "El nombre es obligatorio", "Name is required", "O nome é obrigatório")); return; }
     setRfBusy(true);
     setRfErr("");
     try {
@@ -1180,7 +1180,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
       await updateFarm(savedFarm?.id || farm.id, payload);
       setMe(await fetchMe());
       setRenameOpen(false);
-      setSavedMsg(es ? "Campo actualizado" : "Field updated");
+      setSavedMsg(pick(lang, "Campo actualizado", "Field updated", "Campo atualizado"));
     } catch (e2) { setRfErr(e2.message); }
     finally { setRfBusy(false); }
   };
@@ -1231,7 +1231,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     setSettingsMsg("");
     try {
       await putSettings({ thFire, thFlood, thDrought, thWind, wa, sms, mail, push, daily, weekly, autoPdf, insCopy });
-      setSettingsMsg(es ? "Configuración guardada" : "Settings saved");
+      setSettingsMsg(pick(lang, "Configuración guardada", "Settings saved", "Configurações salvas"));
     } catch (e) { setSettingsMsg(e.message); }
   };
 
@@ -1242,13 +1242,13 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     if (pwBusy) return;
     setPwMsg("");
     if (String(pwNew).length < 6) {
-      setPwMsg(es ? "La nueva contraseña debe tener al menos 6 caracteres" : "New password must be at least 6 characters");
+      setPwMsg(pick(lang, "La nueva contraseña debe tener al menos 6 caracteres", "New password must be at least 6 characters", "A nova senha deve ter pelo menos 6 caracteres"));
       return;
     }
     setPwBusy(true);
     try {
       await changePassword(pwCur, pwNew);
-      setPwMsg(es ? "Contraseña actualizada" : "Password updated");
+      setPwMsg(pick(lang, "Contraseña actualizada", "Password updated", "Senha atualizada"));
       setPwCur(""); setPwNew("");
     } catch (e) { setPwMsg(e.message); }
     finally { setPwBusy(false); }
@@ -1265,7 +1265,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     try {
       const r = await updateProfile(profName.trim());
       setMe((prev) => (prev ? { ...prev, user: { ...prev.user, ...r.user } } : prev));
-      setProfMsg(es ? "Perfil actualizado" : "Profile updated");
+      setProfMsg(pick(lang, "Perfil actualizado", "Profile updated", "Perfil atualizado"));
     } catch (e) { setProfMsg(e.message); }
     finally { setProfBusy(false); }
   };
@@ -1306,11 +1306,11 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     setGenErr("");
     try {
       await downloadReport({
-        lang: es ? "es" : "en",
+        lang,
         generatedAt: new Date().toISOString(),
         farm: { label: farm.label, country: farm.country, coord: farm.coord, hectares: farm.ha, elev: farm.elev },
         risks: farm.risks,
-        zones: zones.map((z) => ({ id: z.id, crop: z.crop[es ? 0 : 1], ndvi: z.ndvi, ha: z.ha, fire: z.fire, soil: z.soil })),
+        zones: zones.map((z) => ({ id: z.id, crop: z.crop[lang === "es" ? 0 : 1], ndvi: z.ndvi, ha: z.ha, fire: z.fire, soil: z.soil })),
       });
     } catch (e) {
       setGenErr(e.message);
@@ -1735,19 +1735,19 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             <>
               <div className="card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
-                  <div className="mono lbl">{es ? "Historial de alertas" : "Alert history"}</div>
-                  <button className="mono chipbtn" onClick={() => setTab("settings")}><Ic d={ic.gear} s={11} /> {es ? "Ajustar umbrales" : "Adjust thresholds"}</button>
+                  <div className="mono lbl">{pick(lang, "Historial de alertas", "Alert history", "Histórico de alertas")}</div>
+                  <button className="mono chipbtn" onClick={() => setTab("settings")}><Ic d={ic.gear} s={11} /> {pick(lang, "Ajustar umbrales", "Adjust thresholds", "Ajustar limites")}</button>
                 </div>
                 <div style={{ display: "grid", gap: 9 }}>
                   {alerts.map((a, i) => <AlertRow key={i} type={a.type} level={a.level} title={a.title} desc={a.desc} time={a.time} channels={a.ch} />)}
                 </div>
               </div>
               <div className="card" style={{ marginTop: 14 }}>
-                <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Cómo se disparan" : "How they trigger"}</div>
+                <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Cómo se disparan", "How they trigger", "Como são disparados")}</div>
                 <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14 }}>
-                  {[[es ? "Urgente" : "Urgent", C.n1, es ? "WhatsApp + SMS + correo al instante, más PDF automático." : "WhatsApp + SMS + email immediately, plus automatic PDF."],
-                    [es ? "Alta" : "High", C.n2, es ? "WhatsApp y correo al instante, sin SMS." : "WhatsApp and email immediately, no SMS."],
-                    [es ? "Media" : "Medium", C.n3, es ? "Se agrupa en el resumen de las próximas 12 h." : "Batched into the next 12 h digest."]].map(([l, c, d]) => (
+                  {[[pick(lang, "Urgente", "Urgent", "Urgente"), C.n1, pick(lang, "WhatsApp + SMS + correo al instante, más PDF automático.", "WhatsApp + SMS + email immediately, plus automatic PDF.", "WhatsApp + SMS + e-mail na hora, mais PDF automático.")],
+                    [pick(lang, "Alta", "High", "Alta"), C.n2, pick(lang, "WhatsApp y correo al instante, sin SMS.", "WhatsApp and email immediately, no SMS.", "WhatsApp e e-mail na hora, sem SMS.")],
+                    [pick(lang, "Media", "Medium", "Média"), C.n3, pick(lang, "Se agrupa en el resumen de las próximas 12 h.", "Batched into the next 12 h digest.", "Agrupado no resumo das próximas 12 h.")]].map(([l, c, d]) => (
                     <div key={l}>
                       <div style={{ fontSize: 12.5, fontWeight: 600, color: c }}>{l}</div>
                       <div style={{ fontSize: 11.5, color: C.t2, marginTop: 5, lineHeight: 1.55 }}>{d}</div>
@@ -1763,24 +1763,24 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             <>
               <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 650 }}>{es ? "Generar reporte con evidencia satelital" : "Generate a report with satellite evidence"}</div>
+                  <div style={{ fontSize: 14, fontWeight: 650 }}>{pick(lang, "Generar reporte con evidencia satelital", "Generate a report with satellite evidence", "Gerar relatório com evidência de satélite")}</div>
                   <div style={{ fontSize: 12.3, color: C.t2, marginTop: 5, lineHeight: 1.55, maxWidth: 520 }}>
-                    {es ? "Incluye coordenadas GPS del polígono, hora exacta de la pasada satelital, imagen NDVI de la zona afectada y la serie meteorológica. Formato aceptado por aseguradoras." : "Includes the polygon's GPS coordinates, exact satellite pass time, NDVI image of the affected zone and the weather series. Format accepted by insurers."}
+                    {pick(lang, "Incluye coordenadas GPS del polígono, hora exacta de la pasada satelital, imagen NDVI de la zona afectada y la serie meteorológica. Formato aceptado por aseguradoras.", "Includes the polygon's GPS coordinates, exact satellite pass time, NDVI image of the affected zone and the weather series. Format accepted by insurers.", "Inclui as coordenadas GPS do polígono, hora exata da passagem do satélite, imagem NDVI da zona afetada e a série meteorológica. Formato aceito por seguradoras.")}
                   </div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <button className="btn" onClick={generateReport} disabled={genBusy} aria-label={es ? "Generar reporte" : "Generate report"} style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", opacity: genBusy ? 0.6 : 1 }}><Ic d={ic.file} s={15} c="#04140B" /> {genBusy ? (es ? "Generando…" : "Generating…") : es ? "Generar ahora" : "Generate now"}</button>
+                  <button className="btn" onClick={generateReport} disabled={genBusy} aria-label={pick(lang, "Generar reporte", "Generate report", "Gerar relatório")} style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", opacity: genBusy ? 0.6 : 1 }}><Ic d={ic.file} s={15} c="#04140B" /> {genBusy ? pick(lang, "Generando…", "Generating…", "Gerando…") : pick(lang, "Generar ahora", "Generate now", "Gerar agora")}</button>
                   {genErr && <div style={{ fontSize: 11, color: C.n1, marginTop: 6 }}>{genErr}</div>}
                 </div>
               </div>
               <div className="card" style={{ marginTop: 14 }}>
-                <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Reportes generados" : "Generated reports"}</div>
+                <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Reportes generados", "Generated reports", "Relatórios gerados")}</div>
                 <div style={{ display: "grid", gap: 8 }}>
                   {[
-                    { t: es ? "Incendio — zona F" : "Wildfire — zone F", d: "2026-07-18 04:12", s: es ? "Automático · alerta urgente" : "Automatic · urgent alert", c: C.n1 },
-                    { t: es ? "Sequía — zonas C y D" : "Drought — zones C and D", d: "2026-07-17 09:00", s: es ? "Automático · alerta alta" : "Automatic · high alert", c: C.n2 },
-                    { t: es ? "Resumen mensual del campo" : "Monthly farm summary", d: "2026-07-01 08:00", s: es ? "Programado" : "Scheduled", c: C.green },
-                    { t: es ? "Inundación — zona B" : "Flood — zone B", d: "2026-06-11 21:40", s: es ? "Manual · enviado a aseguradora" : "Manual · sent to insurer", c: C.blue },
+                    { t: pick(lang, "Incendio — zona F", "Wildfire — zone F", "Incêndio — zona F"), d: "2026-07-18 04:12", s: pick(lang, "Automático · alerta urgente", "Automatic · urgent alert", "Automático · alerta urgente"), c: C.n1 },
+                    { t: pick(lang, "Sequía — zonas C y D", "Drought — zones C and D", "Seca — zonas C e D"), d: "2026-07-17 09:00", s: pick(lang, "Automático · alerta alta", "Automatic · high alert", "Automático · alerta alta"), c: C.n2 },
+                    { t: pick(lang, "Resumen mensual del campo", "Monthly farm summary", "Resumo mensal do campo"), d: "2026-07-01 08:00", s: pick(lang, "Programado", "Scheduled", "Programado"), c: C.green },
+                    { t: pick(lang, "Inundación — zona B", "Flood — zone B", "Inundação — zona B"), d: "2026-06-11 21:40", s: pick(lang, "Manual · enviado a aseguradora", "Manual · sent to insurer", "Manual · enviado à seguradora"), c: C.blue },
                   ].map((r, i) => (
                     <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", padding: "12px 13px", background: C.s2, borderRadius: 9, border: `1px solid ${C.line}` }}>
                       <span style={{ width: 30, height: 30, borderRadius: 8, background: `${r.c}1a`, display: "grid", placeItems: "center", flexShrink: 0 }}><Ic d={ic.file} s={15} c={r.c} /></span>
@@ -1801,134 +1801,134 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             <>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap" }}>
               <div className="mono lbl">
-                {me ? (es ? "Tus preferencias se guardan en tu cuenta" : "Your preferences are saved to your account")
-                    : (es ? "Inicia sesión para guardar tu configuración" : "Log in to save your settings")}
+                {me ? pick(lang, "Tus preferencias se guardan en tu cuenta", "Your preferences are saved to your account", "As suas preferências são salvas na sua conta")
+                    : pick(lang, "Inicia sesión para guardar tu configuración", "Log in to save your settings", "Faça login para salvar as suas configurações")}
               </div>
               {me && (
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   {settingsMsg && <span className="mono lbl" style={{ color: C.green }}>{settingsMsg}</span>}
-                  <button className="btn sm" onClick={saveSettings}>{es ? "Guardar configuración" : "Save settings"}</button>
+                  <button className="btn sm" onClick={saveSettings}>{pick(lang, "Guardar configuración", "Save settings", "Salvar configurações")}</button>
                 </div>
               )}
             </div>
             <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               {me && stats && (
                 <div className="card" style={{ gridColumn: "1 / -1" }}>
-                  <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Tu cuenta" : "Your account"}</div>
+                  <div className="mono lbl" style={{ marginBottom: 14 }}>{pick(lang, "Tu cuenta", "Your account", "Sua conta")}</div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 14 }}>
                     <div>
                       <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{stats.farms}</div>
-                      <div className="mono lbl">{es ? "Campos" : "Fields"}</div>
+                      <div className="mono lbl">{pick(lang, "Campos", "Fields", "Campos")}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{Number(stats.hectares).toLocaleString(es ? "es" : "en")}</div>
-                      <div className="mono lbl">{es ? "Hectáreas totales" : "Total hectares"}</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{Number(stats.hectares).toLocaleString(pick(lang, "es", "en", "pt"))}</div>
+                      <div className="mono lbl">{pick(lang, "Hectáreas totales", "Total hectares", "Hectares totais")}</div>
                     </div>
                     <div>
                       <div style={{ fontSize: 22, fontWeight: 700, color: C.green }}>{stats.located}</div>
-                      <div className="mono lbl">{es ? "Con ubicación" : "With location"}</div>
+                      <div className="mono lbl">{pick(lang, "Con ubicación", "With location", "Com localização")}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, marginTop: 6 }}>{stats.memberSince ? new Date(stats.memberSince).toLocaleDateString(es ? "es" : "en") : "—"}</div>
-                      <div className="mono lbl">{es ? "Miembro desde" : "Member since"}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, marginTop: 6 }}>{stats.memberSince ? new Date(stats.memberSince).toLocaleDateString(pick(lang, "es", "en", "pt")) : "—"}</div>
+                      <div className="mono lbl">{pick(lang, "Miembro desde", "Member since", "Membro desde")}</div>
                     </div>
                   </div>
                   <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 12 }}>
-                    {es ? "Datos reales de tu cuenta." : "Real data from your account."}
+                    {pick(lang, "Datos reales de tu cuenta.", "Real data from your account.", "Dados reais da sua conta.")}
                   </div>
                 </div>
               )}
               <div className="card">
-                <div className="mono lbl" style={{ marginBottom: 14 }}>{es ? "Perfil" : "Profile"}</div>
-                <label className="mono lbl">{es ? "Nombre" : "Name"}</label>
+                <div className="mono lbl" style={{ display: "flex", marginBottom: 14 }}>{pick(lang, "Perfil", "Profile", "Perfil")}</div>
+                <label className="mono lbl" style={{ display: "flex" }}>{pick(lang, "Nombre", "Name", "Nome")}</label>
                 <input
                   value={me ? profName : "María Fernández"}
                   onChange={(e) => setProfName(e.target.value)}
                   readOnly={!me}
-                  placeholder={es ? "Tu nombre" : "Your name"}
+                  placeholder={pick(lang, "Tu nombre", "Your name", "Seu nome")}
                   style={{ margin: "6px 0 8px" }}
                 />
                 {me && (
                   <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "0 0 12px", flexWrap: "wrap" }}>
                     <button className="btn sm" onClick={submitProfile} disabled={profBusy}>
-                      {profBusy ? (es ? "Guardando…" : "Saving…") : (es ? "Guardar perfil" : "Save profile")}
+                      {profBusy ? pick(lang, "Guardando…", "Saving…", "Salvando…") : pick(lang, "Guardar perfil", "Save profile", "Salvar perfil")}
                     </button>
-                    {profMsg && <span className="mono lbl" style={{ color: /actualiz|updated/i.test(profMsg) ? C.green : C.n1 }}>{profMsg}</span>}
+                    {profMsg && <span className="mono lbl" style={{ color: /actualiz|updated|atualiz/i.test(profMsg) ? C.green : C.n1 }}>{profMsg}</span>}
                   </div>
                 )}
-                <label className="mono lbl">{es ? "Correo" : "Email"}</label>
+                <label className="mono lbl">{pick(lang, "Correo", "Email", "E-mail")}</label>
                 <input value={me ? (me.user?.email || "") : "maria@campo.ar"} readOnly style={{ margin: "6px 0 12px", opacity: 0.75 }} />
-                <label className="mono lbl">{es ? "Teléfono (WhatsApp y SMS)" : "Phone (WhatsApp and SMS)"}</label>
+                <label className="mono lbl">{pick(lang, "Teléfono (WhatsApp y SMS)", "Phone (WhatsApp and SMS)", "Telefone (WhatsApp e SMS)")}</label>
                 <input defaultValue="+54 358 412 7788" style={{ margin: "6px 0 12px" }} />
-                <label className="mono lbl">{es ? "Idioma de las alertas" : "Alert language"}</label>
-                <select className="mono sel" defaultValue="es" aria-label={es ? "Idioma de las alertas" : "Alert language"} style={{ width: "100%", margin: "6px 0 0" }}>
+                <label className="mono lbl">{pick(lang, "Idioma de las alertas", "Alert language", "Idioma dos alertas")}</label>
+                <select className="mono sel" defaultValue="es" aria-label={pick(lang, "Idioma de las alertas", "Alert language", "Idioma dos alertas")} style={{ width: "100%", margin: "6px 0 0" }}>
                   <option value="es">Español</option><option value="en">English</option><option value="pt">Português</option><option value="hi">हिन्दी</option>
                 </select>
               </div>
 
               <div className="card">
-                <div className="mono lbl" style={{ marginBottom: 4 }}>{es ? "Canales de notificación" : "Notification channels"}</div>
+                <div className="mono lbl" style={{ marginBottom: 4 }}>{pick(lang, "Canales de notificación", "Notification channels", "Canais de notificação")}</div>
                 <Toggle on={wa} set={setWa} label="WhatsApp" sub="+54 358 412 7788" />
-                <Toggle on={sms} set={setSms} label="SMS" sub={es ? "funciona sin datos móviles" : "works without mobile data"} />
-                <Toggle on={mail} set={setMail} label={es ? "Correo" : "Email"} sub="maria@campo.ar" />
-                <Toggle on={push} set={setPush} label={es ? "Notificación web" : "Web push"} />
-                <div className="mono lbl" style={{ margin: "18px 0 4px" }}>{es ? "Frecuencia" : "Frequency"}</div>
-                <Toggle on={daily} set={setDaily} label={es ? "Resumen diario" : "Daily digest"} sub={es ? "todos los días a las 06:00" : "every day at 06:00"} />
-                <Toggle on={weekly} set={setWeekly} label={es ? "Reporte semanal" : "Weekly report"} sub={es ? "lunes a las 08:00" : "Mondays at 08:00"} />
+                <Toggle on={sms} set={setSms} label="SMS" sub={pick(lang, "funciona sin datos móviles", "works without mobile data", "funciona sem dados móveis")} />
+                <Toggle on={mail} set={setMail} label={pick(lang, "Correo", "Email", "E-mail")} sub="maria@campo.ar" />
+                <Toggle on={push} set={setPush} label={pick(lang, "Notificación web", "Web push", "Notificação web")} />
+                <div className="mono lbl" style={{ margin: "18px 0 4px" }}>{pick(lang, "Frecuencia", "Frequency", "Frequência")}</div>
+                <Toggle on={daily} set={setDaily} label={pick(lang, "Resumen diario", "Daily digest", "Resumo diário")} sub={pick(lang, "todos los días a las 06:00", "every day at 06:00", "todos os dias às 06:00")} />
+                <Toggle on={weekly} set={setWeekly} label={pick(lang, "Reporte semanal", "Weekly report", "Relatório semanal")} sub={pick(lang, "lunes a las 08:00", "Mondays at 08:00", "segundas às 08:00")} />
               </div>
 
               <div className="card">
-                <div className="mono lbl" style={{ marginBottom: 4 }}>{es ? "Umbrales de alerta" : "Alert thresholds"}</div>
-                <Slider label={es ? "Incendio: avisar si el riesgo supera" : "Wildfire: alert above"} v={thFire} set={setThFire} min={20} max={95} unit="%" c={C.n1} />
-                <Slider label={es ? "Inundación: precipitación en 48 h" : "Flood: rainfall in 48 h"} v={thFlood} set={setThFlood} min={10} max={200} unit=" mm" c={C.blue} />
-                <Slider label={es ? "Sequía: déficit hídrico" : "Drought: water deficit"} v={thDrought} set={setThDrought} min={10} max={90} unit="%" c={C.n2} />
-                <Slider label={es ? "Viento: ráfagas máximas" : "Wind: peak gusts"} v={thWind} set={setThWind} min={20} max={120} unit=" km/h" c={C.blue} />
+                <div className="mono lbl" style={{ marginBottom: 4 }}>{pick(lang, "Umbrales de alerta", "Alert thresholds", "Limites de alerta")}</div>
+                <Slider label={pick(lang, "Incendio: avisar si el riesgo supera", "Wildfire: alert above", "Incêndio: avisar se o risco ultrapassar")} v={thFire} set={setThFire} min={20} max={95} unit="%" c={C.n1} />
+                <Slider label={pick(lang, "Inundación: precipitación en 48 h", "Flood: rainfall in 48 h", "Inundação: precipitação em 48 h")} v={thFlood} set={setThFlood} min={10} max={200} unit=" mm" c={C.blue} />
+                <Slider label={pick(lang, "Sequía: déficit hídrico", "Drought: water deficit", "Seca: déficit hídrico")} v={thDrought} set={setThDrought} min={10} max={90} unit="%" c={C.n2} />
+                <Slider label={pick(lang, "Viento: ráfagas máximas", "Wind: peak gusts", "Vento: rajadas máximas")} v={thWind} set={setThWind} min={20} max={120} unit=" km/h" c={C.blue} />
                 <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 12, lineHeight: 1.6 }}>
-                  {es ? "Las emergencias urgentes se envían siempre, aunque bajes el umbral." : "Urgent emergencies always go out, even if you lower the threshold."}
+                  {pick(lang, "Las emergencias urgentes se envían siempre, aunque bajes el umbral.", "Urgent emergencies always go out, even if you lower the threshold.", "As emergências urgentes são sempre enviadas, mesmo que você reduza o limite.")}
                 </div>
               </div>
 
               <div>
                 <div className="card">
-                  <div className="mono lbl" style={{ marginBottom: 4 }}>{es ? "Reportes automáticos" : "Automatic reports"}</div>
-                  <Toggle on={autoPdf} set={setAutoPdf} label={es ? "Generar PDF en cada alerta urgente" : "Generate PDF on every urgent alert"} />
-                  <Toggle on={insCopy} set={setInsCopy} label={es ? "Enviar copia a la aseguradora" : "Send a copy to my insurer"} sub={insCopy ? "claims@aseguradora.com" : es ? "sin destinatario configurado" : "no recipient set"} />
+                  <div className="mono lbl" style={{ marginBottom: 4 }}>{pick(lang, "Reportes automáticos", "Automatic reports", "Relatórios automáticos")}</div>
+                  <Toggle on={autoPdf} set={setAutoPdf} label={pick(lang, "Generar PDF en cada alerta urgente", "Generate PDF on every urgent alert", "Gerar PDF em cada alerta urgente")} />
+                  <Toggle on={insCopy} set={setInsCopy} label={pick(lang, "Enviar copia a la aseguradora", "Send a copy to my insurer", "Enviar cópia à seguradora")} sub={insCopy ? "claims@aseguradora.com" : pick(lang, "sin destinatario configurado", "no recipient set", "sem destinatário configurado")} />
                 </div>
                 <div className="card" style={{ marginTop: 14 }}>
-                  <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Suscripción" : "Subscription"}</div>
+                  <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Suscripción", "Subscription", "Assinatura")}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                    <span style={{ fontSize: 26, fontWeight: 700, color: C.green }}>${cost}<span style={{ fontSize: 12, color: C.t3, fontWeight: 400 }}>{es ? "/mes" : "/mo"}</span></span>
-                    <span className="mono" style={{ fontSize: 10.5, color: C.t3 }}>$9 + $0.15 × {Number(farm.ha).toLocaleString(es ? "es" : "en")} ha</span>
+                    <span style={{ fontSize: 26, fontWeight: 700, color: C.green }}>${cost}<span style={{ fontSize: 12, color: C.t3, fontWeight: 400 }}>{pick(lang, "/mes", "/mo", "/mês")}</span></span>
+                    <span className="mono" style={{ fontSize: 10.5, color: C.t3 }}>$9 + $0.15 × {Number(farm.ha).toLocaleString(pick(lang, "es", "en", "pt"))} ha</span>
                   </div>
-                  <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 6 }}>{es ? "Próximo cobro: 1 de agosto de 2026" : "Next charge: August 1, 2026"}</div>
+                  <div className="mono" style={{ fontSize: 10.5, color: C.t4, marginTop: 6 }}>{pick(lang, "Próximo cobro: 1 de agosto de 2026", "Next charge: August 1, 2026", "Próxima cobrança: 1 de agosto de 2026")}</div>
                   <button className="btn ghost" style={{ width: "100%", marginTop: 14, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                    <Ic d={ic.dollar} s={14} c={C.t1} /> {es ? "Gestionar pago en Stripe" : "Manage billing in Stripe"}
+                    <Ic d={ic.dollar} s={14} c={C.t1} /> {pick(lang, "Gestionar pago en Stripe", "Manage billing in Stripe", "Gerenciar pagamento no Stripe")}
                   </button>
                 </div>
                 <div className="card" style={{ marginTop: 14 }}>
-                  <div className="mono lbl" style={{ marginBottom: 10 }}>{es ? "Privacidad y datos" : "Privacy and data"}</div>
+                  <div className="mono lbl" style={{ marginBottom: 10 }}>{pick(lang, "Privacidad y datos", "Privacy and data", "Privacidade e dados")}</div>
                   <p style={{ fontSize: 12, color: C.t2, lineHeight: 1.6, margin: "0 0 12px" }}>
-                    {es ? "Las coordenadas de tu campo están cifradas con AES-256 y no se comparten con terceros." : "Your field coordinates are AES-256 encrypted and never shared with third parties."}
+                    {pick(lang, "Las coordenadas de tu campo están cifradas con AES-256 y no se comparten con terceros.", "Your field coordinates are AES-256 encrypted and never shared with third parties.", "As coordenadas do seu campo são criptografadas com AES-256 e nunca compartilhadas com terceiros.")}
                   </p>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                    <button className="mono chipbtn" onClick={doExport} disabled={!me}>{es ? "Exportar mis datos" : "Export my data"}</button>
-                    <button className="mono chipbtn" onClick={doDeleteAccount} disabled={!me} style={{ color: C.n1, borderColor: `${C.n1}44` }}>{es ? "Eliminar cuenta" : "Delete account"}</button>
+                    <button className="mono chipbtn" onClick={doExport} disabled={!me}>{pick(lang, "Exportar mis datos", "Export my data", "Exportar meus dados")}</button>
+                    <button className="mono chipbtn" onClick={doDeleteAccount} disabled={!me} style={{ color: C.n1, borderColor: `${C.n1}44` }}>{pick(lang, "Eliminar cuenta", "Delete account", "Excluir conta")}</button>
                   </div>
                   {privMsg && <div className="mono lbl" style={{ marginTop: 10, color: C.n1 }}>{privMsg}</div>}
-                  {!me && <div className="mono lbl" style={{ marginTop: 10, color: C.t4 }}>{es ? "Inicia sesión para exportar tus datos reales." : "Log in to export your real data."}</div>}
+                  {!me && <div className="mono lbl" style={{ marginTop: 10, color: C.t4 }}>{pick(lang, "Inicia sesión para exportar tus datos reales.", "Log in to export your real data.", "Faça login para exportar os seus dados reais.")}</div>}
                 </div>
                 {me && (
                   <div className="card" style={{ marginTop: 14 }}>
-                    <div className="mono lbl" style={{ marginBottom: 10 }}>{es ? "Cambiar contraseña" : "Change password"}</div>
-                    <label className="mono lbl">{es ? "Contraseña actual" : "Current password"}</label>
+                    <div className="mono lbl" style={{ marginBottom: 10 }}>{pick(lang, "Cambiar contraseña", "Change password", "Alterar senha")}</div>
+                    <label className="mono lbl">{pick(lang, "Contraseña actual", "Current password", "Senha atual")}</label>
                     <input type="password" autoComplete="current-password" value={pwCur} onChange={(e) => setPwCur(e.target.value)} style={{ margin: "6px 0 12px" }} />
-                    <label className="mono lbl">{es ? "Nueva contraseña" : "New password"}</label>
-                    <input type="password" autoComplete="new-password" value={pwNew} onChange={(e) => setPwNew(e.target.value)} placeholder={es ? "mínimo 6 caracteres" : "at least 6 characters"} style={{ margin: "6px 0 12px" }} />
+                    <label className="mono lbl">{pick(lang, "Nueva contraseña", "New password", "Nova senha")}</label>
+                    <input type="password" autoComplete="new-password" value={pwNew} onChange={(e) => setPwNew(e.target.value)} placeholder={pick(lang, "mínimo 6 caracteres", "at least 6 characters", "mínimo 6 caracteres")} style={{ margin: "6px 0 12px" }} />
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                       <button className="btn sm" onClick={submitPassword} disabled={pwBusy}>
-                        {pwBusy ? (es ? "Guardando…" : "Saving…") : (es ? "Actualizar contraseña" : "Update password")}
+                        {pwBusy ? pick(lang, "Guardando…", "Saving…", "Salvando…") : pick(lang, "Actualizar contraseña", "Update password", "Atualizar senha")}
                       </button>
-                      {pwMsg && <span className="mono lbl" style={{ color: /actualiz|updated/i.test(pwMsg) ? C.green : C.n1 }}>{pwMsg}</span>}
+                      {pwMsg && <span className="mono lbl" style={{ color: /actualiz|updated|atualiz/i.test(pwMsg) ? C.green : C.n1 }}>{pwMsg}</span>}
                     </div>
                   </div>
                 )}
