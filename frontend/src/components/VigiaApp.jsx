@@ -13,6 +13,8 @@ const DOMAIN = "vigia.ag";
 const LANGS = ["es", "en", "pt"];
 // pick(lang, textoES, textoEN, textoPT?) — PT cae a EN si no se tradujo.
 const pick = (lang, es, en, pt) => (lang === "pt" ? (pt ?? en) : lang === "en" ? en : es);
+// tri(arr, lang) — arr posicional [es, en, pt?]; PT cae a EN si no hay 3.er elemento.
+const tri = (arr, lang) => (Array.isArray(arr) ? (lang === "pt" ? (arr[2] ?? arr[1] ?? arr[0]) : lang === "en" ? (arr[1] ?? arr[0]) : arr[0]) : arr);
 const nextLang = (lang) => LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
 const langLabel = (lang) => nextLang(lang).toUpperCase();
 
@@ -314,7 +316,7 @@ const FARMS = {
     label: "Story County, Iowa", country: "USA", cc: "US", coord: "42°02′N 93°37′O", tz: "UTC−5", lat: 42.03, lng: -93.62,
     shape: SHAPE_A, ha: 640, elev: 285, crop: { es: "Maíz / Soja", en: "Corn / Soybean" },
     zones: [0.81, 0.76, 0.68, 0.44, 0.71, 0.33],
-    zoneCrop: [["Maíz — R2", "Corn — R2"], ["Maíz — R2", "Corn — R2"], ["Soja — R4", "Soybean — R4"], ["Soja — R4", "Soybean — R4"], ["Maíz — R2", "Corn — R2"], ["Franja de borde", "Field margin"]],
+    zoneCrop: [["Maíz — R2", "Corn — R2", "Milho — R2"], ["Maíz — R2", "Corn — R2", "Milho — R2"], ["Soja — R4", "Soybean — R4", "Soja — R4"], ["Soja — R4", "Soybean — R4", "Soja — R4"], ["Maíz — R2", "Corn — R2", "Milho — R2"], ["Franja de borde", "Field margin", "Faixa de bordadura"]],
     risks: { fire: 12, drought: 38, flood: 61, pest: 44, frost: 8, wind: 52 },
     base: { t: 26, p: 14, h: 63, w: 21 },
     crops: [
@@ -327,7 +329,7 @@ const FARMS = {
     label: "Riverina, NSW", country: "Australia", cc: "AU", coord: "34°17′S 146°03′E", tz: "UTC+11", lat: -34.28, lng: 146.05,
     shape: SHAPE_B, ha: 1240, elev: 132, crop: { es: "Trigo / Pastura", en: "Wheat / Pasture" },
     zones: [0.52, 0.41, 0.29, 0.18, 0.36, 0.15],
-    zoneCrop: [["Trigo — encañado", "Wheat — stem elong."], ["Trigo — encañado", "Wheat — stem elong."], ["Pastura", "Pasture"], ["Pastura", "Pasture"], ["Barbecho", "Fallow"], ["Barbecho", "Fallow"]],
+    zoneCrop: [["Trigo — encañado", "Wheat — stem elong.", "Trigo — emborrachamento"], ["Trigo — encañado", "Wheat — stem elong.", "Trigo — emborrachamento"], ["Pastura", "Pasture", "Pastagem"], ["Pastura", "Pasture", "Pastagem"], ["Barbecho", "Fallow", "Pousio"], ["Barbecho", "Fallow", "Pousio"]],
     risks: { fire: 78, drought: 84, flood: 6, pest: 22, frost: 14, wind: 58 },
     base: { t: 34, p: 1, h: 24, w: 33 },
     crops: [
@@ -340,7 +342,7 @@ const FARMS = {
     label: "Sorriso, Mato Grosso", country: "Brasil", cc: "BR", coord: "12°32′S 55°42′O", tz: "UTC−4", lat: -12.53, lng: -55.70,
     shape: SHAPE_A, ha: 2100, elev: 365, crop: { es: "Soja / Maíz safrinha", en: "Soybean / 2nd corn" },
     zones: [0.84, 0.79, 0.73, 0.62, 0.77, 0.48],
-    zoneCrop: [["Soja — R5", "Soybean — R5"], ["Soja — R5", "Soybean — R5"], ["Soja — R5", "Soybean — R5"], ["Maíz safrinha", "2nd-season corn"], ["Soja — R5", "Soybean — R5"], ["Reserva legal", "Legal reserve"]],
+    zoneCrop: [["Soja — R5", "Soybean — R5", "Soja — R5"], ["Soja — R5", "Soybean — R5", "Soja — R5"], ["Soja — R5", "Soybean — R5", "Soja — R5"], ["Maíz safrinha", "2nd-season corn", "Milho safrinha"], ["Soja — R5", "Soybean — R5", "Soja — R5"], ["Reserva legal", "Legal reserve", "Reserva legal"]],
     risks: { fire: 41, drought: 19, flood: 47, pest: 68, frost: 2, wind: 29 },
     base: { t: 31, p: 42, h: 81, w: 12 },
     crops: [
@@ -353,7 +355,7 @@ const FARMS = {
     label: "Ludhiana, Punjab", country: "India", cc: "IN", coord: "30°54′N 75°51′E", tz: "UTC+5:30", lat: 30.90, lng: 75.85,
     shape: SHAPE_B, ha: 96, elev: 244, crop: { es: "Arroz / Trigo", en: "Rice / Wheat" },
     zones: [0.69, 0.64, 0.51, 0.38, 0.58, 0.26],
-    zoneCrop: [["Arroz — macollaje", "Rice — tillering"], ["Arroz — macollaje", "Rice — tillering"], ["Arroz — macollaje", "Rice — tillering"], ["Trigo (post-cosecha)", "Wheat (post-harvest)"], ["Arroz", "Rice"], ["Canal / borde", "Canal / margin"]],
+    zoneCrop: [["Arroz — macollaje", "Rice — tillering", "Arroz — perfilhamento"], ["Arroz — macollaje", "Rice — tillering", "Arroz — perfilhamento"], ["Arroz — macollaje", "Rice — tillering", "Arroz — perfilhamento"], ["Trigo (post-cosecha)", "Wheat (post-harvest)", "Trigo (pós-colheita)"], ["Arroz", "Rice", "Arroz"], ["Canal / borde", "Canal / margin", "Canal / borda"]],
     risks: { fire: 34, drought: 56, flood: 39, pest: 62, frost: 11, wind: 24 },
     base: { t: 38, p: 6, h: 47, w: 15 },
     crops: [
@@ -366,7 +368,7 @@ const FARMS = {
     label: "Écija, Andalucía", country: "España", cc: "ES", coord: "37°32′N 5°04′O", tz: "UTC+2", lat: 37.53, lng: -5.07,
     shape: SHAPE_A, ha: 310, elev: 110, crop: { es: "Olivar / Girasol", en: "Olive / Sunflower" },
     zones: [0.58, 0.49, 0.37, 0.24, 0.44, 0.17],
-    zoneCrop: [["Olivar intensivo", "Intensive olive"], ["Olivar intensivo", "Intensive olive"], ["Girasol", "Sunflower"], ["Girasol", "Sunflower"], ["Olivar tradicional", "Traditional olive"], ["Erial", "Wasteland"]],
+    zoneCrop: [["Olivar intensivo", "Intensive olive", "Olival intensivo"], ["Olivar intensivo", "Intensive olive", "Olival intensivo"], ["Girasol", "Sunflower", "Girassol"], ["Girasol", "Sunflower", "Girassol"], ["Olivar tradicional", "Traditional olive", "Olival tradicional"], ["Erial", "Wasteland", "Terreno baldio"]],
     risks: { fire: 67, drought: 73, flood: 9, pest: 51, frost: 18, wind: 31 },
     base: { t: 39, p: 0, h: 28, w: 19 },
     crops: [
@@ -379,7 +381,7 @@ const FARMS = {
     label: "Río Cuarto, Córdoba", country: "Argentina", cc: "AR", coord: "33°08′S 64°21′O", tz: "UTC−3", lat: -33.13, lng: -64.35,
     shape: SHAPE_B, ha: 480, elev: 421, crop: { es: "Soja / Maíz", en: "Soybean / Corn" },
     zones: [0.79, 0.71, 0.54, 0.36, 0.63, 0.19],
-    zoneCrop: [["Soja — R3", "Soybean — R3"], ["Soja — R3", "Soybean — R3"], ["Maíz — V8", "Corn — V8"], ["Maíz — V8", "Corn — V8"], ["Pastura", "Pasture"], ["Barbecho", "Fallow"]],
+    zoneCrop: [["Soja — R3", "Soybean — R3", "Soja — R3"], ["Soja — R3", "Soybean — R3", "Soja — R3"], ["Maíz — V8", "Corn — V8", "Milho — V8"], ["Maíz — V8", "Corn — V8", "Milho — V8"], ["Pastura", "Pasture", "Pastagem"], ["Barbecho", "Fallow", "Pousio"]],
     risks: { fire: 74, drought: 58, flood: 12, pest: 37, frost: 21, wind: 46 },
     base: { t: 33, p: 3, h: 31, w: 38 },
     crops: [
@@ -415,7 +417,7 @@ function synthFarm(saved) {
     elev: Math.round(50 + rnd(7) * 900),
     crop: { es: "Tu cultivo", en: "Your crop" },
     zones,
-    zoneCrop: zones.map(() => ["Cultivo", "Crop"]),
+    zoneCrop: zones.map(() => ["Cultivo", "Crop", "Cultura"]),
     risks: {
       fire: Math.round(20 + rnd(1) * 70), drought: Math.round(15 + rnd(2) * 70),
       flood: Math.round(5 + rnd(3) * 60), pest: Math.round(15 + rnd(4) * 55),
@@ -522,7 +524,7 @@ const ParcelScan = ({ farm, es, lang = es ? "es" : "en", layer = "ndvi", onZone,
         <div className="readout">
           {act ? (
             <>
-              <div className="ro-t" style={{ color: col(act) }}>{pick(lang, "Zona", "Zone", "Zona")} {act.id} · {act.crop[lang === "es" ? 0 : 1]}</div>
+              <div className="ro-t" style={{ color: col(act) }}>{pick(lang, "Zona", "Zone", "Zona")} {act.id} · {tri(act.crop, lang)}</div>
               <div className="ro-s">{act.ha} ha · NDVI {act.ndvi.toFixed(2)} · {pick(lang, "riesgo incendio", "fire risk", "risco incêndio")} {act.fire}% · {pick(lang, "humedad suelo", "soil moisture", "umidade do solo")} {act.soil}%</div>
             </>
           ) : (
@@ -1314,7 +1316,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
         generatedAt: new Date().toISOString(),
         farm: { label: farm.label, country: farm.country, coord: farm.coord, hectares: farm.ha, elev: farm.elev },
         risks: farm.risks,
-        zones: zones.map((z) => ({ id: z.id, crop: z.crop[lang === "es" ? 0 : 1], ndvi: z.ndvi, ha: z.ha, fire: z.fire, soil: z.soil })),
+        zones: zones.map((z) => ({ id: z.id, crop: tri(z.crop, lang), ndvi: z.ndvi, ha: z.ha, fire: z.fire, soil: z.soil })),
       });
     } catch (e) {
       setGenErr(e.message);
@@ -1555,7 +1557,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                         <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <span style={{ width: 9, height: 9, borderRadius: 3, background: ndviColor(z.ndvi) }} />
                           <span style={{ fontSize: 13, fontWeight: 600 }}>{pick(lang, "Zona", "Zone", "Zona")} {z.id}</span>
-                          <span style={{ fontSize: 11.5, color: C.t3 }}>{z.crop[lang === "es" ? 0 : 1]}</span>
+                          <span style={{ fontSize: 11.5, color: C.t3 }}>{tri(z.crop, lang)}</span>
                         </span>
                         <span className="mono" style={{ fontSize: 11.5, color: ndviColor(z.ndvi), fontWeight: 600 }}>{z.ndvi.toFixed(2)}</span>
                       </div>
@@ -1622,7 +1624,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 <div className="card">
                   <div className="mono lbl" style={{ marginBottom: 14 }}>{pick(lang, "Estrés hídrico por zona", "Water stress by zone", "Estresse hídrico por zona")}</div>
                   {zones.map((z) => (
-                    <Bar key={z.id} label={`${pick(lang, "Zona", "Zone", "Zona")} ${z.id} · ${z.crop[lang === "es" ? 0 : 1]}`} v={100 - z.soil} c={riskColor(100 - z.soil)} threshold={thDrought} />
+                    <Bar key={z.id} label={`${pick(lang, "Zona", "Zone", "Zona")} ${z.id} · ${tri(z.crop, lang)}`} v={100 - z.soil} c={riskColor(100 - z.soil)} threshold={thDrought} />
                   ))}
                   <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 8, lineHeight: 1.6 }}>
                     {pick(lang, "Humedad de suelo estimada con SoilGrids + balance hídrico ERA5. La línea marca tu umbral de alerta.", "Soil moisture estimated with SoilGrids + ERA5 water balance. The line marks your alert threshold.", "Umidade do solo estimada com SoilGrids + balanço hídrico ERA5. A linha marca o seu limite de alerta.")}
