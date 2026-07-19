@@ -137,6 +137,35 @@ test("DELETE /api/users/farms/:id borra solo el campo propio", async () => {
   assert.equal(list.body.length, 0);
 });
 
+test("PUT /api/users/password cambia la contraseña con la actual correcta", async () => {
+  const s = await signup("chg@field.ar", "clave-vieja", "Ana");
+  const auth = { Authorization: `Bearer ${s.body.token}`, "Content-Type": "application/json" };
+
+  // Sin sesión -> 401
+  assert.equal((await api(base, "/api/users/password", json("PUT", { current: "clave-vieja", next: "clave-nueva" }))).status, 401);
+
+  // Nueva contraseña demasiado corta -> 400
+  assert.equal(
+    (await api(base, "/api/users/password", { method: "PUT", headers: auth, body: JSON.stringify({ current: "clave-vieja", next: "123" }) })).status,
+    400
+  );
+
+  // Contraseña actual incorrecta -> 401
+  assert.equal(
+    (await api(base, "/api/users/password", { method: "PUT", headers: auth, body: JSON.stringify({ current: "no-es", next: "clave-nueva" }) })).status,
+    401
+  );
+
+  // Cambio correcto -> 200
+  const ok = await api(base, "/api/users/password", { method: "PUT", headers: auth, body: JSON.stringify({ current: "clave-vieja", next: "clave-nueva" }) });
+  assert.equal(ok.status, 200);
+  assert.equal(ok.body.ok, true);
+
+  // La contraseña vieja ya no sirve; la nueva sí
+  assert.equal((await api(base, "/api/users/login", json("POST", { email: "chg@field.ar", password: "clave-vieja" }))).status, 401);
+  assert.equal((await api(base, "/api/users/login", json("POST", { email: "chg@field.ar", password: "clave-nueva" }))).status, 200);
+});
+
 test("los campos de un usuario no son visibles para otro", async () => {
   const a = await signup("a@x.com", "clave-larga");
   const b = await signup("b@x.com", "clave-larga");

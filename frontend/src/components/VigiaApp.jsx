@@ -123,6 +123,18 @@ async function putSettings(settings) {
   if (!res.ok) throw new Error(b?.error || "No se pudo guardar la configuración");
   return b;
 }
+async function changePassword(current, next) {
+  const t = getUserToken();
+  if (!t) throw new Error("Inicia sesión para cambiar tu contraseña");
+  const res = await fetch(`${API_URL}/api/users/password`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${t}` },
+    body: JSON.stringify({ current, next }),
+  });
+  const b = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(b?.error || "No se pudo cambiar la contraseña");
+  return b;
+}
 
 // Genera el PDF de evidencia en el backend y dispara la descarga.
 async function downloadReport(payload) {
@@ -1039,6 +1051,25 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     } catch (e) { setSettingsMsg(e.message); }
   };
 
+  /* cambio de contraseña real (conectado al backend) */
+  const [pwCur, setPwCur] = useState(""), [pwNew, setPwNew] = useState("");
+  const [pwMsg, setPwMsg] = useState(""), [pwBusy, setPwBusy] = useState(false);
+  const submitPassword = async () => {
+    if (pwBusy) return;
+    setPwMsg("");
+    if (String(pwNew).length < 6) {
+      setPwMsg(es ? "La nueva contraseña debe tener al menos 6 caracteres" : "New password must be at least 6 characters");
+      return;
+    }
+    setPwBusy(true);
+    try {
+      await changePassword(pwCur, pwNew);
+      setPwMsg(es ? "Contraseña actualizada" : "Password updated");
+      setPwCur(""); setPwNew("");
+    } catch (e) { setPwMsg(e.message); }
+    finally { setPwBusy(false); }
+  };
+
   const zones = farm.zones.map((v, i) => ({
     id: "ABCDEF"[i], ndvi: v, ha: Math.round((farm.ha / 6) * (0.7 + (i % 3) * 0.3)),
     crop: farm.zoneCrop[i], fire: Math.min(97, Math.round(farm.risks.fire * (1.35 - v))), soil: Math.round(v * 100 * 0.55 + 12),
@@ -1590,6 +1621,21 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                     <button className="mono chipbtn" style={{ color: C.n1, borderColor: `${C.n1}44` }}>{es ? "Eliminar cuenta" : "Delete account"}</button>
                   </div>
                 </div>
+                {me && (
+                  <div className="card" style={{ marginTop: 14 }}>
+                    <div className="mono lbl" style={{ marginBottom: 10 }}>{es ? "Cambiar contraseña" : "Change password"}</div>
+                    <label className="mono lbl">{es ? "Contraseña actual" : "Current password"}</label>
+                    <input type="password" autoComplete="current-password" value={pwCur} onChange={(e) => setPwCur(e.target.value)} style={{ margin: "6px 0 12px" }} />
+                    <label className="mono lbl">{es ? "Nueva contraseña" : "New password"}</label>
+                    <input type="password" autoComplete="new-password" value={pwNew} onChange={(e) => setPwNew(e.target.value)} placeholder={es ? "mínimo 6 caracteres" : "at least 6 characters"} style={{ margin: "6px 0 12px" }} />
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      <button className="btn sm" onClick={submitPassword} disabled={pwBusy}>
+                        {pwBusy ? (es ? "Guardando…" : "Saving…") : (es ? "Actualizar contraseña" : "Update password")}
+                      </button>
+                      {pwMsg && <span className="mono lbl" style={{ color: /actualiz|updated/i.test(pwMsg) ? C.green : C.n1 }}>{pwMsg}</span>}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             </>

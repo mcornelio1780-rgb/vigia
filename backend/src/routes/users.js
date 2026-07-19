@@ -95,6 +95,25 @@ router.get("/me", requireUser, async (req, res, next) => {
   }
 });
 
+// PUT /api/users/password { current, next } -> cambia la contraseña
+router.put("/password", authLimiter, requireUser, async (req, res, next) => {
+  try {
+    const { current, next: newPassword } = req.body || {};
+    if (!newPassword || String(newPassword).length < 6) {
+      return res.status(400).json({ error: "la nueva contraseña debe tener al menos 6 caracteres" });
+    }
+    const { rows } = await query("SELECT password_hash FROM users WHERE id = $1", [req.user.id]);
+    if (!rows.length) return res.status(404).json({ error: "usuario no encontrado" });
+    if (!verifyPassword(current, rows[0].password_hash)) {
+      return res.status(401).json({ error: "la contraseña actual es incorrecta" });
+    }
+    await query("UPDATE users SET password_hash = $1 WHERE id = $2", [hashPassword(String(newPassword)), req.user.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/users/farms -> [ ... ]
 router.get("/farms", requireUser, async (req, res, next) => {
   try {
