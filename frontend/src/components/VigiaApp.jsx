@@ -1294,6 +1294,11 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 {FARM_KEYS.map((k) => <option key={k} value={k}>{FARMS[k].label} — {FARMS[k].country}</option>)}
               </optgroup>
             </select>
+            {me && savedFarms.length > 0 && (
+              <span className="mono lbl" style={{ color: C.t3, whiteSpace: "nowrap" }}>
+                {savedFarms.length} {es ? (savedFarms.length === 1 ? "campo" : "campos") : (savedFarms.length === 1 ? "field" : "fields")}
+              </span>
+            )}
             <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label="Cambiar idioma">{langLabel(lang)}</button>
             {me && !farm.saved && (
               <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} aria-label={es ? "Guardar campo" : "Save field"} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
