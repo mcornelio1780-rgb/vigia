@@ -52,6 +52,7 @@ test("GET /api/users/me requiere sesión y devuelve usuario + campos", async () 
   const auth = { Authorization: `Bearer ${s.body.token}` };
 
   assert.equal((await api(base, "/api/users/me")).status, 401);
+  assert.equal((await api(base, "/api/users/me", { headers: { Authorization: "Bearer basura" } })).status, 401); // token inválido
 
   const me = await api(base, "/api/users/me", { headers: auth });
   assert.equal(me.status, 200);
