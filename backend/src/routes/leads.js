@@ -2,12 +2,12 @@ import { Router } from "express";
 import { query } from "../db.js";
 import { requireAdmin } from "../auth.js";
 import { rateLimit } from "../ratelimit.js";
+import { isValidEmail, normalizeEmail } from "../validation.js";
 
 const router = Router();
 const createLimiter = rateLimit({ windowMs: 60_000, max: 30 });
 
 const KINDS = ["waitlist", "newsletter"];
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const LEAD_SELECT = `
   SELECT id, email, kind, name, country, hectares, created_at,
@@ -67,9 +67,10 @@ router.get("/", requireAdmin, async (req, res, next) => {
 router.post("/", createLimiter, async (req, res, next) => {
   try {
     const { email, kind = "waitlist", name, country, hectares, lat, lng } = req.body || {};
-    if (!email || typeof email !== "string" || !EMAIL_RE.test(email.trim())) {
+    if (!isValidEmail(email)) {
       return res.status(400).json({ error: "email inválido" });
     }
+    const mail = normalizeEmail(email);
     if (!KINDS.includes(kind)) {
       return res.status(400).json({ error: `kind debe ser uno de: ${KINDS.join(", ")}` });
     }
@@ -102,8 +103,8 @@ router.post("/", createLimiter, async (req, res, next) => {
              location = COALESCE(EXCLUDED.location, leads.location)
        RETURNING id`,
       point
-        ? [email.trim(), kind, name || null, country || null, ha, point.lngN, point.latN]
-        : [email.trim(), kind, name || null, country || null, ha]
+        ? [mail, kind, name || null, country || null, ha, point.lngN, point.latN]
+        : [mail, kind, name || null, country || null, ha]
     );
     const created = await query(`${LEAD_SELECT} WHERE id = $1`, [rows[0].id]);
     res.status(201).json(created.rows[0]);

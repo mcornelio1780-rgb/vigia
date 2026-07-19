@@ -3,10 +3,10 @@ import { query } from "../db.js";
 import { issueToken, requireUser } from "../auth.js";
 import { hashPassword, verifyPassword } from "../passwords.js";
 import { rateLimit } from "../ratelimit.js";
+import { isValidEmail, normalizeEmail } from "../validation.js";
 
 const router = Router();
 const authLimiter = rateLimit({ windowMs: 60_000, max: 15 });
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const FARM_SELECT = `
   SELECT id, name, hectares, created_at,
@@ -44,8 +44,8 @@ function sanitizeSettings(input) {
 router.post("/signup", authLimiter, async (req, res, next) => {
   try {
     const { email, password, name } = req.body || {};
-    const mail = String(email || "").trim().toLowerCase();
-    if (!mail || !EMAIL_RE.test(mail)) return res.status(400).json({ error: "email inválido" });
+    if (!isValidEmail(email)) return res.status(400).json({ error: "email inválido" });
+    const mail = normalizeEmail(email);
     if (!password || String(password).length < 6) {
       return res.status(400).json({ error: "la contraseña debe tener al menos 6 caracteres" });
     }
@@ -67,7 +67,7 @@ router.post("/signup", authLimiter, async (req, res, next) => {
 router.post("/login", authLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
-    const mail = String(email || "").trim().toLowerCase();
+    const mail = normalizeEmail(email);
     const { rows } = await query(
       "SELECT id, email, name, password_hash FROM users WHERE email = $1",
       [mail]
