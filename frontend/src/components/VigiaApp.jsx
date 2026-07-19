@@ -9,6 +9,13 @@ import { useState, useEffect, useMemo } from "react";
 const BRAND = "Vigia";
 const DOMAIN = "vigia.ag";
 
+/* ── Idioma: ES · EN · PT ── */
+const LANGS = ["es", "en", "pt"];
+// pick(lang, textoES, textoEN, textoPT?) — PT cae a EN si no se tradujo.
+const pick = (lang, es, en, pt) => (lang === "pt" ? (pt ?? en) : lang === "en" ? en : es);
+const nextLang = (lang) => LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
+const langLabel = (lang) => nextLang(lang).toUpperCase();
+
 /* ── API real: captura de leads (lista de espera + boletín) ── */
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -484,7 +491,8 @@ const Slider = ({ label, v, set, min, max, unit, c }) => (
 );
 
 /* ══════════════════ LANDING ══════════════════ */
-const Landing = ({ es, setLang, onEnter, live, setLive, onAdmin }) => {
+const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
+  const t = (esS, enS, ptS) => pick(lang, esS, enS, ptS);
   const [wl, setWl] = useState(""); const [wlSent, setWlSent] = useState(false); const [wlErr, setWlErr] = useState(""); const [wlBusy, setWlBusy] = useState(false);
   const [nl, setNl] = useState(""); const [nlSent, setNlSent] = useState(false); const [nlErr, setNlErr] = useState("");
   const [ha, setHa] = useState(200);
@@ -550,8 +558,8 @@ const Landing = ({ es, setLang, onEnter, live, setLive, onAdmin }) => {
             <button className="btn ghost sm mono" onClick={() => setLive(!live)} style={{ fontSize: 10, color: C.t3 }}>
               {live ? (es ? "modo: activo" : "mode: live") : (es ? "modo: pre-lanzamiento" : "mode: pre-launch")}
             </button>
-            <button className="btn ghost sm" onClick={() => setLang(es ? "en" : "es")}>{es ? "EN" : "ES"}</button>
-            <button className="btn sm" onClick={onEnter}>{live ? (es ? "Entrar" : "Log in") : (es ? "Ver demo" : "See demo")}</button>
+            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label="Cambiar idioma">{langLabel(lang)}</button>
+            <button className="btn sm" onClick={onEnter}>{live ? t("Entrar", "Log in", "Entrar") : t("Ver demo", "See demo", "Ver demonstração")}</button>
           </div>
         </nav>
       </div>
@@ -560,14 +568,20 @@ const Landing = ({ es, setLang, onEnter, live, setLive, onAdmin }) => {
       <div className="wrap">
         <div className="hero">
           <div>
-            <div className="eyebrow" style={{ marginBottom: 16 }}>{es ? "Inteligencia climática satelital · cobertura mundial" : "Satellite climate intelligence · worldwide coverage"}</div>
+            <div className="eyebrow" style={{ marginBottom: 16 }}>{t("Inteligencia climática satelital · cobertura mundial", "Satellite climate intelligence · worldwide coverage", "Inteligência climática por satélite · cobertura mundial")}</div>
             <h1 className="h1">
-              {es ? <>El incendio empieza<br /><span style={{ color: C.green }}>seis horas</span> antes de<br />que lo veas.</> : <>The fire starts<br /><span style={{ color: C.green }}>six hours</span> before<br />you see it.</>}
+              {lang === "pt"
+                ? <>O incêndio começa<br /><span style={{ color: C.green }}>seis horas</span> antes de<br />você ver.</>
+                : es
+                ? <>El incendio empieza<br /><span style={{ color: C.green }}>seis horas</span> antes de<br />que lo veas.</>
+                : <>The fire starts<br /><span style={{ color: C.green }}>six hours</span> before<br />you see it.</>}
             </h1>
             <p className="lead" style={{ marginTop: 18, maxWidth: 470 }}>
-              {es
-                ? `${BRAND} vigila tu campo desde el satélite y te avisa por WhatsApp cuando el riesgo de incendio, sequía, inundación, plaga o helada cruza tu umbral. Zona por zona, en cualquier país del mundo.`
-                : `${BRAND} watches your farm from orbit and messages you on WhatsApp when wildfire, drought, flood, pest or frost risk crosses your threshold. Zone by zone, in any country on Earth.`}
+              {t(
+                `${BRAND} vigila tu campo desde el satélite y te avisa por WhatsApp cuando el riesgo de incendio, sequía, inundación, plaga o helada cruza tu umbral. Zona por zona, en cualquier país del mundo.`,
+                `${BRAND} watches your farm from orbit and messages you on WhatsApp when wildfire, drought, flood, pest or frost risk crosses your threshold. Zone by zone, in any country on Earth.`,
+                `A ${BRAND} vigia sua lavoura desde o satélite e avisa por WhatsApp quando o risco de incêndio, seca, enchente, praga ou geada cruza seu limite. Zona por zona, em qualquer país do mundo.`
+              )}
             </p>
 
             {live ? (
@@ -593,7 +607,7 @@ const Landing = ({ es, setLang, onEnter, live, setLive, onAdmin }) => {
                   <>
                     <div style={{ display: "flex", gap: 8 }}>
                       <input value={wl} onChange={(e) => setWl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submitWaitlist()} placeholder={es ? "tu@correo.com" : "you@email.com"} aria-label="Email" />
-                      <button className="btn" onClick={submitWaitlist} disabled={wlBusy} style={{ whiteSpace: "nowrap", opacity: wlBusy ? 0.6 : 1 }}>{wlBusy ? (es ? "Enviando…" : "Sending…") : es ? "Pedir acceso" : "Request access"}</button>
+                      <button className="btn" onClick={submitWaitlist} disabled={wlBusy} style={{ whiteSpace: "nowrap", opacity: wlBusy ? 0.6 : 1 }}>{wlBusy ? t("Enviando…", "Sending…", "Enviando…") : t("Pedir acceso", "Request access", "Pedir acesso")}</button>
                     </div>
                     {wlErr && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 8 }}>{wlErr}</div>}
                     <div className="mono" style={{ fontSize: 10.5, color: C.t3, marginTop: 10, lineHeight: 1.7 }}>
@@ -625,8 +639,8 @@ const Landing = ({ es, setLang, onEnter, live, setLive, onAdmin }) => {
 
       {/* RIESGOS */}
       <div className="wrap"><section className="sec">
-        <div className="eyebrow">{es ? "Qué vigila" : "What it watches"}</div>
-        <h2 className="h2" style={{ marginTop: 12, maxWidth: 620 }}>{es ? "Seis amenazas, un solo umbral que tú defines" : "Six threats, one threshold you set yourself"}</h2>
+        <div className="eyebrow">{t("Qué vigila", "What it watches", "O que vigia")}</div>
+        <h2 className="h2" style={{ marginTop: 12, maxWidth: 620 }}>{t("Seis amenazas, un solo umbral que tú defines", "Six threats, one threshold you set yourself", "Seis ameaças, um único limite que você define")}</h2>
         <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", marginTop: 26 }}>
           {risks.map((r, i) => (
             <div key={i} className="card">
@@ -796,7 +810,7 @@ const Landing = ({ es, setLang, onEnter, live, setLive, onAdmin }) => {
 
       {/* CIERRE */}
       <div className="wrap"><section className="sec" style={{ textAlign: "center", paddingBottom: 40 }}>
-        <h2 className="h2" style={{ maxWidth: 570, margin: "0 auto" }}>{es ? "¿Cuánto perdiste la última vez que el clima te agarró desprevenido?" : "What did it cost you last time the weather caught you off guard?"}</h2>
+        <h2 className="h2" style={{ maxWidth: 570, margin: "0 auto" }}>{t("¿Cuánto perdiste la última vez que el clima te agarró desprevenido?", "What did it cost you last time the weather caught you off guard?", "Quanto você perdeu da última vez que o clima te pegou de surpresa?")}</h2>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 24, flexWrap: "wrap" }}>
           <button className="btn" onClick={onEnter} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
             {live ? (es ? "Analizar mi campo gratis" : "Analyze my farm free") : (es ? "Pedir acceso a la beta" : "Request beta access")} <Ic d={ic.arrow} s={15} c="#04140B" />
@@ -878,7 +892,7 @@ const Login = ({ es, onDone, onBack }) => {
 };
 
 /* ══════════════════ DASHBOARD ══════════════════ */
-const Dashboard = ({ es, setLang, onLogout }) => {
+const Dashboard = ({ es, lang, setLang, onLogout }) => {
   const [tab, setTab] = useState("overview");
   const [farmKey, setFarmKey] = useState("cordoba");
   const [layer, setLayer] = useState("ndvi");
@@ -1028,7 +1042,7 @@ const Dashboard = ({ es, setLang, onLogout }) => {
             <select value={farmKey} onChange={(e) => { setFarmKey(e.target.value); setZone(null); }} className="mono sel" aria-label={es ? "Campo" : "Farm"}>
               {FARM_KEYS.map((k) => <option key={k} value={k}>{FARMS[k].label} — {FARMS[k].country}</option>)}
             </select>
-            <button className="btn ghost sm" onClick={() => setLang(es ? "en" : "es")}>{es ? "EN" : "ES"}</button>
+            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label="Cambiar idioma">{langLabel(lang)}</button>
             {me && (
               <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <Ic d={ic.pin} s={12} /> {savedMsg || (es ? `Guardar campo (${me.farms?.length ?? 0})` : `Save field (${me.farms?.length ?? 0})`)}
@@ -1626,9 +1640,9 @@ export default function VigiaApp() {
         }
       `}</style>
 
-      {view === "landing" && <Landing es={es} setLang={setLang} live={live} setLive={setLive} onEnter={() => setView("login")} onAdmin={() => setView("admin")} />}
+      {view === "landing" && <Landing es={es} lang={lang} setLang={setLang} live={live} setLive={setLive} onEnter={() => setView("login")} onAdmin={() => setView("admin")} />}
       {view === "login" && <Login es={es} onDone={() => setView("app")} onBack={() => setView("landing")} />}
-      {view === "app" && <Dashboard es={es} setLang={setLang} onLogout={() => setView("landing")} />}
+      {view === "app" && <Dashboard es={es} lang={lang} setLang={setLang} onLogout={() => setView("landing")} />}
       {view === "admin" && <AdminLeads es={es} onBack={() => setView("landing")} />}
     </div>
   );
