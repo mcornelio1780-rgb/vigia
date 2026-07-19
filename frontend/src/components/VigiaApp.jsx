@@ -474,7 +474,7 @@ const Toggle = ({ on, set, label, sub }) => (
       <div style={{ fontSize: 13, fontWeight: 500 }}>{label}</div>
       {sub && <div style={{ fontSize: 11.5, color: C.t3, marginTop: 2 }}>{sub}</div>}
     </div>
-    <button onClick={() => set(!on)} aria-pressed={on} style={{ width: 40, height: 22, borderRadius: 12, border: "none", cursor: "pointer", background: on ? C.green : C.s3, position: "relative", transition: "background .2s", flexShrink: 0 }}>
+    <button onClick={() => set(!on)} aria-pressed={on} aria-label={label} style={{ width: 40, height: 22, borderRadius: 12, border: "none", cursor: "pointer", background: on ? C.green : C.s3, position: "relative", transition: "background .2s", flexShrink: 0 }}>
       <span style={{ position: "absolute", top: 3, left: on ? 21 : 3, width: 16, height: 16, borderRadius: "50%", background: on ? "#04140B" : C.t3, transition: "left .2s" }} />
     </button>
   </div>
@@ -1576,6 +1576,11 @@ export default function VigiaApp() {
   const [lang, setLang] = useState("es");
   const [live, setLive] = useState(false);
   const es = lang === "es";
+
+  // Refleja el idioma en <html lang> para lectores de pantalla.
+  useEffect(() => {
+    if (typeof document !== "undefined") document.documentElement.lang = lang;
+  }, [lang]);
 
   return (
     <div style={{ background: C.bg, color: C.t1, minHeight: "100vh", fontFamily: "system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" }}>
