@@ -235,6 +235,12 @@ antiguo.
 
 Responde el archivo con `Content-Type: application/pdf`.
 
+**`GET /api/fires`** devuelve los focos de calor cercanos usando **NASA FIRMS**
+(VIIRS, casi en tiempo real). Requiere una `FIRMS_MAP_KEY` gratuita
+([solicítala aquí](https://firms.modaps.eosdis.nasa.gov/api/map_key/)); sin ella,
+responde `503` y el dashboard usa el riesgo de incendio de demostración. La
+fuente por defecto es `FIRMS_SOURCE=VIIRS_SNPP_NRT`.
+
 **Formato de errores.** Toda respuesta de error devuelve JSON con la forma
 `{ "error": "mensaje" }` y el código HTTP correspondiente: `400` (validación),
 `401` (autenticación), `404` (no encontrado), `409` (conflicto), `413` (cuerpo
