@@ -96,6 +96,13 @@ async function updateProfile(name) {
   if (!res.ok) throw new Error(b?.error || "No se pudo actualizar el perfil");
   return b;
 }
+async function deleteAccount() {
+  const t = getUserToken();
+  if (!t) throw new Error("Inicia sesión");
+  const res = await fetch(`${API_URL}/api/users/me`, { method: "DELETE", headers: { Authorization: `Bearer ${t}` } });
+  if (!res.ok) throw new Error("No se pudo eliminar la cuenta");
+  clearUserToken();
+}
 async function deleteFarm(id) {
   const t = getUserToken();
   if (!t) throw new Error("Inicia sesión");
@@ -1115,12 +1122,24 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
     finally { setProfBusy(false); }
   };
 
-  /* privacidad y datos: exportación real de la cuenta */
+  /* privacidad y datos: exportación y borrado reales de la cuenta */
   const [privMsg, setPrivMsg] = useState("");
   const doExport = async () => {
     setPrivMsg("");
     try { await exportData(); }
     catch (e) { setPrivMsg(e.message); }
+  };
+  const doDeleteAccount = async () => {
+    setPrivMsg("");
+    const msg = es
+      ? "¿Eliminar tu cuenta y todos tus campos? Esta acción es irreversible."
+      : "Delete your account and all your fields? This action cannot be undone.";
+    if (typeof window !== "undefined" && !window.confirm(msg)) return;
+    try {
+      await deleteAccount(); // borra en el backend y limpia el token
+      setMe(null);
+      onLogout(); // vuelve al landing
+    } catch (e) { setPrivMsg(e.message); }
   };
 
   const zones = farm.zones.map((v, i) => ({
@@ -1685,7 +1704,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                   </p>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                     <button className="mono chipbtn" onClick={doExport} disabled={!me}>{es ? "Exportar mis datos" : "Export my data"}</button>
-                    <button className="mono chipbtn" style={{ color: C.n1, borderColor: `${C.n1}44` }}>{es ? "Eliminar cuenta" : "Delete account"}</button>
+                    <button className="mono chipbtn" onClick={doDeleteAccount} disabled={!me} style={{ color: C.n1, borderColor: `${C.n1}44` }}>{es ? "Eliminar cuenta" : "Delete account"}</button>
                   </div>
                   {privMsg && <div className="mono lbl" style={{ marginTop: 10, color: C.n1 }}>{privMsg}</div>}
                   {!me && <div className="mono lbl" style={{ marginTop: 10, color: C.t4 }}>{es ? "Inicia sesión para exportar tus datos reales." : "Log in to export your real data."}</div>}

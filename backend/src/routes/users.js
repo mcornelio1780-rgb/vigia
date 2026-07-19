@@ -114,6 +114,18 @@ router.put("/me", requireUser, async (req, res, next) => {
   }
 });
 
+// DELETE /api/users/me -> elimina la cuenta y sus campos (la FK farms.user_id
+// es ON DELETE CASCADE, así que borrar el usuario arrastra sus campos).
+router.delete("/me", requireUser, async (req, res, next) => {
+  try {
+    const { rowCount } = await query("DELETE FROM users WHERE id = $1", [req.user.id]);
+    if (!rowCount) return res.status(404).json({ error: "usuario no encontrado" });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/users/export -> descarga JSON con todos los datos del usuario
 // (perfil + campos + preferencias). Portabilidad de datos para el productor.
 router.get("/export", requireUser, async (req, res, next) => {

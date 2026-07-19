@@ -160,6 +160,36 @@ test("PUT /api/users/me actualiza el nombre del perfil", async () => {
   assert.equal(me.body.user.name, "Nombre Nuevo");
 });
 
+test("DELETE /api/users/me elimina la cuenta y sus campos en cascada", async () => {
+  const s = await signup("del@field.ar", "clave-larga", "Borrar");
+  const auth = { Authorization: `Bearer ${s.body.token}` };
+
+  // Sin sesión -> 401
+  assert.equal((await api(base, "/api/users/me", { method: "DELETE" })).status, 401);
+
+  // Crea un campo que debe borrarse en cascada
+  await api(base, "/api/users/farms", {
+    method: "POST",
+    headers: { ...auth, "Content-Type": "application/json" },
+    body: JSON.stringify({ name: "Se va con la cuenta" }),
+  });
+
+  // Borra la cuenta
+  const del = await api(base, "/api/users/me", { method: "DELETE", headers: auth });
+  assert.equal(del.status, 200);
+  assert.equal(del.body.ok, true);
+
+  // El token deja de servir: el usuario ya no existe -> 404
+  assert.equal((await api(base, "/api/users/me", { headers: auth })).status, 404);
+
+  // El correo queda libre: puede volver a registrarse
+  const again = await signup("del@field.ar", "otra-clave", "Nuevo");
+  assert.equal(again.status, 201);
+  // Y no arrastra el campo anterior (se borró en cascada)
+  const me2 = await api(base, "/api/users/me", { headers: { Authorization: `Bearer ${again.body.token}` } });
+  assert.deepEqual(me2.body.farms, []);
+});
+
 test("GET /api/users/export devuelve perfil, campos y preferencias", async () => {
   const s = await signup("exp@field.ar", "clave-larga", "Exportador");
   const auth = { Authorization: `Bearer ${s.body.token}` };
