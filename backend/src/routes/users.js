@@ -3,7 +3,7 @@ import { query } from "../db.js";
 import { issueToken, requireUser } from "../auth.js";
 import { hashPassword, verifyPassword } from "../passwords.js";
 import { rateLimit } from "../ratelimit.js";
-import { isValidEmail, normalizeEmail } from "../validation.js";
+import { isValidEmail, normalizeEmail, cleanName } from "../validation.js";
 
 const router = Router();
 const authLimiter = rateLimit({ windowMs: 60_000, max: 15 });
@@ -49,12 +49,14 @@ router.post("/signup", authLimiter, async (req, res, next) => {
     if (!password || String(password).length < 6) {
       return res.status(400).json({ error: "la contraseña debe tener al menos 6 caracteres" });
     }
+    const nameCheck = cleanName(name);
+    if (!nameCheck.ok) return res.status(400).json({ error: nameCheck.error });
     const exists = await query("SELECT 1 FROM users WHERE email = $1", [mail]);
     if (exists.rows.length) return res.status(409).json({ error: "ese correo ya está registrado" });
 
     const { rows } = await query(
       "INSERT INTO users (email, name, password_hash) VALUES ($1, $2, $3) RETURNING id, email, name",
-      [mail, name || null, hashPassword(password)]
+      [mail, nameCheck.value, hashPassword(password)]
     );
     const user = rows[0];
     res.status(201).json({ user, ...issueToken({ role: "user", sub: user.id }) });
@@ -117,13 +119,11 @@ router.get("/stats", requireUser, async (req, res, next) => {
 router.put("/me", requireUser, async (req, res, next) => {
   try {
     const { name } = req.body || {};
-    const clean = name == null ? null : String(name).trim();
-    if (clean != null && clean.length > 120) {
-      return res.status(400).json({ error: "el nombre es demasiado largo (máx. 120)" });
-    }
+    const nameCheck = cleanName(name);
+    if (!nameCheck.ok) return res.status(400).json({ error: nameCheck.error });
     const { rows } = await query(
       "UPDATE users SET name = $1 WHERE id = $2 RETURNING id, email, name",
-      [clean || null, req.user.id]
+      [nameCheck.value, req.user.id]
     );
     if (!rows.length) return res.status(404).json({ error: "usuario no encontrado" });
     res.json({ user: rows[0] });
