@@ -31,6 +31,25 @@ async function fetchLeadStats() {
   return res.json();
 }
 
+// Genera el PDF de evidencia en el backend y dispara la descarga.
+async function downloadReport(payload) {
+  const res = await fetch(`${API_URL}/api/report`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("No se pudo generar el reporte");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "vigia-reporte.pdf";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 // Pronóstico real vía backend (Open-Meteo). Devuelve la serie de días o
 // null si no hay red disponible, para que el dashboard use su demo.
 async function fetchWeather(lat, lng) {
@@ -772,6 +791,27 @@ const Dashboard = ({ es, setLang, onLogout }) => {
   const worst = Math.max(...Object.values(farm.risks));
   const cost = (9 + farm.ha * 0.15).toFixed(2);
 
+  const [genBusy, setGenBusy] = useState(false);
+  const [genErr, setGenErr] = useState("");
+  const generateReport = async () => {
+    if (genBusy) return;
+    setGenBusy(true);
+    setGenErr("");
+    try {
+      await downloadReport({
+        lang: es ? "es" : "en",
+        generatedAt: new Date().toISOString(),
+        farm: { label: farm.label, country: farm.country, coord: farm.coord, hectares: farm.ha, elev: farm.elev },
+        risks: farm.risks,
+        zones: zones.map((z) => ({ id: z.id, crop: z.crop[es ? 0 : 1], ndvi: z.ndvi, ha: z.ha, fire: z.fire, soil: z.soil })),
+      });
+    } catch (e) {
+      setGenErr(e.message);
+    } finally {
+      setGenBusy(false);
+    }
+  };
+
   const tabs = [
     { id: "overview", l: es ? "Vista general" : "Overview", i: ic.grid },
     { id: "geomap", l: es ? "Geomapa" : "Geomap", i: ic.map },
@@ -1126,7 +1166,10 @@ const Dashboard = ({ es, setLang, onLogout }) => {
                     {es ? "Incluye coordenadas GPS del polígono, hora exacta de la pasada satelital, imagen NDVI de la zona afectada y la serie meteorológica. Formato aceptado por aseguradoras." : "Includes the polygon's GPS coordinates, exact satellite pass time, NDVI image of the affected zone and the weather series. Format accepted by insurers."}
                   </div>
                 </div>
-                <button className="btn" style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}><Ic d={ic.file} s={15} c="#04140B" /> {es ? "Generar ahora" : "Generate now"}</button>
+                <div style={{ textAlign: "right" }}>
+                  <button className="btn" onClick={generateReport} disabled={genBusy} style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", opacity: genBusy ? 0.6 : 1 }}><Ic d={ic.file} s={15} c="#04140B" /> {genBusy ? (es ? "Generando…" : "Generating…") : es ? "Generar ahora" : "Generate now"}</button>
+                  {genErr && <div style={{ fontSize: 11, color: C.n1, marginTop: 6 }}>{genErr}</div>}
+                </div>
               </div>
               <div className="card" style={{ marginTop: 14 }}>
                 <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Reportes generados" : "Generated reports"}</div>

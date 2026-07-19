@@ -105,3 +105,26 @@ test("GET /api/auth/me valida el token de administrador", async () => {
   assert.equal(ok.status, 200);
   assert.equal(ok.body.role, "admin");
 });
+
+test("POST /api/report devuelve un PDF de evidencia", async () => {
+  const res = await fetch(`${base}/api/report`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      lang: "es",
+      farm: { label: "Río Cuarto", country: "Argentina", coord: "33°08′S 64°21′O", hectares: 480 },
+      risks: { fire: 74, drought: 58 },
+      zones: [{ id: "A", crop: "Soja", ndvi: 0.79, ha: 96, fire: 30, soil: 55 }],
+    }),
+  });
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get("content-type"), "application/pdf");
+  const buf = Buffer.from(await res.arrayBuffer());
+  assert.equal(buf.subarray(0, 5).toString("latin1"), "%PDF-");
+  assert.ok(buf.length > 1000);
+});
+
+test("POST /api/report sin farm devuelve 400", async () => {
+  const { status } = await api(base, "/api/report", json("POST", {}));
+  assert.equal(status, 400);
+});

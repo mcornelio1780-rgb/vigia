@@ -4,6 +4,8 @@ import { query } from "./db.js";
 import authRouter from "./routes/auth.js";
 import leadsRouter from "./routes/leads.js";
 import { fetchForecast } from "./weather.js";
+import PDFDocument from "pdfkit";
+import { buildReportPdf } from "./report.js";
 
 // Construye la app de Express sin arrancar el servidor, para poder
 // importarla desde los tests.
@@ -34,6 +36,24 @@ export function createApp() {
       res.json({ source: "open-meteo", days });
     } catch {
       res.status(502).json({ error: "Clima en vivo no disponible" });
+    }
+  });
+
+  // Genera un PDF de evidencia satelital del campo (para el seguro).
+  app.post("/api/report", (req, res) => {
+    const data = req.body || {};
+    if (!data.farm || typeof data.farm !== "object") {
+      return res.status(400).json({ error: "Se requiere el objeto 'farm' del campo" });
+    }
+    try {
+      const doc = new PDFDocument({ margin: 40, size: "A4" });
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", 'attachment; filename="vigia-reporte.pdf"');
+      doc.pipe(res);
+      buildReportPdf(doc, data);
+      doc.end();
+    } catch (err) {
+      if (!res.headersSent) res.status(500).json({ error: "No se pudo generar el PDF" });
     }
   });
 
