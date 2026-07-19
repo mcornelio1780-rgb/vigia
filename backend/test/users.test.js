@@ -59,6 +59,29 @@ test("GET /api/users/me requiere sesión y devuelve usuario + campos", async () 
   assert.deepEqual(me.body.farms, []);
 });
 
+test("GET /api/users/stats resume campos, hectáreas y ubicación", async () => {
+  const s = await signup("stats@field.ar", "clave-larga", "Estadística");
+  const auth = { Authorization: `Bearer ${s.body.token}`, "Content-Type": "application/json" };
+
+  // Sin sesión -> 401
+  assert.equal((await api(base, "/api/users/stats")).status, 401);
+
+  // Usuario nuevo -> todo en cero, con fecha de alta
+  const empty = await api(base, "/api/users/stats", { headers: { Authorization: `Bearer ${s.body.token}` } });
+  assert.equal(empty.status, 200);
+  assert.deepEqual({ farms: empty.body.farms, hectares: empty.body.hectares, located: empty.body.located }, { farms: 0, hectares: 0, located: 0 });
+  assert.ok(empty.body.memberSince);
+
+  // Un campo con hectáreas y ubicación, otro solo con nombre
+  await api(base, "/api/users/farms", { method: "POST", headers: auth, body: JSON.stringify({ name: "Con ubicación", hectares: 300, lat: -33.1, lng: -64.3 }) });
+  await api(base, "/api/users/farms", { method: "POST", headers: auth, body: JSON.stringify({ name: "Sin nada más" }) });
+
+  const stats = await api(base, "/api/users/stats", { headers: { Authorization: `Bearer ${s.body.token}` } });
+  assert.equal(stats.body.farms, 2);
+  assert.equal(stats.body.hectares, 300);
+  assert.equal(stats.body.located, 1);
+});
+
 test("un usuario crea y lista sus campos (persistidos con geografía)", async () => {
   const s = await signup();
   const auth = { Authorization: `Bearer ${s.body.token}`, "Content-Type": "application/json" };

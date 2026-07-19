@@ -95,6 +95,24 @@ router.get("/me", requireUser, async (req, res, next) => {
   }
 });
 
+// GET /api/users/stats -> resumen del productor (campos, hectáreas, etc.)
+router.get("/stats", requireUser, async (req, res, next) => {
+  try {
+    const u = await query("SELECT created_at FROM users WHERE id = $1", [req.user.id]);
+    if (!u.rows.length) return res.status(404).json({ error: "usuario no encontrado" });
+    const { rows } = await query(
+      `SELECT count(*)::int AS farms,
+              COALESCE(SUM(hectares), 0)::int AS hectares,
+              count(location)::int AS located
+       FROM farms WHERE user_id = $1`,
+      [req.user.id]
+    );
+    res.json({ ...rows[0], memberSince: u.rows[0].created_at });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PUT /api/users/me { name } -> actualiza el nombre del perfil
 router.put("/me", requireUser, async (req, res, next) => {
   try {
