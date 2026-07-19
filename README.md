@@ -109,6 +109,11 @@ npm install
 npm run dev                   # http://localhost:3000
 ```
 
+`NEXT_PUBLIC_API_URL` es una variable **pública del cliente**, así que su valor
+se **fija en tiempo de build** (`npm run build`; en Docker se pasa con
+`--build-arg NEXT_PUBLIC_API_URL=...`). Para producción, apúntala a la URL
+pública de la API antes de construir el frontend.
+
 Abre <http://localhost:3000>: verás el landing de Vigia. Al enviar tu correo en
 **"Pedir acceso"** o en el boletín, el registro se guarda de verdad en PostGIS
 (pruébalo con `GET /api/leads`). Desde **"Ver demo"** entras al dashboard.
