@@ -29,7 +29,16 @@ test("mapFires tolera entradas vacías o inválidas", () => {
 test("distanceKm calcula distancias razonables", () => {
   const d = distanceKm(-33.13, -64.35, -33.14, -64.36);
   assert.ok(d >= 0 && d < 3); // ~1.4 km
-  assert.ok(distanceKm(0, 0, 0, 1) > 100); // 1° de longitud en el ecuador ≈ 111 km
+});
+
+test("distanceKm coincide con distancias conocidas (haversine)", () => {
+  // Mismo punto -> 0.
+  assert.equal(distanceKm(-33.13, -64.35, -33.13, -64.35), 0);
+  // 1° de longitud en el ecuador ≈ 111.19 km.
+  assert.ok(Math.abs(distanceKm(0, 0, 0, 1) - 111.19) < 1, `esperado ~111.19, dio ${distanceKm(0, 0, 0, 1)}`);
+  // Buenos Aires -> Córdoba ≈ 646 km.
+  const baCba = distanceKm(-34.61, -58.38, -31.42, -64.19);
+  assert.ok(Math.abs(baCba - 646) < 15, `esperado ~646, dio ${baCba}`);
 });
 
 test("firmsUrl arma un bounding box alrededor del punto", () => {
