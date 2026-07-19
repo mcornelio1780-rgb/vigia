@@ -672,7 +672,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
             <button className="btn ghost sm mono" onClick={() => setLive(!live)} style={{ fontSize: 10, color: C.t3 }}>
               {live ? (es ? "modo: activo" : "mode: live") : (es ? "modo: pre-lanzamiento" : "mode: pre-launch")}
             </button>
-            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label="Cambiar idioma">{langLabel(lang)}</button>
+            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label={es ? "Cambiar idioma" : "Change language"}>{langLabel(lang)}</button>
             <button className="btn sm" onClick={onEnter}>{live ? t("Entrar", "Log in", "Entrar") : t("Ver demo", "See demo", "Ver demonstração")}</button>
           </div>
         </nav>
@@ -1299,7 +1299,7 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 {savedFarms.length} {es ? (savedFarms.length === 1 ? "campo" : "campos") : (savedFarms.length === 1 ? "field" : "fields")}
               </span>
             )}
-            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label="Cambiar idioma">{langLabel(lang)}</button>
+            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label={es ? "Cambiar idioma" : "Change language"}>{langLabel(lang)}</button>
             {me && !farm.saved && (
               <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} aria-label={es ? "Guardar campo" : "Save field"} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <Ic d={ic.pin} s={12} /> {savedMsg || (es ? "Guardar campo" : "Save field")}
