@@ -110,6 +110,29 @@ test("GET /api/leads requiere administrador", async () => {
   assert.equal(badKind.status, 400);
 });
 
+test("GET /api/leads filtra por país sin distinguir mayúsculas y combina con kind", async () => {
+  const token = await adminToken();
+  const auth = { headers: { Authorization: `Bearer ${token}` } };
+  await api(base, "/api/leads", json("POST", { email: "ar1@x.com", kind: "waitlist", country: "Argentina" }));
+  await api(base, "/api/leads", json("POST", { email: "ar2@x.com", kind: "newsletter", country: "argentina" }));
+  await api(base, "/api/leads", json("POST", { email: "cl1@x.com", kind: "waitlist", country: "Chile" }));
+
+  // Insensible a mayúsculas
+  assert.equal((await api(base, "/api/leads?country=Argentina", auth)).body.length, 2);
+  assert.equal((await api(base, "/api/leads?country=argentina", auth)).body.length, 2);
+
+  // Combinable con kind
+  const argWaitlist = await api(base, "/api/leads?country=argentina&kind=waitlist", auth);
+  assert.equal(argWaitlist.body.length, 1);
+  assert.equal(argWaitlist.body[0].email, "ar1@x.com");
+
+  // País sin registros -> vacío
+  assert.equal((await api(base, "/api/leads?country=Brasil", auth)).body.length, 0);
+
+  // Sin filtro sigue devolviendo todo
+  assert.equal((await api(base, "/api/leads", auth)).body.length, 3);
+});
+
 test("POST /api/auth/login rechaza contraseña incorrecta y acepta la correcta", async () => {
   assert.equal((await api(base, "/api/auth/login", json("POST", { password: "mala" }))).status, 401);
   const ok = await api(base, "/api/auth/login", json("POST", { password: "test-admin" }));

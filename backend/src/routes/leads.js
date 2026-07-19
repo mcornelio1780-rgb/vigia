@@ -31,18 +31,24 @@ router.get("/stats", async (_req, res, next) => {
   }
 });
 
-// GET /api/leads — listado (solo administrador), con filtro opcional ?kind.
+// GET /api/leads — listado (solo administrador), con filtros opcionales
+// ?kind y ?country (este último sin distinguir mayúsculas, combinable).
 router.get("/", requireAdmin, async (req, res, next) => {
   try {
     const params = [];
-    let where = "";
+    const conds = [];
     if (req.query.kind) {
       if (!KINDS.includes(req.query.kind)) {
         return res.status(400).json({ error: `kind debe ser uno de: ${KINDS.join(", ")}` });
       }
       params.push(req.query.kind);
-      where = "WHERE kind = $1";
+      conds.push(`kind = $${params.length}`);
     }
+    if (req.query.country) {
+      params.push(String(req.query.country).trim().toLowerCase());
+      conds.push(`LOWER(country) = $${params.length}`);
+    }
+    const where = conds.length ? `WHERE ${conds.join(" AND ")}` : "";
     const limit = Math.min(Number(req.query.limit) || 100, 500);
     const offset = Number(req.query.offset) || 0;
     params.push(limit, offset);
