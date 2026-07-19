@@ -672,7 +672,7 @@ const Landing = ({ es, lang, setLang, onEnter, live, setLive, onAdmin }) => {
             <button className="btn ghost sm mono" onClick={() => setLive(!live)} style={{ fontSize: 10, color: C.t3 }}>
               {live ? (es ? "modo: activo" : "mode: live") : (es ? "modo: pre-lanzamiento" : "mode: pre-launch")}
             </button>
-            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label={es ? "Cambiar idioma" : "Change language"}>{langLabel(lang)}</button>
+            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label={pick(lang, "Cambiar idioma", "Change language", "Mudar idioma")}>{langLabel(lang)}</button>
             <button className="btn sm" onClick={onEnter}>{live ? t("Entrar", "Log in", "Entrar") : t("Ver demo", "See demo", "Ver demonstração")}</button>
           </div>
         </nav>
@@ -1375,92 +1375,92 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <select value={farmKey} onChange={(e) => { setFarmKey(e.target.value); setZone(null); setSavedMsg(""); setRenameOpen(false); }} className="mono sel" aria-label={es ? "Campo" : "Farm"}>
+            <select value={farmKey} onChange={(e) => { setFarmKey(e.target.value); setZone(null); setSavedMsg(""); setRenameOpen(false); }} className="mono sel" aria-label={pick(lang, "Campo", "Farm", "Campo")}>
               {savedFarms.length > 0 && (
-                <optgroup label={es ? "Mis campos" : "My fields"}>
+                <optgroup label={pick(lang, "Mis campos", "My fields", "Meus campos")}>
                   {[...savedFarms]
-                    .sort((a, b) => a.name.localeCompare(b.name, es ? "es" : "en", { sensitivity: "base" }))
+                    .sort((a, b) => a.name.localeCompare(b.name, pick(lang, "es", "en", "pt"), { sensitivity: "base" }))
                     .map((f) => <option key={f.id} value={`saved:${f.id}`}>{f.name}</option>)}
                 </optgroup>
               )}
-              <optgroup label={es ? "Campos demo" : "Demo fields"}>
+              <optgroup label={pick(lang, "Campos demo", "Demo fields", "Campos demo")}>
                 {FARM_KEYS.map((k) => <option key={k} value={k}>{FARMS[k].label} — {FARMS[k].country}</option>)}
               </optgroup>
             </select>
             {me && savedFarms.length > 0 && (
               <span className="mono lbl" style={{ color: C.t3, whiteSpace: "nowrap" }}>
-                {savedFarms.length} {es ? (savedFarms.length === 1 ? "campo" : "campos") : (savedFarms.length === 1 ? "field" : "fields")}
+                {savedFarms.length} {pick(lang, savedFarms.length === 1 ? "campo" : "campos", savedFarms.length === 1 ? "field" : "fields", savedFarms.length === 1 ? "campo" : "campos")}
               </span>
             )}
-            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label={es ? "Cambiar idioma" : "Change language"}>{langLabel(lang)}</button>
+            <button className="btn ghost sm" onClick={() => setLang(nextLang(lang))} aria-label={pick(lang, "Cambiar idioma", "Change language", "Mudar idioma")}>{langLabel(lang)}</button>
             {me && !farm.saved && (
-              <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} aria-label={es ? "Guardar campo" : "Save field"} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                <Ic d={ic.pin} s={12} /> {savedMsg || (es ? "Guardar campo" : "Save field")}
+              <button className="btn ghost sm" onClick={persistFarm} title={me.user?.email} aria-label={pick(lang, "Guardar campo", "Save field", "Salvar campo")} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <Ic d={ic.pin} s={12} /> {savedMsg || pick(lang, "Guardar campo", "Save field", "Salvar campo")}
               </button>
             )}
             {me && farm.saved && (
-              <button className="btn ghost sm" onClick={openRename} aria-label={es ? "Editar campo" : "Edit field"} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                <Ic d={ic.gear} s={12} /> {es ? "Editar campo" : "Edit field"}
+              <button className="btn ghost sm" onClick={openRename} aria-label={pick(lang, "Editar campo", "Edit field", "Editar campo")} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <Ic d={ic.gear} s={12} /> {pick(lang, "Editar campo", "Edit field", "Editar campo")}
               </button>
             )}
             {me && farm.saved && (
-              <button className="btn ghost sm" onClick={removeFarm} aria-label={es ? "Quitar campo" : "Remove field"} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: C.n1 }}>
-                {savedMsg || (es ? "Quitar campo" : "Remove field")}
+              <button className="btn ghost sm" onClick={removeFarm} aria-label={pick(lang, "Quitar campo", "Remove field", "Remover campo")} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: C.n1 }}>
+                {savedMsg || pick(lang, "Quitar campo", "Remove field", "Remover campo")}
               </button>
             )}
             {me && (
-              <button className="btn ghost sm" onClick={() => { setAddOpen((v) => !v); setNfErr(""); }} aria-label={es ? "Nuevo campo" : "New field"} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                <Ic d={ic.plus} s={12} /> {es ? "Nuevo campo" : "New field"}
+              <button className="btn ghost sm" onClick={() => { setAddOpen((v) => !v); setNfErr(""); }} aria-label={pick(lang, "Nuevo campo", "New field", "Novo campo")} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <Ic d={ic.plus} s={12} /> {pick(lang, "Nuevo campo", "New field", "Novo campo")}
               </button>
             )}
-            <span className="mono lbl" style={{ color: C.green }}><span className="dot" /> {es ? "próximo análisis 4h 12m" : "next analysis 4h 12m"}</span>
+            <span className="mono lbl" style={{ color: C.green }}><span className="dot" /> {pick(lang, "próximo análisis 4h 12m", "next analysis 4h 12m", "próxima análise 4h 12m")}</span>
           </div>
         </header>
 
         <div style={{ padding: 24, maxWidth: 1180 }}>
           {addOpen && me && (
             <form className="card" onSubmit={createNewFarm} style={{ marginBottom: 14 }}>
-              <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Nuevo campo" : "New field"}</div>
+              <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Nuevo campo", "New field", "Novo campo")}</div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
                 <label style={{ flex: "2 1 200px" }}>
-                  <div className="mono lbl" style={{ marginBottom: 5 }}>{es ? "Nombre" : "Name"}</div>
-                  <input value={nf.name} onChange={(e) => setNf({ ...nf, name: e.target.value })} placeholder={es ? "Lote Norte" : "North field"} required />
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>{pick(lang, "Nombre", "Name", "Nome")}</div>
+                  <input value={nf.name} onChange={(e) => setNf({ ...nf, name: e.target.value })} placeholder={pick(lang, "Lote Norte", "North field", "Lote Norte")} required />
                 </label>
                 <label style={{ flex: "1 1 110px" }}>
-                  <div className="mono lbl" style={{ marginBottom: 5 }}>{es ? "Latitud" : "Latitude"}</div>
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>{pick(lang, "Latitud", "Latitude", "Latitude")}</div>
                   <input value={nf.lat} onChange={(e) => setNf({ ...nf, lat: e.target.value })} placeholder="-33.13" inputMode="decimal" />
                 </label>
                 <label style={{ flex: "1 1 110px" }}>
-                  <div className="mono lbl" style={{ marginBottom: 5 }}>{es ? "Longitud" : "Longitude"}</div>
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>{pick(lang, "Longitud", "Longitude", "Longitude")}</div>
                   <input value={nf.lng} onChange={(e) => setNf({ ...nf, lng: e.target.value })} placeholder="-64.35" inputMode="decimal" />
                 </label>
                 <label style={{ flex: "1 1 90px" }}>
                   <div className="mono lbl" style={{ marginBottom: 5 }}>ha</div>
                   <input value={nf.ha} onChange={(e) => setNf({ ...nf, ha: e.target.value })} placeholder="480" inputMode="numeric" />
                 </label>
-                <button className="btn sm" type="submit" disabled={nfBusy} style={{ opacity: nfBusy ? 0.6 : 1 }}>{nfBusy ? (es ? "Creando…" : "Creating…") : es ? "Crear" : "Create"}</button>
-                <button className="btn ghost sm" type="button" onClick={() => setAddOpen(false)}>{es ? "Cancelar" : "Cancel"}</button>
+                <button className="btn sm" type="submit" disabled={nfBusy} style={{ opacity: nfBusy ? 0.6 : 1 }}>{nfBusy ? pick(lang, "Creando…", "Creating…", "Criando…") : pick(lang, "Crear", "Create", "Criar")}</button>
+                <button className="btn ghost sm" type="button" onClick={() => setAddOpen(false)}>{pick(lang, "Cancelar", "Cancel", "Cancelar")}</button>
               </div>
               {nfErr && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 10 }}>{nfErr}</div>}
             </form>
           )}
           {renameOpen && me && farm.saved && (
             <form className="card" onSubmit={submitRename} style={{ marginBottom: 14 }}>
-              <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Editar campo" : "Edit field"}</div>
+              <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Editar campo", "Edit field", "Editar campo")}</div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
                 <label style={{ flex: "2 1 200px" }}>
-                  <div className="mono lbl" style={{ marginBottom: 5 }}>{es ? "Nombre" : "Name"}</div>
-                  <input value={rf.name} onChange={(e) => setRf({ ...rf, name: e.target.value })} placeholder={es ? "Lote Norte" : "North field"} required />
+                  <div className="mono lbl" style={{ marginBottom: 5 }}>{pick(lang, "Nombre", "Name", "Nome")}</div>
+                  <input value={rf.name} onChange={(e) => setRf({ ...rf, name: e.target.value })} placeholder={pick(lang, "Lote Norte", "North field", "Lote Norte")} required />
                 </label>
                 <label style={{ flex: "1 1 90px" }}>
                   <div className="mono lbl" style={{ marginBottom: 5 }}>ha</div>
                   <input value={rf.ha} onChange={(e) => setRf({ ...rf, ha: e.target.value })} placeholder="480" inputMode="numeric" />
                 </label>
-                <button className="btn sm" type="submit" disabled={rfBusy} style={{ opacity: rfBusy ? 0.6 : 1 }}>{rfBusy ? (es ? "Guardando…" : "Saving…") : es ? "Guardar" : "Save"}</button>
-                <button className="btn ghost sm" type="button" onClick={() => setRenameOpen(false)}>{es ? "Cancelar" : "Cancel"}</button>
+                <button className="btn sm" type="submit" disabled={rfBusy} style={{ opacity: rfBusy ? 0.6 : 1 }}>{rfBusy ? pick(lang, "Guardando…", "Saving…", "Salvando…") : pick(lang, "Guardar", "Save", "Salvar")}</button>
+                <button className="btn ghost sm" type="button" onClick={() => setRenameOpen(false)}>{pick(lang, "Cancelar", "Cancel", "Cancelar")}</button>
               </div>
               <div className="mono" style={{ fontSize: 10, color: C.t4, marginTop: 10 }}>
-                {es ? "La ubicación del campo se conserva." : "The field location is preserved."}
+                {pick(lang, "La ubicación del campo se conserva.", "The field location is preserved.", "A localização do campo é preservada.")}
               </div>
               {rfErr && <div style={{ fontSize: 11.5, color: C.n1, marginTop: 8 }}>{rfErr}</div>}
             </form>
@@ -1469,23 +1469,23 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
           {tab === "overview" && (
             <>
               <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(158px,1fr))" }}>
-                <Metric icon={ic.fire} c={riskColor(farm.risks.fire)} label={es ? "Riesgo mayor" : "Top risk"} value={worst} unit="%" sub={es ? "incendio · zona F" : "wildfire · zone F"} />
-                <Metric icon={ic.leaf} c={ndviColor(Number(avgNdvi))} label="NDVI" value={avgNdvi} sub={es ? "promedio ponderado" : "weighted average"} />
-                <Metric icon={ic.map} label={es ? "Superficie" : "Area"} value={Number(farm.ha).toLocaleString(es ? "es" : "en")} unit="ha" sub={es ? "6 zonas de manejo" : "6 management zones"} />
-                <Metric icon={ic.water} c={C.blue} label={es ? "Lluvia 10 d" : "Rain 10 d"} value={weather.reduce((a, d) => a + d.p, 0)} unit="mm" sub={es ? "pronóstico Open-Meteo" : "Open-Meteo forecast"} />
-                <Metric icon={ic.bell} c={C.n2} label={es ? "Alertas 7 d" : "Alerts 7 d"} value="3" sub={es ? "1 urgente · 1 alta" : "1 urgent · 1 high"} />
+                <Metric icon={ic.fire} c={riskColor(farm.risks.fire)} label={pick(lang, "Riesgo mayor", "Top risk", "Risco maior")} value={worst} unit="%" sub={pick(lang, "incendio · zona F", "wildfire · zone F", "incêndio · zona F")} />
+                <Metric icon={ic.leaf} c={ndviColor(Number(avgNdvi))} label="NDVI" value={avgNdvi} sub={pick(lang, "promedio ponderado", "weighted average", "média ponderada")} />
+                <Metric icon={ic.map} label={pick(lang, "Superficie", "Area", "Superfície")} value={Number(farm.ha).toLocaleString(pick(lang, "es", "en", "pt"))} unit="ha" sub={pick(lang, "6 zonas de manejo", "6 management zones", "6 zonas de manejo")} />
+                <Metric icon={ic.water} c={C.blue} label={pick(lang, "Lluvia 10 d", "Rain 10 d", "Chuva 10 d")} value={weather.reduce((a, d) => a + d.p, 0)} unit="mm" sub={pick(lang, "pronóstico Open-Meteo", "Open-Meteo forecast", "previsão Open-Meteo")} />
+                <Metric icon={ic.bell} c={C.n2} label={pick(lang, "Alertas 7 d", "Alerts 7 d", "Alertas 7 d")} value="3" sub={pick(lang, "1 urgente · 1 alta", "1 urgent · 1 high", "1 urgente · 1 alta")} />
               </div>
 
               {fires && (fires.count > 0 ? (
                 <div style={{ marginTop: 14 }}>
-                  <AlertRow type="fire" level={es ? "en vivo" : "live"}
-                    title={es ? `${fires.count} foco(s) de calor a menos de 50 km` : `${fires.count} heat spot(s) within 50 km`}
-                    desc={es ? `Datos NASA FIRMS (VIIRS). El más cercano a ${fires.fires?.[0]?.distanceKm ?? "—"} km del campo.` : `NASA FIRMS data (VIIRS). Nearest ${fires.fires?.[0]?.distanceKm ?? "—"} km from the field.`}
+                  <AlertRow type="fire" level={pick(lang, "en vivo", "live", "ao vivo")}
+                    title={pick(lang, `${fires.count} foco(s) de calor a menos de 50 km`, `${fires.count} heat spot(s) within 50 km`, `${fires.count} foco(s) de calor a menos de 50 km`)}
+                    desc={pick(lang, `Datos NASA FIRMS (VIIRS). El más cercano a ${fires.fires?.[0]?.distanceKm ?? "—"} km del campo.`, `NASA FIRMS data (VIIRS). Nearest ${fires.fires?.[0]?.distanceKm ?? "—"} km from the field.`, `Dados NASA FIRMS (VIIRS). O mais próximo a ${fires.fires?.[0]?.distanceKm ?? "—"} km do campo.`)}
                     time="FIRMS" channels={null} />
                 </div>
               ) : (
                 <div className="mono lbl" style={{ marginTop: 14, color: C.green }}>
-                  <span className="dot" /> {es ? "Sin focos activos cerca · NASA FIRMS en vivo" : "No active fire spots nearby · NASA FIRMS live"}
+                  <span className="dot" /> {pick(lang, "Sin focos activos cerca · NASA FIRMS en vivo", "No active fire spots nearby · NASA FIRMS live", "Sem focos ativos por perto · NASA FIRMS ao vivo")}
                 </div>
               ))}
 
@@ -1493,24 +1493,24 @@ const Dashboard = ({ es, lang, setLang, onLogout }) => {
                 <div>
                   <ParcelScan farm={farm} es={es} layer={layer} onZone={setZone} selected={zone} />
                   <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-                    {[["ndvi", es ? "Vigor NDVI" : "NDVI vigor"], ["fire", es ? "Riesgo incendio" : "Fire risk"], ["soil", es ? "Humedad suelo" : "Soil moisture"]].map(([k, l]) => (
+                    {[["ndvi", pick(lang, "Vigor NDVI", "NDVI vigor", "Vigor NDVI")], ["fire", pick(lang, "Riesgo incendio", "Fire risk", "Risco incêndio")], ["soil", pick(lang, "Humedad suelo", "Soil moisture", "Umidade do solo")]].map(([k, l]) => (
                       <button key={k} onClick={() => setLayer(k)} className="mono chipbtn" style={{ borderColor: layer === k ? C.green : C.line, color: layer === k ? C.green : C.t3 }}>{l}</button>
                     ))}
                   </div>
                 </div>
                 <div className="card">
-                  <div className="mono lbl" style={{ marginBottom: 16 }}>{es ? "Riesgo del campo · umbral marcado" : "Farm risk · threshold marked"}</div>
-                  <Bar label={es ? "Incendio" : "Wildfire"} v={farm.risks.fire} c={riskColor(farm.risks.fire)} threshold={thFire} />
-                  <Bar label={es ? "Sequía" : "Drought"} v={farm.risks.drought} c={riskColor(farm.risks.drought)} threshold={thDrought} />
-                  <Bar label={es ? "Inundación" : "Flood"} v={farm.risks.flood} c={riskColor(farm.risks.flood)} threshold={thFlood} />
-                  <Bar label={es ? "Plagas" : "Pests"} v={farm.risks.pest} c={riskColor(farm.risks.pest)} />
-                  <Bar label={es ? "Viento" : "Wind"} v={farm.risks.wind} c={riskColor(farm.risks.wind)} threshold={thWind} />
-                  <Bar label={es ? "Helada" : "Frost"} v={farm.risks.frost} c={riskColor(farm.risks.frost)} />
+                  <div className="mono lbl" style={{ marginBottom: 16 }}>{pick(lang, "Riesgo del campo · umbral marcado", "Farm risk · threshold marked", "Risco do campo · limite marcado")}</div>
+                  <Bar label={pick(lang, "Incendio", "Wildfire", "Incêndio")} v={farm.risks.fire} c={riskColor(farm.risks.fire)} threshold={thFire} />
+                  <Bar label={pick(lang, "Sequía", "Drought", "Seca")} v={farm.risks.drought} c={riskColor(farm.risks.drought)} threshold={thDrought} />
+                  <Bar label={pick(lang, "Inundación", "Flood", "Inundação")} v={farm.risks.flood} c={riskColor(farm.risks.flood)} threshold={thFlood} />
+                  <Bar label={pick(lang, "Plagas", "Pests", "Pragas")} v={farm.risks.pest} c={riskColor(farm.risks.pest)} />
+                  <Bar label={pick(lang, "Viento", "Wind", "Vento")} v={farm.risks.wind} c={riskColor(farm.risks.wind)} threshold={thWind} />
+                  <Bar label={pick(lang, "Helada", "Frost", "Geada")} v={farm.risks.frost} c={riskColor(farm.risks.frost)} />
                 </div>
               </div>
 
               <div className="card" style={{ marginTop: 14 }}>
-                <div className="mono lbl" style={{ marginBottom: 12 }}>{es ? "Últimas alertas" : "Latest alerts"}</div>
+                <div className="mono lbl" style={{ marginBottom: 12 }}>{pick(lang, "Últimas alertas", "Latest alerts", "Últimos alertas")}</div>
                 <div style={{ display: "grid", gap: 9 }}>
                   {alerts.slice(0, 3).map((a, i) => <AlertRow key={i} type={a.type} level={a.level} title={a.title} desc={a.desc} time={a.time} channels={a.ch} />)}
                 </div>
