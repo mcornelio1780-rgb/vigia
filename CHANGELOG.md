@@ -41,8 +41,22 @@ sigue, de forma sencilla, [Keep a Changelog](https://keepachangelog.com/es/).
   plagas, alertas, reportes y configuración.
 - Tarjeta **"Tu cuenta"** con datos reales, alta/edición/borrado de campos y
   contador de "Mis campos".
-- **i18n** ES/EN/PT, mejoras de **accesibilidad** (aria-labels) y formato de
-  hectáreas con separador de miles.
+- **i18n ES/EN/PT completa**: selector de idioma en todo el producto (landing,
+  login, dashboard, panel admin) y **todos los datos agronómicos demo**
+  traducidos, con términos correctos del mercado brasileño (p. ej.
+  *Lagarta-do-cartucho*, *Milho safrinha*). El **PDF de evidencia** también en PT.
+- **Vista móvil**: las métricas del panel se muestran en 2 columnas en pantallas
+  chicas para acercar el mapa satelital; iniciales de mes del calendario según
+  idioma; formato de hectáreas con separador de miles.
+- **Accesibilidad**: aria-labels en controles, foco visible (`:focus-visible`),
+  `aria-hidden` en los logotipos decorativos y `<html lang>` reflejado.
+- **Robustez**: los formularios del landing y el login muestran un mensaje amable
+  y localizado cuando la API no responde (en vez de un error técnico).
+- **SEO / metadata**: `robots.txt`, `sitemap.xml`, datos estructurados JSON-LD
+  (Organization + SoftwareApplication, solo datos reales) y OpenGraph/Twitter.
+- **Seguridad del frontend**: cabeceras (`X-Content-Type-Options`,
+  `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS).
+- **Página 404** con la identidad de Vigia (mensaje trilingüe, noindex).
 
 ### Infraestructura y calidad
 
