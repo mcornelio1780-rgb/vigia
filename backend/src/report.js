@@ -29,7 +29,7 @@ const INK = "#1a1a1a";
 const MUTE = "#6b7280";
 
 // Helvetica (WinAnsi) no incluye primas tipográficas; se normalizan.
-const clean = (s) => String(s ?? "—").replace(/[′’]/g, "'").replace(/[″”]/g, '"');
+export const clean = (s) => String(s ?? "—").replace(/[′’]/g, "'").replace(/[″”]/g, '"');
 
 export function buildReportPdf(doc, data = {}) {
   const t = T[data.lang === "en" ? "en" : "es"];

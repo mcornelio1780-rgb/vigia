@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { renderReportToBuffer } from "../src/report.js";
+import { renderReportToBuffer, clean } from "../src/report.js";
 
 const SAMPLE = {
   lang: "es",
@@ -29,4 +29,14 @@ test("renderReportToBuffer tolera datos mínimos sin romperse", async () => {
 test("renderReportToBuffer funciona en inglés", async () => {
   const buf = await renderReportToBuffer({ ...SAMPLE, lang: "en" });
   assert.ok(buf.length > 1000);
+});
+
+test("clean normaliza primas y comillas tipográficas a ASCII", () => {
+  // Primas (′ ″) y comillas de cierre (’ ”) que Helvetica no incluye.
+  assert.equal(clean("33°08′S 64°21″O"), "33°08'S 64°21\"O");
+  assert.equal(clean("Río’s"), "Río's");
+  assert.equal(clean("fin”"), 'fin"');
+  // Valores vacíos -> guion largo (marcador de "sin dato").
+  assert.equal(clean(null), "—");
+  assert.equal(clean(undefined), "—");
 });
