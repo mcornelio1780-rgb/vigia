@@ -1,7 +1,7 @@
 {
   "name": "vigia-backend",
   "version": "0.1.0",
-  "description": "API de Vigia: reportes ciudadanos georreferenciados con PostGIS",
+  "description": "API de Vigia: inteligencia climática satelital para el agro (Express + PostGIS)",
   "type": "module",
   "main": "src/index.js",
   "scripts": {

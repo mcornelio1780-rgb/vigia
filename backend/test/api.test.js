@@ -15,11 +15,22 @@ async function adminToken() {
   return body.token;
 }
 
-test("GET /api/health devuelve la versión de PostGIS", async () => {
+test("GET /api/health devuelve la versión de PostGIS y el uptime", async () => {
   const { status, body } = await api(base, "/api/health");
   assert.equal(status, 200);
   assert.equal(body.status, "ok");
   assert.match(body.postgis, /^\d+\.\d+/);
+  assert.equal(typeof body.uptime, "number");
+  assert.ok(body.uptime >= 0);
+});
+
+test("GET /api/version devuelve nombre, versión y uptime", async () => {
+  const { status, body } = await api(base, "/api/version");
+  assert.equal(status, 200);
+  assert.equal(body.name, "vigia-backend");
+  assert.match(body.version, /^\d+\.\d+\.\d+/);
+  assert.equal(typeof body.uptime, "number");
+  assert.ok(body.uptime >= 0);
 });
 
 test("todas las respuestas incluyen cabeceras de seguridad", async () => {

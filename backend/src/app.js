@@ -9,6 +9,7 @@ import { fetchFires, firmsConfigured } from "./firms.js";
 import { rateLimit } from "./ratelimit.js";
 import PDFDocument from "pdfkit";
 import { buildReportPdf } from "./report.js";
+import { name as appName, version as appVersion } from "./version.js";
 
 // Construye la app de Express sin arrancar el servidor, para poder
 // importarla desde los tests.
@@ -33,10 +34,16 @@ export function createApp() {
   app.get("/api/health", async (_req, res) => {
     try {
       const { rows } = await query("SELECT PostGIS_Lib_Version() AS postgis");
-      res.json({ status: "ok", postgis: rows[0].postgis });
+      res.json({ status: "ok", postgis: rows[0].postgis, uptime: Math.round(process.uptime()) });
     } catch (err) {
       res.status(503).json({ status: "error", error: err.message });
     }
+  });
+
+  // Metadatos de la build: nombre, versión (desde package.json) y segundos
+  // en línea. Útil para monitoreo y para confirmar qué versión está desplegada.
+  app.get("/api/version", (_req, res) => {
+    res.json({ name: appName, version: appVersion, uptime: Math.round(process.uptime()) });
   });
 
   // Pronóstico real del campo (Open-Meteo). Si la red no está disponible
