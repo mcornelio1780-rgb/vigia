@@ -7,10 +7,12 @@ productor — zona por zona, en cualquier país.
 
 - **Frontend** — **Next.js 16** (App Router) + React 19: **Landing → Login →
   Dashboard**, con la identidad visual de Vigia (tema oscuro, mapa de parcela por
-  zonas NDVI, riesgos, clima, cultivos, plagas, alertas y configuración).
+  zonas NDVI, riesgos, clima, cultivos, plagas, alertas y configuración), más un
+  **panel de administrador** para consultar y exportar los leads.
 - **Backend** — API REST en Node/Express sobre **PostgreSQL + PostGIS**: captura
   de interés (**lista de espera** y **boletín**) con la ubicación del campo como
-  geografía, más autenticación de administrador para consultar los registros.
+  geografía, **pronóstico real** (Open-Meteo), **PDF de evidencia** para el seguro
+  y autenticación de administrador.
 
 ```
 vigia/
@@ -26,12 +28,13 @@ vigia/
     └── src/components/VigiaApp.jsx   # Landing + Login + Dashboard
 ```
 
-> **Qué es real y qué es demo.** El **landing** captura leads de verdad contra la
-> API (lista de espera, boletín y el contador de campos inscritos vienen de la
-> base). El **dashboard** usa datos satelitales/agronómicos **deterministas de
-> demostración** (parcelas, NDVI, clima, precios). Conectar las fuentes en vivo
-> (NASA FIRMS, Sentinel-2, ERA5, SoilGrids, Open-Meteo) es el siguiente paso y no
-> forma parte de este repositorio todavía.
+> **Qué es real y qué es demo.** Son **reales** (contra la API + PostGIS): la
+> captura de leads del landing y su contador, el **panel de administrador**
+> (login + listado + CSV), el **pronóstico del clima** (Open-Meteo, con fallback
+> a demo si no hay red) y el **PDF de evidencia** que genera el dashboard. Siguen
+> siendo **demo determinista** los datos satelitales/agronómicos del dashboard
+> (parcelas, NDVI, precios). Conectar el resto de fuentes en vivo (NASA FIRMS,
+> Sentinel-2, ERA5, SoilGrids) es el siguiente paso.
 
 ## Requisitos
 
@@ -99,6 +102,8 @@ Base: `http://localhost:4000`
 | `GET`  | `/api/leads/stats`  | —     | Conteos públicos (lista de espera, boletín, países)            |
 | `POST` | `/api/leads`        | —     | Alta en lista de espera o boletín (idempotente por email+kind) |
 | `GET`  | `/api/leads`        | admin | Listado de registros (filtro opcional `?kind=`)                |
+| `GET`  | `/api/weather`      | —     | Pronóstico real del campo (`?lat=&lng=`, Open-Meteo); 502 sin red |
+| `POST` | `/api/report`       | —     | Genera un PDF de evidencia satelital del campo                  |
 | `POST` | `/api/auth/login`   | —     | `{password}` → `{token}` de administrador                      |
 | `GET`  | `/api/auth/me`      | admin | Verifica el token de administrador                             |
 
