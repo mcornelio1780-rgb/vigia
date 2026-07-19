@@ -142,6 +142,34 @@ test("GET/PUT /api/users/settings guarda y carga preferencias", async () => {
   assert.equal(after.body.thFlood, 50);
 });
 
+test("GET /api/users/farms/:id devuelve un campo propio y protege los ajenos", async () => {
+  const a = await signup("g1@x.com", "clave-larga");
+  const b = await signup("g2@x.com", "clave-larga");
+  const authA = { Authorization: `Bearer ${a.body.token}`, "Content-Type": "application/json" };
+
+  const created = await api(base, "/api/users/farms", {
+    method: "POST",
+    headers: authA,
+    body: JSON.stringify({ name: "Lote Único", hectares: 210, lat: -33.13, lng: -64.35 }),
+  });
+  const id = created.body.id;
+
+  // Sin sesión -> 401
+  assert.equal((await api(base, `/api/users/farms/${id}`)).status, 401);
+
+  // El dueño lo obtiene con sus coordenadas
+  const own = await api(base, `/api/users/farms/${id}`, { headers: { Authorization: `Bearer ${a.body.token}` } });
+  assert.equal(own.status, 200);
+  assert.equal(own.body.name, "Lote Único");
+  assert.ok(Math.abs(own.body.lat - -33.13) < 1e-6 && Math.abs(own.body.lng - -64.35) < 1e-6);
+
+  // Otro usuario -> 404
+  assert.equal((await api(base, `/api/users/farms/${id}`, { headers: { Authorization: `Bearer ${b.body.token}` } })).status, 404);
+
+  // id con formato inválido -> 400
+  assert.equal((await api(base, "/api/users/farms/no-uuid", { headers: { Authorization: `Bearer ${a.body.token}` } })).status, 400);
+});
+
 test("PUT /api/users/farms/:id edita un campo propio y valida propiedad", async () => {
   const a = await signup("fa@x.com", "clave-larga");
   const b = await signup("fb@x.com", "clave-larga");

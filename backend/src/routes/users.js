@@ -193,6 +193,18 @@ router.get("/farms", requireUser, async (req, res, next) => {
   }
 });
 
+// GET /api/users/farms/:id -> un solo campo propio
+router.get("/farms/:id", requireUser, async (req, res, next) => {
+  try {
+    const { rows } = await query(`${FARM_SELECT} WHERE id = $1 AND user_id = $2`, [req.params.id, req.user.id]);
+    if (!rows.length) return res.status(404).json({ error: "Campo no encontrado" });
+    res.json(rows[0]);
+  } catch (err) {
+    if (err.code === "22P02") return res.status(400).json({ error: "id inválido" });
+    next(err);
+  }
+});
+
 // POST /api/users/farms { name, lat, lng, hectares } -> farm
 router.post("/farms", requireUser, async (req, res, next) => {
   try {
