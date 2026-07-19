@@ -88,7 +88,8 @@ está vacía, así que puedes ejecutarlos varias veces sin duplicar nada.
 Comprobación rápida:
 
 ```bash
-curl localhost:4000/api/health          # {"status":"ok","postgis":"3.4.2"}
+curl localhost:4000/api/health          # {"status":"ok","postgis":"3.4.2","uptime":...}
+curl localhost:4000/api/version         # {"name":"vigia-backend","version":"0.1.0","uptime":...}
 curl localhost:4000/api/leads/stats     # {"waitlist":6,"newsletter":2,...}
 ```
 
