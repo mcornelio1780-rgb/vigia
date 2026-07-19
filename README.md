@@ -160,6 +160,7 @@ Base: `http://localhost:4000`
 | `PUT`    | `/api/users/password`  | usuario | Cambia la contraseña (verifica la actual)                          |
 | `GET`    | `/api/users/farms`     | usuario | Lista los campos del productor                                     |
 | `POST`   | `/api/users/farms`     | usuario | Crea un campo (`{name, lat?, lng?, hectares?}`)                    |
+| `GET`    | `/api/users/farms/:id` | usuario | Obtiene un campo propio por id                                     |
 | `PUT`    | `/api/users/farms/:id` | usuario | Edita un campo propio (actualización parcial)                     |
 | `DELETE` | `/api/users/farms/:id` | usuario | Borra un campo propio                                              |
 | `GET`    | `/api/users/settings`  | usuario | Preferencias (umbrales y canales de alerta)                        |
