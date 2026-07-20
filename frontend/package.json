@@ -1,7 +1,8 @@
 {
-  "name": "frontend",
+  "name": "vigia-frontend",
   "version": "0.1.0",
   "private": true,
+  "description": "Frontend de Vigia (panel Next.js)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,15 +10,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "leaflet": "^1.9.4",
     "next": "16.2.10",
     "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-leaflet": "^5.0.0"
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -25,5 +23,8 @@
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
   }
 }

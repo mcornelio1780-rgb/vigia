@@ -16,5 +16,47 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build: ./backend
+    container_name: vigia-api
+    environment:
+      DATABASE_URL: postgres://vigia:vigia@db:5432/vigia
+      PORT: "4000"
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-vigia-admin}
+      AUTH_SECRET: ${AUTH_SECRET:-dev-secret-change-me}
+      FIRMS_MAP_KEY: ${FIRMS_MAP_KEY:-}
+    # Aplica migraciones y carga la semilla (idempotentes) antes de arrancar.
+    command: sh -c "node scripts/migrate.js && node scripts/seed.js && node src/index.js"
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # wget de BusyBox (node:22-alpine) contra el propio endpoint de salud.
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000}
+    container_name: vigia-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    healthcheck:
+      # wget de BusyBox (viene en node:22-alpine) contra el propio Next.
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
 volumes:
   vigia_pgdata:

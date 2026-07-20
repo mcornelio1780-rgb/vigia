@@ -1,19 +1,21 @@
 {
   "name": "vigia-backend",
   "version": "0.1.0",
-  "description": "API de Vigia: reportes ciudadanos georreferenciados con PostGIS",
+  "description": "API de Vigia: inteligencia climática satelital para el agro (Express + PostGIS)",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
     "migrate": "node scripts/migrate.js",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "test": "node --test --test-concurrency=1"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
+    "pdfkit": "^0.15.2",
     "pg": "^8.13.1"
   }
 }

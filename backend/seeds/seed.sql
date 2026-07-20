@@ -1,38 +1,14 @@
-INSERT INTO categories (slug, name, color) VALUES
-  ('seguridad',  'Seguridad',            '#dc2626'),
-  ('alumbrado',  'Alumbrado público',    '#f59e0b'),
-  ('baches',     'Baches y vialidad',    '#78716c'),
-  ('basura',     'Basura y limpieza',    '#16a34a'),
-  ('agua',       'Agua y drenaje',       '#2563eb'),
-  ('otro',       'Otro',                 '#6b7280')
-ON CONFLICT (slug) DO NOTHING;
-
--- Reportes de ejemplo alrededor del centro de Ciudad de México
-INSERT INTO reports (title, description, category_id, status, reporter_name, location)
+-- Interés de ejemplo en la lista de espera y el boletín, repartido por
+-- varios países para que las estadísticas del landing tengan vida.
+INSERT INTO leads (email, kind, name, country, hectares, location)
 SELECT * FROM (VALUES
-  ('Lámpara fundida en la esquina', 'La luminaria lleva dos semanas sin funcionar y la calle queda muy oscura.',
-    (SELECT id FROM categories WHERE slug = 'alumbrado'), 'abierto', 'María G.',
-    ST_SetSRID(ST_MakePoint(-99.1332, 19.4326), 4326)::geography),
-  ('Bache profundo frente al mercado', 'Un bache de unos 40 cm que ya ha dañado varias llantas.',
-    (SELECT id FROM categories WHERE slug = 'baches'), 'en_proceso', 'Carlos R.',
-    ST_SetSRID(ST_MakePoint(-99.1405, 19.4290), 4326)::geography),
-  ('Acumulación de basura en el parque', 'Bolsas de basura acumuladas desde el fin de semana.',
-    (SELECT id FROM categories WHERE slug = 'basura'), 'abierto', NULL,
-    ST_SetSRID(ST_MakePoint(-99.1270, 19.4380), 4326)::geography),
-  ('Fuga de agua en la banqueta', 'Sale agua constantemente desde hace tres días.',
-    (SELECT id FROM categories WHERE slug = 'agua'), 'en_proceso', 'Ana L.',
-    ST_SetSRID(ST_MakePoint(-99.1450, 19.4355), 4326)::geography),
-  ('Robo de autopartes reportado', 'Vecinos reportan robo de espejos en autos estacionados por la noche.',
-    (SELECT id FROM categories WHERE slug = 'seguridad'), 'abierto', NULL,
-    ST_SetSRID(ST_MakePoint(-99.1380, 19.4400), 4326)::geography),
-  ('Semáforo descompuesto', 'El semáforo del cruce está intermitente desde ayer.',
-    (SELECT id FROM categories WHERE slug = 'otro'), 'resuelto', 'Jorge M.',
-    ST_SetSRID(ST_MakePoint(-99.1300, 19.4250), 4326)::geography),
-  ('Luminaria parpadeante en el andador', 'Parpadea toda la noche y molesta a los vecinos.',
-    (SELECT id FROM categories WHERE slug = 'alumbrado'), 'resuelto', NULL,
-    ST_SetSRID(ST_MakePoint(-99.1500, 19.4310), 4326)::geography),
-  ('Coladera sin tapa', 'Coladera abierta en plena banqueta, es un peligro para peatones.',
-    (SELECT id FROM categories WHERE slug = 'agua'), 'abierto', 'Lucía P.',
-    ST_SetSRID(ST_MakePoint(-99.1355, 19.4225), 4326)::geography)
-) AS v(title, description, category_id, status, reporter_name, location)
-WHERE NOT EXISTS (SELECT 1 FROM reports);
+  ('maria@campo.ar',     'waitlist',   'María Fernández', 'Argentina', 480,  ST_SetSRID(ST_MakePoint(-64.35, -33.13), 4326)::geography),
+  ('john@story.us',      'waitlist',   'John Meyer',      'USA',       640,  ST_SetSRID(ST_MakePoint(-93.62, 42.03), 4326)::geography),
+  ('lucas@sorriso.br',   'waitlist',   'Lucas Almeida',   'Brasil',    2100, ST_SetSRID(ST_MakePoint(-55.70, -12.53), 4326)::geography),
+  ('harpreet@ludhiana.in','waitlist',  'Harpreet Singh',  'India',     96,   ST_SetSRID(ST_MakePoint(75.85, 30.90), 4326)::geography),
+  ('nuria@ecija.es',     'waitlist',   'Núria Vidal',     'España',    310,  ST_SetSRID(ST_MakePoint(-5.07, 37.53), 4326)::geography),
+  ('tom@riverina.au',    'waitlist',   'Tom Harding',     'Australia', 1240, ST_SetSRID(ST_MakePoint(146.05, -34.28), 4326)::geography),
+  ('ana@newsletter.mx',  'newsletter', NULL,              'México',    NULL, NULL),
+  ('pedro@newsletter.pe','newsletter', NULL,              'Perú',      NULL, NULL)
+) AS v(email, kind, name, country, hectares, location)
+WHERE NOT EXISTS (SELECT 1 FROM leads);

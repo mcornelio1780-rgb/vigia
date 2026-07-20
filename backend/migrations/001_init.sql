@@ -1,25 +1,20 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
-CREATE TABLE IF NOT EXISTS categories (
-  id    serial PRIMARY KEY,
-  slug  text NOT NULL UNIQUE,
-  name  text NOT NULL,
-  color text NOT NULL DEFAULT '#6b7280'
+-- Captura de interés del landing de Vigia: lista de espera y boletín.
+-- La ubicación del campo (opcional) se guarda como geografía para poder
+-- hacer consultas geoespaciales de cobertura por país/región.
+CREATE TABLE IF NOT EXISTS leads (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email      text NOT NULL,
+  kind       text NOT NULL CHECK (kind IN ('waitlist', 'newsletter')),
+  name       text,
+  country    text,
+  hectares   integer CHECK (hectares IS NULL OR hectares >= 0),
+  location   geography(Point, 4326),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (email, kind)
 );
 
-CREATE TABLE IF NOT EXISTS reports (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  title         text NOT NULL,
-  description   text,
-  category_id   integer NOT NULL REFERENCES categories (id),
-  status        text NOT NULL DEFAULT 'abierto'
-                CHECK (status IN ('abierto', 'en_proceso', 'resuelto')),
-  reporter_name text,
-  location      geography(Point, 4326) NOT NULL,
-  created_at    timestamptz NOT NULL DEFAULT now(),
-  updated_at    timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS reports_location_gix ON reports USING GIST (location);
-CREATE INDEX IF NOT EXISTS reports_category_idx ON reports (category_id);
-CREATE INDEX IF NOT EXISTS reports_status_idx ON reports (status);
+CREATE INDEX IF NOT EXISTS leads_location_gix ON leads USING GIST (location);
+CREATE INDEX IF NOT EXISTS leads_kind_idx ON leads (kind);
+CREATE INDEX IF NOT EXISTS leads_created_idx ON leads (created_at DESC);

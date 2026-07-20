@@ -1,20 +1,57 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const title = "Vigia — Inteligencia climática satelital para tu campo";
+const description =
+  "Vigia vigila tu campo desde el satélite y te avisa por WhatsApp cuando el riesgo de incendio, sequía, inundación, plaga, helada o viento cruza tu umbral. Zona por zona, en cualquier país. 100% satelital, sin hardware.";
 
 export const metadata: Metadata = {
-  title: "Vigia — Reportes ciudadanos",
-  description: "Plataforma de reportes ciudadanos georreferenciados",
+  metadataBase: new URL("https://vigia.ag"),
+  title: {
+    default: title,
+    template: "%s · Vigia",
+  },
+  description,
+  applicationName: "Vigia",
+  keywords: [
+    "inteligencia climática",
+    "satélite",
+    "agricultura",
+    "incendios",
+    "sequía",
+    "NDVI",
+    "NASA FIRMS",
+    "Sentinel-2",
+    "Open-Meteo",
+    "alertas de campo",
+    "alertas por WhatsApp",
+    "teledetección",
+    "cooperativas agrícolas",
+    "aseguradoras agrícolas",
+    "agtech",
+  ],
+  authors: [{ name: "Vigia" }],
+  openGraph: {
+    type: "website",
+    siteName: "Vigia",
+    title,
+    description,
+    url: "https://vigia.ag",
+    locale: "es_ES",
+    alternateLocale: ["en_US", "pt_BR"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#080d0b",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -22,12 +59,41 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "Vigia",
+        url: "https://vigia.ag",
+        logo: "https://vigia.ag/icon.svg",
+        description,
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "Vigia",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        url: "https://vigia.ag",
+        description,
+        offers: {
+          "@type": "Offer",
+          price: "9.00",
+          priceCurrency: "USD",
+          description: "Base mensual de $9 más $0.15 por hectárea.",
+        },
+      },
+    ],
+  };
   return (
-    <html
-      lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="es">
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
